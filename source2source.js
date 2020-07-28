@@ -8,11 +8,7 @@ const ohm = require ('ohm-js')
 const grammarData = fs.readFileSync('source2source.ohm')
 const grammar = ohm.grammar(grammarData)
 
-const input = "\
-function f(a, b) { \
-   a = b; \
- } \
-"
+const input = fs.readFileSync('s2s.js')
 
 const result = grammar.match(input)
 
