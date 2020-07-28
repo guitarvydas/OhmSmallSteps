@@ -1,6 +1,6 @@
 // usage:
 // npm install ohm-js
-// node source2source.js
+// node source2source1b.js
 
 
 const fs = require ('fs')
