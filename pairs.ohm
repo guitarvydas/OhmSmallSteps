@@ -1,0 +1,7 @@
+Program {
+  code = matchingBraces+ eol
+  matchingBraces =    "{" matchingBraces "}" -- braces
+                    | innards
+  innards = "inside"
+  eol = "\n"
+}
