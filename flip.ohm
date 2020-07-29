@@ -1,0 +1,7 @@
+Program {
+  code = chunkA chunkB
+  chunkA = "aaa" eol*
+  chunkB = "bbb" eol*
+  eol = "\n"
+}
+
