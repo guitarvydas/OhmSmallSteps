@@ -1,0 +1,8 @@
+Program {
+  Code = any*
+  space +=   slashStarComment
+           | slashSlashComment
+  slashStarComment = "/*" (~"*/" any)* "*/"
+  slashSlashComment = "//" (~"\n" any)* "\n"
+}
+
