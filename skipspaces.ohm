@@ -1,0 +1,8 @@
+Program {
+  Code = ChunkC ChunkD
+  ChunkC = "ccc" Eol*
+  ChunkD = "ddd" Eol*
+  Eol = "\n"
+}
+
+
