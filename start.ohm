@@ -1,0 +1,13 @@
+Program {
+  Code = ChunkA ChunkB
+  ChunkA = "aaa" Eol*
+  ChunkB = "bbb" Eol*
+  Eol = "\n"
+}
+
+Program2 <: Program {
+  Code := ChunkF ChunkA ChunkB
+  StartTest = ChunkG ChunkA ChunkB
+  ChunkF = "fff" Eol*
+  ChunkG = "ggg" Eol*
+}
