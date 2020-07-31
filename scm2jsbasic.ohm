@@ -1,0 +1,13 @@
+Scm2JSBasic {
+  Scm = List | Atom |  Boolean
+  List =   "(" ListInnards ")"
+  ListInnards = (Atom | List)*
+  Atom = Integer | Symbol | Boolean
+  Boolean = "#f" | "#t"
+  Integer = Numchar+
+  Numchar = "0".."9"
+  Symbol = Letchar (Letchar | Numchar | "?" | "_")*
+  Letchar = LC | UC | "+" | "*"
+  LC = "a".."z"
+  UC = "A".."Z"
+}
