@@ -2,13 +2,13 @@ Scm2JSBasic {
   Program = Scm+
   Scm = List | Atom |  Boolean
   QuotedSexp = "'" Scm
-  BackQuoteSexp = "`" Scm
+  BackQuotedSexp = "`" Scm
   CommaSexp = "," Scm
   List = DottedList | NullTerminatedList
   DottedList = "(" ListItem+ "." ListItem ")"
   NullTerminatedList =   "(" ListItem+ ")"
   ListItem = (Atom | List)
-  Atom = Integer | Symbol | String | Boolean | NullList | QuotedSexp | BackQuoteSexp | CommaSexp
+  Atom = Integer | Symbol | String | Boolean | NullList | QuotedSexp | BackQuotedSexp | CommaSexp
   NullList = "(" ")"
   Boolean = "#f" | "#t"
   Integer = Numchar+
