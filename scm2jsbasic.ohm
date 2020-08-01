@@ -1,0 +1,23 @@
+Scm2JSBasic {
+  Program = Scm+
+  Scm = List | Atom |  Boolean
+  QuotedSexp = "'" Scm
+  BackQuotedSexp = "`" Scm
+  CommaSexp = "," Scm
+  List = DottedList | NullTerminatedList
+  DottedList = "(" ListItem+ "." ListItem ")"
+  NullTerminatedList =   "(" ListItem+ ")"
+  ListItem = (Atom | List)
+  Atom = Integer | Symbol | String | Boolean | NullList | QuotedSexp | BackQuotedSexp | CommaSexp
+  NullList = "(" ")"
+  Boolean = "#f" | "#t"
+  Integer = Numchar+
+  Numchar = "0".."9"
+  String = "\"" (~"\"" any)+ "\""
+  Symbol = Letchar (Letchar | Numchar)*
+  Letchar = LC | UC | "+" | "*" | "!" | "?"  | "_" | "-"
+  LC = "a".."z"
+  UC = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+}
