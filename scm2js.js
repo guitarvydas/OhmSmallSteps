@@ -37,23 +37,26 @@ semantics.addOperation(
 console.log(semantics(result).dump())
 
 // a class for every non-whitespace production, except the lowest-level ones (LetChar, LC, UC)
-class Program { constructor(p) { this.p = p } }
-class Scm { constructor(s) { this.s = s } }
-class QuotedSexp { constructor (q, s) { this.q = q ; this.s = s } }
-class BackQuotedSexp { constructor (q, s) { this.q = q ; this.s = s } }
-class CommaSexp { constructor (c, s) { this.c = c ; this.s = s } }
-class SList { constructor (l) { this.l = l } }
-class DottedList { constructor (lp, items, dot, lastItem, rp) { this.lp = lp; this.items = items; this.dot = dot; this.lastItem = lastItem; this.rp = rp }}
-class NullTerminatedList { constructor(lp, items, rp) { this.lp = lp; this.items = items ; this.rp = rp }}
-class ListItem { constructor(item) { this.item = item }}
-class Atom { constructor(a) { this.a = a }}
-class NullList { constructor(lp, rp) { this.lp = lp; this.rp = rp}}
-class SBoolean { constructor(b) { this.b = b }}
+class Program { constructor(p) { this.p = p } toString () { return this.p.toString() }}
+class Scm { constructor(s) { this.s = s } toString () { return this.s.toString () }}
+class QuotedSexp { constructor (q, s) { this.q = q ; this.s = s } toString () { return "'" + this.s.toString() }}
+class BackQuotedSexp { constructor (q, s) { this.q = q ; this.s = s } toString () { return "`" + this.s.toString() }}
+class CommaSexp { constructor (c, s) { this.c = c ; this.s = s } toString () { return "'," + this.s.toString() }}
+class SList { constructor (l) { this.l = l } toString () { return this.l.toString() }}
+class DottedList { constructor (lp, items, dot, lastItem, rp) { this.lp = lp; this.items = items; this.dot = dot; this.lastItem = lastItem; this.rp = rp } toString () { return "(" + this.items.toString() + " . " + this.lastItem.toString() + ")" }}
+class NullTerminatedList { constructor(lp, items, rp) { this.lp = lp; this.items = items ; this.rp = rp } toString() {return "(" + this.items.toString() + ")"}}
+class ListItem { constructor(item) { this.item = item } toString(){ return this.item.toString() }}
+class Atom { constructor(a) { this.a = a } toString() { return this.a.toString() }}
+class NullList { constructor(lp, rp) { this.lp = lp; this.rp = rp} toString () { return "()" } }
+
+class SBoolean { constructor(b) { this.b = b } toString(){ return this.b }}
+
 class SInteger { constructor(ns) { this.ns = ns }}
 class Numchar { constructor(d) { this.d = d }}
-class SString { constructor(q1, chars, q2) { this.q1 = q1; this.chars = chars; this.q2 = q2 }}
-class Symbol { constructor(c, cs) { this.c = c; this.cs = cs; }} 
+class SString { constructor(q1, chars, q2) { this.q1 = q1; this.chars = chars; this.q2 = q2 } toString(){return this.chars}}
+class Symbol { constructor(c, cs) { this.c = c; this.cs = cs; } toString(){ return this.cs; }}
 
+// an operation that uses the above classes
 semantics.addOperation(
     'ast',
     {
@@ -68,13 +71,14 @@ semantics.addOperation(
 	ListItem: (item) => { return new ListItem(item.ast()) },
 	Atom: (a) => { return new Atom(a.ast())},
 	NullList: (lp, rp) => { return new NullList(lp.ast(),rp.ast())},
-	SBoolean: (b) => { return new SBoolean(b.ast()) },
+	SBoolean: (b) => { return new SBoolean(node_to_source(b._node)) },
 	SInteger: (ns) => { return new SInteger(ns.ast()) },
 	Numchar: (d) => { return new Numchar(d.ast()) },
 	SString: (q1, chars, q2) => { return new SString(q1.ast(), chars.ast(), q2.ast())},
-	Symbol: (c, cs) => { return new Symbol(c.ast(),cs.ast()) },
+	Symbol: (c, cs) => { return new Symbol(c.ast(),this.sourceString) },
 	_terminal: () => { return this.primitiveValue }
     }
 )
 
-var tree = semantics(result).ast();
+var tree = semantics(result).ast()
+console.log(tree.toString())
