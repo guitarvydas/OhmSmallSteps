@@ -1,20 +1,20 @@
 Scm2JSBasic {
-  Program = Scm+
-  Scm = SList | Atom |  SBoolean
-  QuotedSexp = "'" Scm
-  BackQuotedSexp = "`" Scm
-  CommaSexp = "," Scm
+  Program = Form+
+  Form = SList | Atom
+  QuotedSexp = "'" Form
+  BackQuotedSexp = "`" Form
+  CommaSexp = "," Form
   SList = DottedList | NullTerminatedList
   DottedList = "(" ListItem+ "." ListItem ")"
   NullTerminatedList =   "(" ListItem+ ")"
   ListItem = (Atom | SList)
-  Atom = SInteger | Symbol | SString | SBoolean | NullList | QuotedSexp | BackQuotedSexp | CommaSexp
+  Atom = SInteger | SSymbol | SString | SBoolean | NullList | QuotedSexp | BackQuotedSexp | CommaSexp
   NullList = "(" ")"
   SBoolean = "#f" | "#t"
   SInteger = Numchar+
   Numchar = "0".."9"
   SString = "\"" (~"\"" any)+ "\""
-  Symbol = Letchar (Letchar | Numchar)*
+  SSymbol = Letchar (Letchar | Numchar)*
   Letchar = LC | UC | "+" | "*" | "!" | "?"  | "_" | "-"
   LC = "a".."z"
   UC = "A".."Z"
