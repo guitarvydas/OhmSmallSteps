@@ -1,0 +1,6 @@
+Scm2JSBasic {
+  Program = Form+
+  Form = Atom
+  Atom = SBoolean
+  SBoolean = "#f" | "#t"
+}
