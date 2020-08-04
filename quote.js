@@ -27,9 +27,11 @@ console.log()
 console.log("result cst")
 console.log(result._cst)
 console.log()
+console.log(JSON.stringify(result._cst))
 
 console.log()
 console.log("result_rewritten cst")
 console.log(result_rewritten._cst)
 console.log()
+console.log(JSON.stringify(result_rewritten._cst))
 
