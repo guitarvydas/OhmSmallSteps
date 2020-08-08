@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+  <head>
+    <title>ohm/js in small steps</title>
+    <meta charset=utf-8>
+    <script src="/Users/tarvydas/projects/ohm/examples/lib.js"></script>
+    <script src="/Users/tarvydas/projects/ohm/dist/ohm.js"></script>
+    <script type="text/ohm-js">
+
+      // An Ohm grammar for Scheme, step 1.
+Scm2JSBasic {
+  Program = Form+
+  Form = SList | Atom
+  QuotedSexp = "'" Form
+  BackQuotedSexp = "`" Form
+  CommaSexp = "," Form
+  SList = DottedList | NullTerminatedList
+  DottedList = "(" ListItem+ "." ListItem ")"
+  NullTerminatedList =   "(" ListItem+ ")"
+  ListItem = (Atom | SList)
+  Atom = SInteger | SSymbol | SString | SBoolean | NullList | QuotedSexp | BackQuotedSexp | CommaSexp
+  NullList = "(" ")"
+  SBoolean = "#f" | "#t"
+  SInteger = Numchar+
+  Numchar = "0".."9"
+  SString = "\"" (~"\"" any)+ "\""
+  SSymbol = Letchar (Letchar | Numchar)*
+  Letchar = LC | UC | "+" | "*" | "!" | "?"  | "_" | "-"
+  LC = "a".."z"
+  UC = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+}
+    </script>
+    
+    <script>
+      var g = ohm.grammarFromScriptElement();
+    </script>
+
+  </head>
+  <body>
+    <p id="tester"></p>
+    <script>
+      function ohmtest () {
+	  var r = g.match("(#t #f)");
+	  document.getElementById('tester').innerHTML = r.toString();
+      }
+      ohmtest();
+    </script>
+  </body>
+</html>
