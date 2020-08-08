@@ -39,11 +39,15 @@ Scm2JSBasic {
 
   </head>
   <body>
+    <button onclick="ohmtest()">Click me</button>
+    <p id="timestamp"></p>
     <p id="tester"></p>
     <script>
       function ohmtest () {
-	  var r = g.match("(#t #f)");
-	  document.getElementById('tester').innerHTML = r.toString();
+	  var testString = "(#t #f)";
+	  var r = g.match(testString);
+	  document.getElementById('tester').innerHTML = testString + "<br><br>" + r.toString();
+	  document.getElementById('timestamp').innerHTML = Date();
       }
       ohmtest();
     </script>
