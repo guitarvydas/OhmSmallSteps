@@ -1,7 +1,3 @@
 *~
-
-\#source2source.ohm#
-
-.#source2source.ohm
-
-node_modules/*
+junk*
+.DS_Store
