@@ -32,9 +32,17 @@ Scm2JSBasic {
   space += semiColonComment
 }
     </script>
-    
+
     <script>
       var g = ohm.grammarFromScriptElement();
+    </script>
+
+    <script type="text/test">
+      (#t #f) ( #f . #t)
+    </script>
+    
+    <script>
+      var tests = document.querySelectorAll('script[type="text/test"]');
     </script>
 
   </head>
@@ -44,7 +52,8 @@ Scm2JSBasic {
     <p id="tester"></p>
     <script>
       function ohmtest () {
-	  var testString = "(#t #f)";
+	  // var testString = "(#t #f)";
+	  var testString = tests[0].innerHTML;
 	  var r = g.match(testString);
 	  document.getElementById('tester').innerHTML = testString + "<br><br>" + r.toString();
 	  document.getElementById('timestamp').innerHTML = Date();
