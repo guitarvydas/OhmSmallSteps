@@ -38,7 +38,15 @@ Scm2JSBasic {
     </script>
 
     <script type="text/test">
-      (#t #f) ( #t #f . #t)
+      (#t #f)
+    </script>
+    
+    <script type="text/test">
+      ( #t #f . #t)
+    </script>
+    
+    <script type="text/test">
+      ( . #t)
     </script>
     
     <script>
@@ -51,20 +59,25 @@ Scm2JSBasic {
     <p id="timestamp"></p>
     <p id="tester"></p>
     <script>
+      var resultsString = '';
+      
       function displayDate () {
 	  document.getElementById('timestamp').innerHTML = Date();
       }
-      function do1Test(testString) {
+      function do1Test(testElement) {
+	  var testString = testElement.innerHTML;
 	  var r = g.match(testString);
-	  return testString + "<br><br>" + r.toString();
+	  resultsString = resultsString + "<br>" + r.toString() + " <--- " + testString;
       }
       function displayTestResults(s) {
 	  document.getElementById('tester').innerHTML = s;
       }
       function ohmtest () {
-	  var testString = tests[0].innerHTML;
-	  var s = do1Test(testString);
-	  displayTestResults(s);
+	  resultsString = '';
+	  console.log(tests);
+	  console.log(tests[0]);
+	  tests.forEach(do1Test);
+	  displayTestResults(resultsString);
 	  displayDate();
       }
       ohmtest();
