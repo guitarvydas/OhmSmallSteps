@@ -38,7 +38,7 @@ Scm2JSBasic {
     </script>
 
     <script type="text/test">
-      (#t #f) ( #f . #t)
+      (#t #f) ( #t #f . #t)
     </script>
     
     <script>
@@ -51,12 +51,21 @@ Scm2JSBasic {
     <p id="timestamp"></p>
     <p id="tester"></p>
     <script>
-      function ohmtest () {
-	  // var testString = "(#t #f)";
-	  var testString = tests[0].innerHTML;
-	  var r = g.match(testString);
-	  document.getElementById('tester').innerHTML = testString + "<br><br>" + r.toString();
+      function displayDate () {
 	  document.getElementById('timestamp').innerHTML = Date();
+      }
+      function do1Test(testString) {
+	  var r = g.match(testString);
+	  return testString + "<br><br>" + r.toString();
+      }
+      function displayTestResults(s) {
+	  document.getElementById('tester').innerHTML = s;
+      }
+      function ohmtest () {
+	  var testString = tests[0].innerHTML;
+	  var s = do1Test(testString);
+	  displayTestResults(s);
+	  displayDate();
       }
       ohmtest();
     </script>
