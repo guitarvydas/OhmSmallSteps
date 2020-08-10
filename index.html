@@ -443,7 +443,7 @@ Scm2JSBasic {
 	      Form: function(item) {return item.inbackquote()},
 	      QuotedSexp: function(_, form) {return "(quote " + form.inbackquote() + ")"},
 	      BackQuotedSexp: function(_, form) {throw "can\'t happen - left as exercise to the reader";},
-	      CommaSexp: function(_, form) {console.log("inbackquote CommaSexp " + form._node + " unity=" + form.unity()); return form.unity()}, // use unbackquote to get eval'ed value
+	      CommaSexp: function(_, form) {return form.unity()}, // use unbackquote to get eval'ed value
 	      SList: function(lis) {return lis.inbackquote()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(list " + toListOfStrings(items.inbackquote()) + " . " + lastItem.inbackquote() + ")"},
@@ -475,10 +475,11 @@ Scm2JSBasic {
 
   </head>
   <body>
-    <button onclick="ohmtest()">Click me</button>
+    <button onclick="pipelinetest()">Click me</button>
     <p id="timestamp"></p>
+    <p id="bool"></p>
     <p id="input"></p>
-    <p id="output"></p>
+    <p id="secondResult"></p>
     <script>
       var resultsString = '';
       
@@ -495,18 +496,32 @@ Scm2JSBasic {
 	  }
 	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unbackquote()) : '');
       }
-      function displayTestResults(s) {
-	  document.getElementById('input').innerHTML = s;
+      function displayTestResults(s,el) {
+	  document.getElementById(el).innerHTML = s;
+      }
+      function displayStringsEqual(s1,s2,el) {
+          document.getElementById(el).innerHTML = (s1 == s2);
       }
       function ohmtest () {
 	  resultsString = '';
 	  console.log(tests);
 	  console.log(tests[0]);
 	  tests.forEach(do1Test);
-	  displayTestResults(resultsString);
+	  displayTestResults(resultsString,'input');
 	  displayDate();
       }
-      ohmtest();
+      //ohmtest();
+      
+      function pipelinetest() {
+	  resultsString = '';
+	  tests.forEach(do1Test);
+          var expandedString = resultsString;
+	  resultsString = '';
+	  tests.forEach(do1Test);
+          displayStringsEqual(expandedString,resultsString,'bool');
+	  displayDate();
+      }
+      //pipelinetest();
     </script>
   </body>
 </html>
