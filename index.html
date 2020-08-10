@@ -70,6 +70,13 @@ Scm2JSBasic {
     </script>
 
     <script type="text/test">
+      'asymbol5
+    </script>
+    <script type="text/test">
+      ('(asymbol6 asymbol7))
+    </script>
+
+    <script type="text/test">
 
 (define (try g r e n)
   (if (null? r)
@@ -349,7 +356,37 @@ Scm2JSBasic {
 	  }
       );
       
-    </script>
+
+          sem.addOperation(
+	  'unquote',
+	  {
+	      Program: function(tree) {return toListOfStrings(tree.unquote())},
+	      Form: function(item) {return item.unquote()},
+	      QuotedSexp: function(_, form) {return "(quote " + form.unquote() + ")"},
+	      BackQuotedSexp: function(_, form) {return "`" + form.unquote()},
+	      CommaSexp: function(_, form) {return "," + form.unquote()},
+	      SList: function(lis) {return lis.unquote()},
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(" + toListOfStrings(items.unquote()) + " . " + lastItem.unquote() + ")"},
+	      NullTerminatedList: function(_lp, items, _rp) {
+		  return "(" + toListOfStrings(items.unquote()) + ")"},
+	      ListItem: function(item) {return item.unquote()},
+	      Atom: function(a) {return a.unquote()},
+	      lexical_integer: function(ns) {return toPackedString(ns.unquote());},
+	      lexical_symbol: function(c, cs) {return c.unquote() + toPackedString(cs.unquote());},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.unquote()) + "\""},
+	      lexical_letchar: function(c) {return c.unquote()},
+	      lexical_numchar: function(c) {return c.unquote()},
+	      lexical_lc: function(c) {return c.unquote()},
+	      lexical_uc: function(c) {return c.unquote()},
+
+	      lexical_nullList: function(_lp,_rp) {return "()"},
+	      lexical_boolean: function(b) {return this.sourceString},
+	      _terminal: function() { return this.primitiveValue; }
+	  }
+      );
+      
+</script>
 
 
 
@@ -377,7 +414,7 @@ Scm2JSBasic {
 	  if (testString.length < charsToDisplay) {
 	      tail = "";
 	  }
-	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unity()) : '');
+	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unquote()) : '');
       }
       function displayTestResults(s) {
 	  document.getElementById('input').innerHTML = s;
