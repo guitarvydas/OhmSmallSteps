@@ -18,16 +18,18 @@ Scm2JSBasic {
   DottedList = "(" ListItem+ "." ListItem ")"
   NullTerminatedList =   "(" ListItem+ ")"
   ListItem = (Atom | SList)
-  Atom = SInteger | SSymbol | SString | SBoolean | NullList | QuotedSexp | BackQuotedSexp | CommaSexp
-  NullList = "(" ")"
-  SBoolean = "#f" | "#t"
-  SInteger = Numchar+
-  Numchar = "0".."9"
-  SString = "\"" (~"\"" any)+ "\""
-  SSymbol = Letchar (Letchar | Numchar)*
-  Letchar = LC | UC | "+" | "*" | "!" | "?"  | "_" | "-"
-  LC = "a".."z"
-  UC = "A".."Z"
+  Atom = lexical_atom | Syntactic_Atom
+  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
+  lexical_nullList = "(" ")"
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
   semiColonComment = ";" (~"\n" any)* "\n"
   space += semiColonComment
 }
@@ -49,6 +51,18 @@ Scm2JSBasic {
       ( . #t)
     </script>
     
+    <script type="text/test">
+      asymbol
+    </script>
+    
+    <script type="text/test">
+      (asymbol)
+    </script>
+
+    <script type="text/test">
+      (asymbol1 asymbol2)
+    </script>
+
     <script type="text/test">
 
 (define (try g r e n)
@@ -288,6 +302,49 @@ Scm2JSBasic {
 
     </script>
 
+    <script>
+
+      var sem = g.createSemantics();
+      
+      function toListOfStrings(a) {
+	  return a.join(' ');
+      }
+      
+      function toPackedString(a) {
+	  return a.join('');
+      }
+      
+      sem.addOperation(
+	  'unity',
+	  {
+	      Program: function(tree) {return tree.unity()},
+	      Form: function(item) {return item.unity()},
+	      QuotedSexp: function(_, form) {return "'" + form.unity()},
+	      BackQuotedSexp: function(_, form) {return "`" + form.unity()},
+	      CommaSexp: function(_, form) {return "," + form.unity()},
+	      SList: function(lis) {return lis.unity()},
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(" + toListOfStrings(items.unity()) + " . " + lastItem.unity() + ")"},
+	      NullTerminatedList: function(_lp, items, _rp) {
+		  return "(" + toListOfStrings(items.unity()) + ")"},
+	      ListItem: function(item) {return item.unity()},
+	      Atom: function(a) {return a.unity()},
+	      lexical_integer: function(ns) {return toPackedString(ns.unity());},
+	      lexical_symbol: function(c, cs) {return "SYM[" + c.unity() + toPackedString(cs.unity()) + "]";},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.unity()) + "\""},
+	      lexical_letchar: function(c) {return c.unity()},
+	      lexical_numchar: function(c) {return c.unity()},
+	      lexical_lc: function(c) {return c.unity()},
+	      lexical_uc: function(c) {return c.unity()},
+
+	      lexical_nullList: function(_lp,_rp) {return "()"},
+	      lexical_boolean: function(b) {return this.sourceString},
+	      _terminal: function() { return this.primitiveValue; }
+	  }
+      );
+      
+    </script>
+
 
 
     <script>
@@ -298,7 +355,8 @@ Scm2JSBasic {
   <body>
     <button onclick="ohmtest()">Click me</button>
     <p id="timestamp"></p>
-    <p id="tester"></p>
+    <p id="input"></p>
+    <p id="output"></p>
     <script>
       var resultsString = '';
       
@@ -313,10 +371,10 @@ Scm2JSBasic {
 	  if (testString.length < charsToDisplay) {
 	      tail = "";
 	  }
-	  resultsString = resultsString + "<br>" + r.toString() + " <--- " + testString.substring(0,charsToDisplay) + tail;
+	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unity()) : '');
       }
       function displayTestResults(s) {
-	  document.getElementById('tester').innerHTML = s;
+	  document.getElementById('input').innerHTML = s;
       }
       function ohmtest () {
 	  resultsString = '';
