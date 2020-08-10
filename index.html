@@ -72,12 +72,30 @@ Scm2JSBasic {
     <script type="text/test">
       'asymbol5
     </script>
+
     <script type="text/test">
       ('(asymbol6 asymbol7))
     </script>
 
     <script type="text/test">
+      `a
+    </script>
 
+    <script type="text/test">
+      `,b
+    </script>
+
+    <script type="text/test">
+      `(c)
+    </script>
+    <script type="text/test">
+      `(d e f)
+    </script>
+    <script type="text/test">
+      `(g ,h i)
+    </script>
+
+    <script type="text/test">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -315,6 +333,7 @@ Scm2JSBasic {
 
     </script>
 
+
     <script>
 
       var sem = g.createSemantics();
@@ -385,6 +404,66 @@ Scm2JSBasic {
 	      _terminal: function() { return this.primitiveValue; }
 	  }
       );
+
+
+
+          sem.addOperation(
+	  'unbackquote',
+	  {
+	      Program: function(tree) {return toListOfStrings(tree.unbackquote())},
+	      Form: function(item) {return item.unbackquote()},
+	      QuotedSexp: function(_, form) {return "(quote " + form.unbackquote() + ")"},
+	      BackQuotedSexp: function(_, form) {return form.inbackquote();},
+	      CommaSexp: function(_, form) {throw "can\'t happen - comma not inside backquote - (actually, not necessarily the case, but nested backquotes left as an exercise for the reader)"},
+	      SList: function(lis) {return lis.unbackquote()},
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(" + toListOfStrings(items.unbackquote()) + " . " + lastItem.unbackquote() + ")"},
+	      NullTerminatedList: function(_lp, items, _rp) {
+		  return "(" + toListOfStrings(items.unbackquote()) + ")"},
+	      ListItem: function(item) {return item.unbackquote()},
+	      Atom: function(a) {return a.unbackquote()},
+	      lexical_integer: function(ns) {return toPackedString(ns.unbackquote());},
+	      lexical_symbol: function(c, cs) {return c.unbackquote() + toPackedString(cs.unbackquote());},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.unbackquote()) + "\""},
+	      lexical_letchar: function(c) {return c.unbackquote()},
+	      lexical_numchar: function(c) {return c.unbackquote()},
+	      lexical_lc: function(c) {return c.unbackquote()},
+	      lexical_uc: function(c) {return c.unbackquote()},
+
+	      lexical_nullList: function(_lp,_rp) {return "()"},
+	      lexical_boolean: function(b) {return this.sourceString},
+	      _terminal: function() { return this.primitiveValue; }
+	  }
+      );
+      
+          sem.addOperation(
+	  'inbackquote',
+	  {
+	      Program: function(tree) {throw "can\'t happen"},
+	      Form: function(item) {return item.inbackquote()},
+	      QuotedSexp: function(_, form) {return "(quote " + form.inbackquote() + ")"},
+	      BackQuotedSexp: function(_, form) {throw "can\'t happen - left as exercise to the reader";},
+	      CommaSexp: function(_, form) {console.log("inbackquote CommaSexp " + form._node + " unity=" + form.unity()); return form.unity()}, // use unbackquote to get eval'ed value
+	      SList: function(lis) {return lis.inbackquote()},
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(list " + toListOfStrings(items.inbackquote()) + " . " + lastItem.inbackquote() + ")"},
+	      NullTerminatedList: function(_lp, items, _rp) {
+		  return "(list " + toListOfStrings(items.inbackquote()) + ")"},
+	      ListItem: function(item) {return item.inbackquote()},
+	      Atom: function(a) {return a.inbackquote()},
+	      lexical_integer: function(ns) {return toPackedString(ns.inbackquote());},
+	      lexical_symbol: function(c, cs) {return "(quote " + c.inbackquote() + toPackedString(cs.inbackquote()) + ")";},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.inbackquote()) + "\""},
+	      lexical_letchar: function(c) {return c.inbackquote()},
+	      lexical_numchar: function(c) {return c.inbackquote()},
+	      lexical_lc: function(c) {return c.inbackquote()},
+	      lexical_uc: function(c) {return c.inbackquote()},
+
+	      lexical_nullList: function(_lp,_rp) {return "()"},
+	      lexical_boolean: function(b) {return this.sourceString},
+	      _terminal: function() { return this.primitiveValue; }
+	  }
+      );
       
 </script>
 
@@ -414,7 +493,7 @@ Scm2JSBasic {
 	  if (testString.length < charsToDisplay) {
 	      tail = "";
 	  }
-	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unquote()) : '');
+	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unbackquote()) : '');
       }
       function displayTestResults(s) {
 	  document.getElementById('input').innerHTML = s;
