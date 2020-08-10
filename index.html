@@ -20,6 +20,7 @@ Scm2JSBasic {
   ListItem = (Atom | SList)
   Atom = lexical_atom | Syntactic_Atom
   Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+
   lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
   lexical_nullList = "(" ")"
   lexical_boolean = "#f" | "#t"
@@ -61,6 +62,11 @@ Scm2JSBasic {
 
     <script type="text/test">
       (asymbol1 asymbol2)
+    </script>
+
+    <script type="text/test">
+      (asymbol1 asymbol2)
+      (asymbol3 asymbol4)
     </script>
 
     <script type="text/test">
@@ -317,7 +323,7 @@ Scm2JSBasic {
       sem.addOperation(
 	  'unity',
 	  {
-	      Program: function(tree) {return tree.unity()},
+	      Program: function(tree) {return toListOfStrings(tree.unity())},
 	      Form: function(item) {return item.unity()},
 	      QuotedSexp: function(_, form) {return "'" + form.unity()},
 	      BackQuotedSexp: function(_, form) {return "`" + form.unity()},
@@ -330,7 +336,7 @@ Scm2JSBasic {
 	      ListItem: function(item) {return item.unity()},
 	      Atom: function(a) {return a.unity()},
 	      lexical_integer: function(ns) {return toPackedString(ns.unity());},
-	      lexical_symbol: function(c, cs) {return "SYM[" + c.unity() + toPackedString(cs.unity()) + "]";},
+	      lexical_symbol: function(c, cs) {return c.unity() + toPackedString(cs.unity());},
 	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.unity()) + "\""},
 	      lexical_letchar: function(c) {return c.unity()},
 	      lexical_numchar: function(c) {return c.unity()},
