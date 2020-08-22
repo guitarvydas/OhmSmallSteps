@@ -552,7 +552,7 @@ Scm2JSPass2 {
 	  {
 	      Program: function(listOfForms) {return toListOfStrings(listOfForms.unity())},
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.unity() + " = " + form.unity() + ";";},
-              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.unity() + " { " + body.unity() + " }";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.unity() + " { return " + body.unity() + "; };";},
               FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.unity() + "(" + actuals.unity() + ");";},
               FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.unity() + "(" + formals.unity() + ")";},
               Identifier: function(id) {return id.unity();},
@@ -560,9 +560,9 @@ Scm2JSPass2 {
               END: function(_rp) {return "";},
 
               Form: function(item) {return item.unity()},
-	      QuotedSexp: function(_, form) {return "'" + form.unity()},
-	      BackQuotedSexp: function(_, form) {return "`" + form.unity()},
-	      CommaSexp: function(_, form) {return "," + form.unity()},
+	      QuotedSexp: function(_, form) {throw "can't happen in pass2"; return "'" + form.unity()},
+	      BackQuotedSexp: function(_, form) {throw "can't happen in pass2"; return "`" + form.unity()},
+	      CommaSexp: function(_, form) {throw "can't happen in pass2"; return "," + form.unity()},
 	      SList: function(lis) {return lis.unity()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.unity()) + " . " + lastItem.unity() + ")"},
