@@ -9,15 +9,15 @@
       (#t #f)
     </script>
     
-    <script type="text/test-hold">
+    <script type="text/test">
       ( #t #f . #t)
     </script>
     
-    <script type="text/test-hold">
+    <script type="text/test">
       ( . #t)
     </script>
     
-    <script type="text/test-hold">
+    <script type="text/test">
       asymbol
     </script>
     
@@ -29,7 +29,7 @@
       (asymbol1 asymbol2)
     </script>
 
-    <script type="text/test-fails">
+    <script type="text/test">
       (define asymbol10)
     </script>
 
@@ -37,7 +37,7 @@
       (define asymbol11 asymbol12)
     </script>
 
-    <script type="text/test-fails">
+    <script type="text/test">
       (define (asymbol13 asymbol14))
     </script>
 
@@ -53,34 +53,34 @@
       (define (x18 x19) (x20))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       (asymbol1a asymbol2a)
       (asymbol3 asymbol4)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       'asymbol5
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       ('(asymbol6 asymbol7))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       `a
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       `,b
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       `(c)
     </script>
-    <script type="text/test-hold">
+    <script type="text/test">
       `(d e f)
     </script>
-    <script type="text/test-hold">
+    <script type="text/test">
       `(g ,h i)
     </script>
 
