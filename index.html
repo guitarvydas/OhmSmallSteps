@@ -606,7 +606,7 @@ Body = Form
 
               SpecialForm: function(e) { return e.unity(); },
               CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
-                  return "COND: " + c.unity() + " " + firstClause.unity() + otherClauses.unity() + elseClause.unity() + " ENDCOND"; },
+                  return "COND: " + c.unity() + " " + firstClause.unity() + otherClauses.unity() + elseClause.unity() + " END COND"; },
               lexical_COND: function(_sp1,_,_sp2) {return "";},
               ElseClause: function(_begin,_else,forms,_end) { return "ELSE: " + forms.unity(); },
               lexical_ELSE: function(_1,_else,_2) { return ""; },
