@@ -9,80 +9,114 @@
       (#t #f)
     </script>
     
-    <script type="text/test">
+    <script type="text/test-hold">
       ( #t #f . #t)
     </script>
     
-    <script type="text/test">
+    <script type="text/test-hold">
       ( . #t)
     </script>
     
-    <script type="text/test">
+    <script type="text/test-hold">
       asymbol
     </script>
     
-    <script type="text/test">
+    <script type="text/test-hold">
       (asymbol)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (asymbol1 asymbol2)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (define asymbol10)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (define asymbol11 asymbol12)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (define (asymbol13 asymbol14))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (define (asymbol15 asymbol16) 5)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (define (x15 x16) x17)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (define (x18 x19) (x20))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       (asymbol1a asymbol2a)
       (asymbol3 asymbol4)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
+      (prove5 '() goals db empty 1)
+    </script>
+
+    <script type="text/test-hold">
+      (define (funNoFormals) 1)
+    </script>
+
+    <script type="text/test-hold">
       'asymbol5
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       ('(asymbol6 asymbol7))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       `a
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       `,b
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       `(c)
     </script>
-    <script type="text/test">
+    <script type="text/test-hold">
       `(d e f)
     </script>
-    <script type="text/test">
+    <script type="text/test-hold">
       `(g ,h i)
     </script>
+
+    <script type="text/test">
+(define (unify1 x y e)
+  (let ((x (value x e))
+        (y (value y e)))
+    (cond
+      ((eq? x y) e))
+))
+    </script>
+
+    <script type="text/test">
+(define (unify2 x y e)
+  (let ((x (value x e))
+        (y (value y e)))
+    (cond
+      ((eq? x y) e)
+      ((var? x) (bind x y e))
+      ((var? y) (bind y x e))
+      ((or (not (pair? x))
+           (not (pair? y))) #f)
+      (else
+        (let ((e* (unify (car x) (car y) e)))
+          (and e* (unify (cdr x) (cdr y) e*)))))))
+    </script>
+
+
 
     <script type="text/test-prolog">
 (define (try g r e n)
@@ -375,15 +409,23 @@ Scm2JSPass2 {
     END = ")"
 
   Form = SList | Atom
-  QuotedSexp = "'" Form
-  BackQuotedSexp = "`" Form
-  CommaSexp = "," Form
-  SList = DottedList | NullTerminatedList
+  SList = DottedList | SpecialForm | NullTerminatedList
+
+SpecialForm = CondExpression
+CondExpression = BEGIN lexical_COND CondFirstClause CondOtherClause* ElseClause* END
+lexical_COND = space* "cond" space*
+ElseClause = BEGIN lexical_ELSE Form+ END
+lexical_ELSE = space* "else" space*
+CondFirstClause = BEGIN ~lexical_ELSE TestExpr Body+ END
+CondOtherClause = BEGIN ~lexical_ELSE TestExpr Body+ END
+TestExpr = Form
+Body = Form
+
   DottedList = "(" ListItem+ "." ListItem ")"
   NullTerminatedList =   "(" ListItem+ ")"
   ListItem = (Atom | SList)
-  Atom = lexical_atom | Syntactic_Atom
-  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+  Atom = lexical_atom | QuotedNil
+  QuotedNil = BEGIN "quote" BEGIN END END
 
   lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
   lexical_nullList = "(" ")"
@@ -558,18 +600,29 @@ Scm2JSPass2 {
               Identifier: function(id) {return id.unity();},
               Define: function(_define) {return "";},
               END: function(_rp) {return "";},
-
+     
               Form: function(item) {return item.unity()},
-	      QuotedSexp: function(_, form) {throw "can't happen in pass2"; return "'" + form.unity()},
-	      BackQuotedSexp: function(_, form) {throw "can't happen in pass2"; return "`" + form.unity()},
-	      CommaSexp: function(_, form) {throw "can't happen in pass2"; return "," + form.unity()},
 	      SList: function(lis) {return lis.unity()},
+
+              SpecialForm: function(e) { return e.unity(); },
+              CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
+                  return "COND: " + c.unity() + " " + firstClause.unity() + otherClauses.unity() + elseClause.unity() + " ENDCOND"; },
+              lexical_COND: function(_sp1,_,_sp2) {return "";},
+              ElseClause: function(_begin,_else,forms,_end) { return "ELSE: " + forms.unity(); },
+              lexical_ELSE: function(_1,_else,_2) { return ""; },
+              CondFirstClause: function(_begin,etest,body,_end) { return "cif (" + etest.unity() + ") { return " + body.unity() + "; })"; },
+              CondOtherClause: function(_begin,etest,body,_end) { return " celseif (" + etest.unity() + ") { return " + body.unity() + "; })"; },
+              TestExpr: function(form) { return form.unity(); },
+              Body: function(form) { return form.unity(); },
+
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.unity()) + " . " + lastItem.unity() + ")"},
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return "(" + toListOfStrings(items.unity()) + ")"},
 	      ListItem: function(item) {return item.unity()},
 	      Atom: function(a) {return a.unity()},
+              QuotedNil: function(_begin, _q, _begin2, _end2, _end) { return "((new List()))"; },
+
 	      lexical_integer: function(ns) {return toPackedString(ns.unity());},
 	      lexical_symbol: function(c, cs) {return c.unity() + toPackedString(cs.unity());},
 	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.unity()) + "\""},
@@ -579,7 +632,7 @@ Scm2JSPass2 {
 	      lexical_uc: function(c) {return c.unity()},
 
 	      lexical_nullList: function(_lp,_rp) {return "()"},
-	      lexical_boolean: function(b) {return this.sourceString},
+	      lexical_boolean: function(b) {return ("#f" == this.sourceString) ? "false" : "true" },
 	      _terminal: function() { return this.primitiveValue; }
 	  }
       );
@@ -599,16 +652,16 @@ Scm2JSPass2 {
 	  var parsed_pass2 = pass2_grammar.match(transpiled_pass1);
 	  var tail = "...";
 	  var charsToDisplay = 40;
-	  if (testString.length < charsToDisplay) {
+	  if (transpiled_pass1.length < charsToDisplay) {
 	      tail = "";
 	  }
 	  if (parsed_pass1.failed()) {
-             resultsString = resultsString + "<br>" + "pass1 parse failed " + testString.substring(0,charsToDisplay);
+             resultsString = resultsString + "<br>" + "pass1 parse failed " + transpiled_pass1.substring(0,charsToDisplay);
           } else if (parsed_pass2.failed()) {
-             resultsString = resultsString + "<br>" + "pass2 parse failed " + testString.substring(0,charsToDisplay);
+             resultsString = resultsString + "<br>" + "pass2 parse failed " + transpiled_pass1.substring(0,charsToDisplay);
           } else {
              var transpiled_pass2 = pass2_semantics(parsed_pass2).unity();
-             resultsString = resultsString + "<br>" + " " + testString.substring(0,charsToDisplay) + tail + " <--- " + transpiled_pass2;
+             resultsString = resultsString + "<br>" + " " + transpiled_pass1.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_pass2;
           }
       }
 
