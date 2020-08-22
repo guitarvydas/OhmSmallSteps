@@ -5,54 +5,19 @@
     <meta charset=utf-8>
     <script src="/Users/tarvydas/projects/ohm/examples/lib.js"></script>
     <script src="/Users/tarvydas/projects/ohm/dist/ohm.js"></script>
-    <script type="text/ohm-js">
-
-      // An Ohm grammar for Scheme, step 1.
-Scm2JSBasic {
-  Program = Form+
-  Form = SList | Atom
-  QuotedSexp = "'" Form
-  BackQuotedSexp = "`" Form
-  CommaSexp = "," Form
-  SList = DottedList | NullTerminatedList
-  DottedList = "(" ListItem+ "." ListItem ")"
-  NullTerminatedList =   "(" ListItem+ ")"
-  ListItem = (Atom | SList)
-  Atom = lexical_atom | Syntactic_Atom
-  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
-
-  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
-  lexical_nullList = "(" ")"
-  lexical_boolean = "#f" | "#t"
-  lexical_integer = lexical_numchar+
-  lexical_numchar = "0".."9"
-  lexical_string = "\"" (~"\"" any)+ "\""
-  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
-  lexical_lc = "a".."z"
-  lexical_uc = "A".."Z"
-  semiColonComment = ";" (~"\n" any)* "\n"
-  space += semiColonComment
-}
-    </script>
-
-    <script>
-      var g = ohm.grammarFromScriptElement();
-    </script>
-
-    <script type="text/test">
+    <script type="text/test-hold">
       (#t #f)
     </script>
     
-    <script type="text/test">
+    <script type="text/test-hold">
       ( #t #f . #t)
     </script>
     
-    <script type="text/test">
+    <script type="text/test-hold">
       ( . #t)
     </script>
     
-    <script type="text/test">
+    <script type="text/test-hold">
       asymbol
     </script>
     
@@ -64,38 +29,62 @@ Scm2JSBasic {
       (asymbol1 asymbol2)
     </script>
 
+    <script type="text/test-fails">
+      (define asymbol10)
+    </script>
+
     <script type="text/test">
-      (asymbol1 asymbol2)
+      (define asymbol11 asymbol12)
+    </script>
+
+    <script type="text/test-fails">
+      (define (asymbol13 asymbol14))
+    </script>
+
+    <script type="text/test">
+      (define (asymbol15 asymbol16) 5)
+    </script>
+
+    <script type="text/test">
+      (define (x15 x16) x17)
+    </script>
+
+    <script type="text/test">
+      (define (x18 x19) (x20))
+    </script>
+
+    <script type="text/test-hold">
+      (asymbol1a asymbol2a)
       (asymbol3 asymbol4)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       'asymbol5
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       ('(asymbol6 asymbol7))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       `a
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       `,b
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
       `(c)
     </script>
-    <script type="text/test">
+    <script type="text/test-hold">
       `(d e f)
     </script>
-    <script type="text/test">
+    <script type="text/test-hold">
       `(g ,h i)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-prolog">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -334,10 +323,92 @@ Scm2JSBasic {
     </script>
 
 
+
+
+    <script type="text/ohm-js">
+
+// pass 1 grammar
+
+      // An Ohm grammar for Scheme, step 1.
+Scm2JSBasic {
+  Program = Form+
+  Form = SList | Atom
+  QuotedSexp = "'" Form
+  BackQuotedSexp = "`" Form
+  CommaSexp = "," Form
+  SList = DottedList | NullTerminatedList
+  DottedList = "(" ListItem+ "." ListItem ")"
+  NullTerminatedList =   "(" ListItem+ ")"
+  ListItem = (Atom | SList)
+  Atom = lexical_atom | Syntactic_Atom
+  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
+  lexical_nullList = "(" ")"
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+}
+</script>
+
+
+    <script type="text/ohm-js">
+
+// pass 2 grammar
+
+Scm2JSPass2 {
+    Program = (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
+    GlobalFunctionDefinition = BEGIN Define FunctionNameAndFormals Form+ END
+    GlobalVariableDefinition = BEGIN Define Identifier Form END
+    FunctionCall = ~Define "(" Identifier ListItem* END
+    FunctionNameAndFormals = BEGIN Identifier ListItem* END
+    Identifier = lexical_symbol
+    Define = "define"
+    BEGIN = "("
+    END = ")"
+
+  Form = SList | Atom
+  QuotedSexp = "'" Form
+  BackQuotedSexp = "`" Form
+  CommaSexp = "," Form
+  SList = DottedList | NullTerminatedList
+  DottedList = "(" ListItem+ "." ListItem ")"
+  NullTerminatedList =   "(" ListItem+ ")"
+  ListItem = (Atom | SList)
+  Atom = lexical_atom | Syntactic_Atom
+  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
+  lexical_nullList = "(" ")"
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+}
+
+    </script>
+
     <script>
 
-      var sem = g.createSemantics();
-      
+      var g_namespace = ohm.grammarsFromScriptElements();
+      var pass1_grammar = g_namespace["Scm2JSBasic"];
+      var pass2_grammar = g_namespace["Scm2JSPass2"];
+
+      var tests = document.querySelectorAll('script[type="text/test"]');
+
       function toListOfStrings(a) {
 	  return a.join(' ');
       }
@@ -346,7 +417,12 @@ Scm2JSBasic {
 	  return a.join('');
       }
       
-      sem.addOperation(
+
+// pass1 semantics
+
+      var pass1_semantics = pass1_grammar.createSemantics();
+      
+      pass1_semantics.addOperation(
 	  'unity',
 	  {
 	      Program: function(tree) {return toListOfStrings(tree.unity())},
@@ -376,7 +452,7 @@ Scm2JSBasic {
       );
       
 
-          sem.addOperation(
+          pass1_semantics.addOperation(
 	  'unquote',
 	  {
 	      Program: function(tree) {return toListOfStrings(tree.unquote())},
@@ -407,7 +483,7 @@ Scm2JSBasic {
 
 
 
-          sem.addOperation(
+          pass1_semantics.addOperation(
 	  'unbackquote',
 	  {
 	      Program: function(tree) {return toListOfStrings(tree.unbackquote())},
@@ -436,7 +512,7 @@ Scm2JSBasic {
 	  }
       );
       
-          sem.addOperation(
+          pass1_semantics.addOperation(
 	  'inbackquote',
 	  {
 	      Program: function(tree) {throw "can\'t happen"},
@@ -465,81 +541,105 @@ Scm2JSBasic {
 	  }
       );
       
-</script>
+////////
 
 
+// pass 2 semantics
+      var pass2_semantics = pass2_grammar.createSemantics();
+      
+      pass2_semantics.addOperation(
+	  'unity',
+	  {
+	      Program: function(listOfForms) {return toListOfStrings(listOfForms.unity())},
+              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.unity() + " = " + form.unity() + ";";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.unity() + " { " + body.unity() + " }";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.unity() + "(" + actuals.unity() + ");";},
+              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.unity() + "(" + formals.unity() + ")";},
+              Identifier: function(id) {return id.unity();},
+              Define: function(_define) {return "";},
+              END: function(_rp) {return "";},
 
-    <script>
-      var tests = document.querySelectorAll('script[type="text/test"]');
-    </script>
+              Form: function(item) {return item.unity()},
+	      QuotedSexp: function(_, form) {return "'" + form.unity()},
+	      BackQuotedSexp: function(_, form) {return "`" + form.unity()},
+	      CommaSexp: function(_, form) {return "," + form.unity()},
+	      SList: function(lis) {return lis.unity()},
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(" + toListOfStrings(items.unity()) + " . " + lastItem.unity() + ")"},
+	      NullTerminatedList: function(_lp, items, _rp) {
+		  return "(" + toListOfStrings(items.unity()) + ")"},
+	      ListItem: function(item) {return item.unity()},
+	      Atom: function(a) {return a.unity()},
+	      lexical_integer: function(ns) {return toPackedString(ns.unity());},
+	      lexical_symbol: function(c, cs) {return c.unity() + toPackedString(cs.unity());},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.unity()) + "\""},
+	      lexical_letchar: function(c) {return c.unity()},
+	      lexical_numchar: function(c) {return c.unity()},
+	      lexical_lc: function(c) {return c.unity()},
+	      lexical_uc: function(c) {return c.unity()},
 
-  </head>
-  <body>
-    <button onclick="pipelinetest()">Click me (pipeline test)</button>
-    <p id="timestamp"></p>
-    <p id="bool"></p>
-    <p id="input"></p>
-    <p id="secondResult"></p>
-    <script>
+	      lexical_nullList: function(_lp,_rp) {return "()"},
+	      lexical_boolean: function(b) {return this.sourceString},
+	      _terminal: function() { return this.primitiveValue; }
+	  }
+      );
+
+////////
+
       var resultsString = '';
       
       function displayDate () {
 	  document.getElementById('timestamp').innerHTML = Date();
       }
-      function do1Test(testElement) {
+
+      function doPipeline(testElement) {
 	  var testString = testElement.innerHTML;
-	  var r = g.match(testString);
+          var parsed_pass1 = pass1_grammar.match(testString);
+          var transpiled_pass1 = parsed_pass1.failed() ? "" : pass1_semantics(parsed_pass1).unbackquote();
+	  var parsed_pass2 = pass2_grammar.match(transpiled_pass1);
 	  var tail = "...";
 	  var charsToDisplay = 40;
 	  if (testString.length < charsToDisplay) {
 	      tail = "";
 	  }
-	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unbackquote()) : '');
-      }
-      function doRegressionTest(testElement) {
-	  var testString = testElement.innerHTML;
-	  var r = g.match(testString);
-          var filtered = r.failed() ? "" : sem(r).unbackquote();
-	  var rregression = g.match(filtered);
-	  var tail = "...";
-	  var charsToDisplay = 40;
-	  if (testString.length < charsToDisplay) {
-	      tail = "";
-	  }
-	  if (r.failed()) {
-             resultsString = resultsString + "<br>" + "r failed " + testString.substring(0,charsToDisplay);
-          } else if (rregression.failed()) {
-             resultsString = resultsString + "<br>" + "rregression failed " + testString.substring(0,charsToDisplay);
-          } else if (filtered == sem(rregression).unbackquote()) {
-             resultsString = resultsString + "<br>" + "regression ok " + sem(rregression).unbackquote();
+	  if (parsed_pass1.failed()) {
+             resultsString = resultsString + "<br>" + "pass1 parse failed " + testString.substring(0,charsToDisplay);
+          } else if (parsed_pass2.failed()) {
+             resultsString = resultsString + "<br>" + "pass2 parse failed " + testString.substring(0,charsToDisplay);
           } else {
-             resultsString = resultsString + "<br>" + "regression FAILED";
+             var transpiled_pass2 = pass2_semantics(parsed_pass2).unity();
+             resultsString = resultsString + "<br>" + " " + testString.substring(0,charsToDisplay) + tail + " <--- " + transpiled_pass2;
           }
       }
+
       function displayTestResults(s,el) {
 	  document.getElementById(el).innerHTML = s;
       }
+
       function displayStringsEqual(s1,s2,el) {
           document.getElementById(el).innerHTML = (s1 == s2);
       }
-      function ohmtest () {
-	  resultsString = '';
-	  console.log(tests);
-	  console.log(tests[0]);
-	  tests.forEach(do1Test);
-	  displayTestResults(resultsString,'input');
-	  displayDate();
-      }
-      //ohmtest();
       
       function pipelinetest() {
 	  resultsString = '';
-	  tests.forEach(doRegressionTest);
-          var expandedString = resultsString;
+	  tests.forEach(doPipeline);
 	  displayTestResults(resultsString,'input');
 	  displayDate();
       }
-      //pipelinetest();
-    </script>
+
+</script>
+
+
+
+
+
+
+  </head>
+  <body>
+    <button onclick="pipelinetest()">Click me (pass1&2 test)</button>
+    <p id="timestamp"></p>
+    <p id="bool"></p>
+    <p id="input"></p>
+    <p id="secondResult"></p>
   </body>
 </html>
