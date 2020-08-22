@@ -475,7 +475,7 @@ Scm2JSBasic {
 
   </head>
   <body>
-    <button onclick="pipelinetest()">Click me</button>
+    <button onclick="pipelinetest()">Click me (pipeline test)</button>
     <p id="timestamp"></p>
     <p id="bool"></p>
     <p id="input"></p>
@@ -496,6 +496,26 @@ Scm2JSBasic {
 	  }
 	  resultsString = resultsString + "<br>" + r.toString() + " " + testString.substring(0,charsToDisplay) + tail + (r.succeeded() ? (" <--- " + sem(r).unbackquote()) : '');
       }
+      function doRegressionTest(testElement) {
+	  var testString = testElement.innerHTML;
+	  var r = g.match(testString);
+          var filtered = r.failed() ? "" : sem(r).unbackquote();
+	  var rregression = g.match(filtered);
+	  var tail = "...";
+	  var charsToDisplay = 40;
+	  if (testString.length < charsToDisplay) {
+	      tail = "";
+	  }
+	  if (r.failed()) {
+             resultsString = resultsString + "<br>" + "r failed " + testString.substring(0,charsToDisplay);
+          } else if (rregression.failed()) {
+             resultsString = resultsString + "<br>" + "rregression failed " + testString.substring(0,charsToDisplay);
+          } else if (filtered == sem(rregression).unbackquote()) {
+             resultsString = resultsString + "<br>" + "regression ok " + sem(rregression).unbackquote();
+          } else {
+             resultsString = resultsString + "<br>" + "regression FAILED";
+          }
+      }
       function displayTestResults(s,el) {
 	  document.getElementById(el).innerHTML = s;
       }
@@ -514,11 +534,9 @@ Scm2JSBasic {
       
       function pipelinetest() {
 	  resultsString = '';
-	  tests.forEach(do1Test);
+	  tests.forEach(doRegressionTest);
           var expandedString = resultsString;
-	  resultsString = '';
-	  tests.forEach(do1Test);
-          displayStringsEqual(expandedString,resultsString,'bool');
+	  displayTestResults(resultsString,'input');
 	  displayDate();
       }
       //pipelinetest();
