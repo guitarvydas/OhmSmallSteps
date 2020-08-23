@@ -116,7 +116,7 @@
           (and e* (unify (cdr x) (cdr y) e*)))))))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
 (define (prove6 l g r e n c)
   (cond
     ((null? g)
@@ -439,8 +439,10 @@ Scm2JSListConstants {
   QuotedSexp = "'" Form
   BackQuotedSexp = "`" Form
   CommaSexp = "," Form
-  SList = DottedList | NullTerminatedList
+  SList = DottedList | ListConstant | NullTerminatedList
   DottedList = "(" ListItem+ "." ListItem ")"
+  ListConstant =   "(" lexical_QUOTE NullTerminatedList ")"
+  lexical_QUOTE = space* "quote" space*
   NullTerminatedList =   "(" ListItem+ ")"
   ListItem = (Atom | SList)
   Atom = lexical_atom | Syntactic_Atom
@@ -684,6 +686,7 @@ lexical_IF = space* "if" space*
 	      SList: function(lis) {return lis.listConstants()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
+              ListConstant: function(_lp,_quote,listItem,_rp) { return "new List" + listItem.listConstants(); },
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + ")"},
 	      ListItem: function(item) {return item.listConstants()},
@@ -799,10 +802,10 @@ lexical_IF = space* "if" space*
           } else if (parsed_listConstants.failed()) {
              resultsString = resultsString + "<br>" + "listConstants parse failed " + transpiled_listConstants.substring(0,charsToDisplay);
           } else if (parsed_emitter.failed()) {
-             resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_pass1.substring(0,charsToDisplay);
+             resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_listConstants.substring(0,charsToDisplay);
           } else {
              var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
-             resultsString = resultsString + "<br>" + " " + transpiled_pass1.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_emitter;
+             resultsString = resultsString + "<br>" + " " + transpiled_listConstants.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_emitter;
           }
       }
 
