@@ -5,94 +5,94 @@
     <meta charset=utf-8>
     <script src="/Users/tarvydas/projects/ohm/examples/lib.js"></script>
     <script src="/Users/tarvydas/projects/ohm/dist/ohm.js"></script>
-    <script type="text/test-hold">
+    <script type="text/test-form">
       (#t #f)
     </script>
     
-    <script type="text/test-hold">
+    <script type="text/test-form">
       ( #t #f . #t)
     </script>
     
-    <script type="text/test-hold">
+    <script type="text/test-form">
       ( . #t)
     </script>
     
-    <script type="text/test-hold">
+    <script type="text/test-form">
       asymbol
     </script>
     
-    <script type="text/test-hold">
+    <script type="text/test-form">
       (asymbol)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-form">
       (asymbol1 asymbol2)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-fail">
       (define asymbol10)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       (define asymbol11 asymbol12)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-fail">
       (define (asymbol13 asymbol14))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       (define (asymbol15 asymbol16) 5)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       (define (x15 x16) x17)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       (define (x18 x19) (x20))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-form">
       (asymbol1a asymbol2a)
       (asymbol3 asymbol4)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-functions">
       (prove5 '() goals db empty 1)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
       (define (funNoFormals) 1)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-form">
       'asymbol5
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-form">
       ('(asymbol6 asymbol7))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-bq">
       `a
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-bq">
       `,b
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test-bq">
       `(c)
     </script>
-    <script type="text/test-hold">
+    <script type="text/test-bq">
       `(d e f)
     </script>
-    <script type="text/test-hold">
+    <script type="text/test-bq">
       `(g ,h i)
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
 (define (unify1 x y e)
   (let ((x (value x e))
         (y (value y e)))
@@ -101,7 +101,7 @@
 ))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
 (define (unify2 x y e)
   (let ((x (value x e))
         (y (value y e)))
@@ -116,7 +116,7 @@
           (and e* (unify (cdr x) (cdr y) e*)))))))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
 (define (prove6 l g r e n c)
   (cond
     ((null? g)
@@ -144,7 +144,7 @@
             (back6 l g r e n c))))))
     </script>
 
-    <script type="text/test-hold">
+    <script type="text/test">
 (define goals '((some (? X))
                 (some (? Y))
                 (neq (? X) (? Y))))
@@ -169,7 +169,7 @@
 
 
 
-    <script type="text/test-hold">
+    <script type="text/test">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -759,6 +759,69 @@ lexical_AtNewListAt = space* "@newList@" space*
 	  }
       );
 
+      emitter_semantics.addOperation(
+	  'emitjs',
+	  {
+	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
+              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.emitjs() + "(" + actuals.emitjs() + ");";},
+              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
+              Identifier: function(id) {return id.emitjs();},
+              Define: function(_define) {return "";},
+              END: function(_rp) {return "";},
+     
+              Form: function(item) {return item.emitjs()},
+	      SList: function(lis) {return lis.emitjs()},
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "new List(" + items.emitjs() + ")"; },
+
+              SpecialForm: function(e) { return e.emitjs(); },
+              CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
+                  return "COND "+ c.emitjs() + " " + firstClause.emitjs() + otherClauses.emitjs() + elseClause.emitjs() + " END COND"; },
+              lexical_COND: function(_sp1,_,_sp2) {return "";},
+              ElseClause: function(_begin,_else,forms,_end) { return " CONDELSE: " + forms.emitjs(); },
+              lexical_ELSE: function(_1,_else,_2) { return ""; },
+              CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.emitjs() + ") { return " + body.emitjs() + "; })"; },
+              CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.emitjs() + ") { return " + body.emitjs() + "; })"; },
+              TestExpr: function(form) { return form.emitjs(); },
+              Body: function(form) { return form.emitjs(); },
+
+              LetExpression: function(_begin, _let, bindings, body, _end) { return "LET " + bindings.emitjs() + " IN " + body.emitjs() + "; END LET"; },
+              lexical_LET: function(_sp1,_let,_star,_sp2) { return ""; },
+              LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
+              Binding: function(_begin,v,e,_end) { return "let " + v.emitjs() + " = " + e.emitjs() + ";" },
+              LetVar: function(id) {return id.emitjs(); },
+              LetClause: function(e) { return e.emitjs(); },
+
+              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "IF " + e.emitjs() + " THEN { return " + thenPart.emitjs() + ";} ELSE { return " + elsePart.emitjs() + ";} END IF";},
+              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "IF " + e.emitjs() + " THEN {return " + thenPart.emitjs() + "; END IF";},
+              IfTestExpr: function(e) { return e.emitjs(); },
+              ThenPart: function(f) { return f.emitjs(); },
+              ElsePart: function(f) { return f.emitjs(); },
+              lexical_IF: function(_sp1,_if,_sp2) { return ""; },
+
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(" + toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs() + ")"},
+	      NullTerminatedList: function(_lp, items, _rp) {
+		  return "(" + toListOfStrings(items.emitjs()) + ")"},
+	      ListItem: function(item) {return item.emitjs()},
+	      Atom: function(a) {return a.emitjs()},
+
+              lexical_AtNewListAt: function(_lp,_atnewlistat,_rp) { return "" ; },
+
+	      lexical_integer: function(ns) {return toPackedString(ns.emitjs());},
+	      lexical_symbol: function(c, cs) {return c.emitjs() + toPackedString(cs.emitjs());},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.emitjs()) + "\""},
+	      lexical_letchar: function(c) {return c.emitjs()},
+	      lexical_numchar: function(c) {return c.emitjs()},
+	      lexical_lc: function(c) {return c.emitjs()},
+	      lexical_uc: function(c) {return c.emitjs()},
+
+	      lexical_boolean: function(b) {return ("#f" == this.sourceString) ? "false" : "true" },
+	      _terminal: function() { return this.primitiveValue; }
+	  }
+      );
+
 ////////
 
       var resultsString = '';
@@ -776,7 +839,7 @@ lexical_AtNewListAt = space* "@newList@" space*
 	  var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
           var transpiled_listConstants = parsed_listConstants.failed() ? "" : listConstants_semantics(parsed_listConstants).listConstants();
 
-          console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
+          // console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
 	  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
 
 	  var tail = "...";
@@ -791,7 +854,8 @@ lexical_AtNewListAt = space* "@newList@" space*
           } else if (parsed_emitter.failed()) {
              resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_listConstants.toString();
           } else {
-             var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
+             // var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
+             var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
              resultsString = resultsString + "<br>" + " " + transpiled_listConstants.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_emitter;
           }
       }
