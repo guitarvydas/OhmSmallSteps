@@ -434,9 +434,14 @@ Scm2JSBasic {
 
 Scm2JSListConstants <: Scm2JSBasic {
   SList := DottedList | ListConstant | NullTerminatedList
-  ListConstant = "(" lexical_QUOTE NullTerminatedList ")"
+  ListConstant = "(" lexical_QUOTE QNullTerminatedList ")"
   lexical_QUOTE = space* "quote" space*
+  QNullTerminatedList =   "(" QListItem+ ")"
+  QListItem = QAtom | QSList
+  QSList = DottedList | QNullTerminatedList 
+  QAtom = Atom
 }
+
 </script>
 
 
@@ -489,6 +494,9 @@ lexical_IF = space* "if" space*
 }
 
     </script>
+
+
+
 
     <script>
 
@@ -644,10 +652,16 @@ lexical_IF = space* "if" space*
 	      QuotedSexp: function(_, form) {return "'" + form.listConstants()},
 	      BackQuotedSexp: function(_, form) {return "`" + form.listConstants()},
 	      CommaSexp: function(_, form) {return "," + form.listConstants()},
-	      SList: function(lis) {return lis.listConstants()},
+	      SList: function(lis) {return lis.listConstants();},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
               ListConstant: function(_lp,_quote,listItem,_rp) { return "(@newList@ " + listItem.listConstants() + ")"; },
+
+             QNullTerminatedList: function(_lp,qitem,_rp) { return toListOfStrings(qitem.listConstants()); },
+             QListItem: function(item) { return item.listConstants(); },
+             QSList: function(slist) { return "(@newList@ " + slist.listConstants() + ")"; },
+             QAtom: function(a) { return '"' + a.listConstants() + '"'; },
+
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + ")"},
 	      ListItem: function(item) {return item.listConstants()},
@@ -763,7 +777,7 @@ lexical_IF = space* "if" space*
           } else if (parsed_listConstants.failed()) {
              resultsString = resultsString + "<br>" + "listConstants parse failed " + transpiled_listConstants.substring(0,charsToDisplay);
           } else if (parsed_emitter.failed()) {
-             resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_listConstants.substring(0,charsToDisplay);
+             resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_listConstants.toString();
           } else {
              var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
              resultsString = resultsString + "<br>" + " " + transpiled_listConstants.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_emitter;
