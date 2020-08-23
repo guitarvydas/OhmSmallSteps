@@ -444,8 +444,8 @@ Scm2JSListConstants <: Scm2JSBasic {
 
 // Emitter grammar
 
-Scm2JSEmitter {
-    Program = (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
+Scm2JSEmitter <: Scm2JSBasic {
+    Program := (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
     GlobalFunctionDefinition = BEGIN Define FunctionNameAndFormals Form+ END
     GlobalVariableDefinition = BEGIN Define Identifier Form END
     FunctionCall = ~Define "(" Identifier ListItem* END
@@ -455,8 +455,7 @@ Scm2JSEmitter {
     BEGIN = "("
     END = ")"
 
-  Form = SList | Atom
-  SList = DottedList | SpecialForm | NullTerminatedList
+  SList := DottedList | SpecialForm | NullTerminatedList
 
 SpecialForm = CondExpression | LetExpression | IfThenElseExpression | IfThenExpression
 
@@ -483,24 +482,10 @@ ThenPart = Form
 ElsePart = Form
 lexical_IF = space* "if" space*
 
-  DottedList = "(" ListItem+ "." ListItem ")"
-  NullTerminatedList =   "(" ListItem+ ")"
-  ListItem = (Atom | SList)
-  Atom = lexical_atom | QuotedNil
+  Atom := lexical_atom | QuotedNil
   QuotedNil = BEGIN "quote" BEGIN END END
 
-  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
-  lexical_nullList = "(" ")"
-  lexical_boolean = "#f" | "#t"
-  lexical_integer = lexical_numchar+
-  lexical_numchar = "0".."9"
-  lexical_string = "\"" (~"\"" any)+ "\""
-  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "@"
-  lexical_lc = "a".."z"
-  lexical_uc = "A".."Z"
-  semiColonComment = ";" (~"\n" any)* "\n"
-  space += semiColonComment
+  lexical_letchar := lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "@"
 }
 
     </script>
