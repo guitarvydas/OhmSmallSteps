@@ -33,7 +33,7 @@
       (define asymbol10)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-global-var">
       (define asymbol11 asymbol12)
     </script>
 
@@ -41,15 +41,15 @@
       (define (asymbol13 asymbol14))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-top-level-function-define">
       (define (asymbol15 asymbol16) 5)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-top-level-function-define">
       (define (x15 x16) x17)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-top-level-function-define">
       (define (x18 x19) (x20))
     </script>
 
@@ -58,11 +58,11 @@
       (asymbol3 asymbol4)
     </script>
 
-    <script type="text/test-functions">
+    <script type="text/test-top-level-call">
       (prove5 '() goals db empty 1)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-top-level-function-define">
       (define (funNoFormals) 1)
     </script>
 
@@ -92,7 +92,7 @@
       `(g ,h i)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-cond">
 (define (unify1 x y e)
   (let ((x (value x e))
         (y (value y e)))
@@ -101,7 +101,7 @@
 ))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-cond">
 (define (unify2 x y e)
   (let ((x (value x e))
         (y (value y e)))
