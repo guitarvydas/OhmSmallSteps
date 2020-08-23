@@ -432,7 +432,7 @@ Scm2JSBasic {
 
 // pass 2 grammar
 
-Scm2JSPass2 {
+Scm2JSEmitter {
     Program = (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
     GlobalFunctionDefinition = BEGIN Define FunctionNameAndFormals Form+ END
     GlobalVariableDefinition = BEGIN Define Identifier Form END
@@ -497,7 +497,7 @@ lexical_IF = space* "if" space*
 
       var g_namespace = ohm.grammarsFromScriptElements();
       var pass1_grammar = g_namespace["Scm2JSBasic"];
-      var pass2_grammar = g_namespace["Scm2JSPass2"];
+      var emitter_grammar = g_namespace["Scm2JSEmitter"];
 
       var tests = document.querySelectorAll('script[type="text/test"]');
 
@@ -637,63 +637,63 @@ lexical_IF = space* "if" space*
 
 
 // pass 2 semantics
-      var pass2_semantics = pass2_grammar.createSemantics();
+      var emitter_semantics = emitter_grammar.createSemantics();
       
-      pass2_semantics.addOperation(
-	  'pass2',
+      emitter_semantics.addOperation(
+	  'emitter',
 	  {
-	      Program: function(listOfForms) {return toListOfStrings(listOfForms.pass2())},
-              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.pass2() + " = " + form.pass2() + ";";},
-              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.pass2() + " { return " + body.pass2() + "; };";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.pass2() + "(" + actuals.pass2() + ");";},
-              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.pass2() + "(" + formals.pass2() + ")";},
-              Identifier: function(id) {return id.pass2();},
+	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitter())},
+              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitter() + " = " + form.emitter() + ";";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitter() + " { return " + body.emitter() + "; };";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.emitter() + "(" + actuals.emitter() + ");";},
+              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitter() + "(" + formals.emitter() + ")";},
+              Identifier: function(id) {return id.emitter();},
               Define: function(_define) {return "";},
               END: function(_rp) {return "";},
      
-              Form: function(item) {return item.pass2()},
-	      SList: function(lis) {return lis.pass2()},
+              Form: function(item) {return item.emitter()},
+	      SList: function(lis) {return lis.emitter()},
 
-              SpecialForm: function(e) { return e.pass2(); },
+              SpecialForm: function(e) { return e.emitter(); },
               CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
-                  return "COND "+ c.pass2() + " " + firstClause.pass2() + otherClauses.pass2() + elseClause.pass2() + " END COND"; },
+                  return "COND "+ c.emitter() + " " + firstClause.emitter() + otherClauses.emitter() + elseClause.emitter() + " END COND"; },
               lexical_COND: function(_sp1,_,_sp2) {return "";},
-              ElseClause: function(_begin,_else,forms,_end) { return " CONDELSE: " + forms.pass2(); },
+              ElseClause: function(_begin,_else,forms,_end) { return " CONDELSE: " + forms.emitter(); },
               lexical_ELSE: function(_1,_else,_2) { return ""; },
-              CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.pass2() + ") { return " + body.pass2() + "; })"; },
-              CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.pass2() + ") { return " + body.pass2() + "; })"; },
-              TestExpr: function(form) { return form.pass2(); },
-              Body: function(form) { return form.pass2(); },
+              CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.emitter() + ") { return " + body.emitter() + "; })"; },
+              CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.emitter() + ") { return " + body.emitter() + "; })"; },
+              TestExpr: function(form) { return form.emitter(); },
+              Body: function(form) { return form.emitter(); },
 
-              LetExpression: function(_begin, _let, bindings, body, _end) { return "LET " + bindings.pass2() + " IN " + body.pass2() + "; END LET"; },
+              LetExpression: function(_begin, _let, bindings, body, _end) { return "LET " + bindings.emitter() + " IN " + body.emitter() + "; END LET"; },
               lexical_LET: function(_sp1,_let,_star,_sp2) { return ""; },
-              LetBindings: function(_begin,bindings,_end) { return bindings.pass2(); },
-              Binding: function(_begin,v,e,_end) { return "let " + v.pass2() + " = " + e.pass2() + ";" },
-              LetVar: function(id) {return id.pass2(); },
-              LetClause: function(e) { return e.pass2(); },
+              LetBindings: function(_begin,bindings,_end) { return bindings.emitter(); },
+              Binding: function(_begin,v,e,_end) { return "let " + v.emitter() + " = " + e.emitter() + ";" },
+              LetVar: function(id) {return id.emitter(); },
+              LetClause: function(e) { return e.emitter(); },
 
-              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "IF " + e.pass2() + " THEN { return " + thenPart.pass2() + ";} ELSE { return " + elsePart.pass2() + ";} END IF";},
-              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "IF " + e.pass2() + " THEN {return " + thenPart.pass2() + "; END IF";},
-              IfTestExpr: function(e) { return e.pass2(); },
-              ThenPart: function(f) { return f.pass2(); },
-              ElsePart: function(f) { return f.pass2(); },
+              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "IF " + e.emitter() + " THEN { return " + thenPart.emitter() + ";} ELSE { return " + elsePart.emitter() + ";} END IF";},
+              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "IF " + e.emitter() + " THEN {return " + thenPart.emitter() + "; END IF";},
+              IfTestExpr: function(e) { return e.emitter(); },
+              ThenPart: function(f) { return f.emitter(); },
+              ElsePart: function(f) { return f.emitter(); },
               lexical_IF: function(_sp1,_if,_sp2) { return ""; },
 
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.pass2()) + " . " + lastItem.pass2() + ")"},
+		  return "(" + toListOfStrings(items.emitter()) + " . " + lastItem.emitter() + ")"},
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(" + toListOfStrings(items.pass2()) + ")"},
-	      ListItem: function(item) {return item.pass2()},
-	      Atom: function(a) {return a.pass2()},
+		  return "(" + toListOfStrings(items.emitter()) + ")"},
+	      ListItem: function(item) {return item.emitter()},
+	      Atom: function(a) {return a.emitter()},
               QuotedNil: function(_begin, _q, _begin2, _end2, _end) { return "((new List()))"; },
 
-	      lexical_integer: function(ns) {return toPackedString(ns.pass2());},
-	      lexical_symbol: function(c, cs) {return c.pass2() + toPackedString(cs.pass2());},
-	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.pass2()) + "\""},
-	      lexical_letchar: function(c) {return c.pass2()},
-	      lexical_numchar: function(c) {return c.pass2()},
-	      lexical_lc: function(c) {return c.pass2()},
-	      lexical_uc: function(c) {return c.pass2()},
+	      lexical_integer: function(ns) {return toPackedString(ns.emitter());},
+	      lexical_symbol: function(c, cs) {return c.emitter() + toPackedString(cs.emitter());},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.emitter()) + "\""},
+	      lexical_letchar: function(c) {return c.emitter()},
+	      lexical_numchar: function(c) {return c.emitter()},
+	      lexical_lc: function(c) {return c.emitter()},
+	      lexical_uc: function(c) {return c.emitter()},
 
 	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return ("#f" == this.sourceString) ? "false" : "true" },
@@ -713,7 +713,7 @@ lexical_IF = space* "if" space*
 	  var testString = testElement.innerHTML;
           var parsed_pass1 = pass1_grammar.match(testString);
           var transpiled_pass1 = parsed_pass1.failed() ? "" : pass1_semantics(parsed_pass1).unbackquote();
-	  var parsed_pass2 = pass2_grammar.match(transpiled_pass1);
+	  var parsed_emitter = emitter_grammar.match(transpiled_pass1);
 	  var tail = "...";
 	  var charsToDisplay = 40;
 	  if (transpiled_pass1.length < charsToDisplay) {
@@ -721,11 +721,11 @@ lexical_IF = space* "if" space*
 	  }
 	  if (parsed_pass1.failed()) {
              resultsString = resultsString + "<br>" + "pass1 parse failed " + transpiled_pass1.substring(0,charsToDisplay);
-          } else if (parsed_pass2.failed()) {
-             resultsString = resultsString + "<br>" + "pass2 parse failed " + transpiled_pass1.substring(0,charsToDisplay);
+          } else if (parsed_emitter.failed()) {
+             resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_pass1.substring(0,charsToDisplay);
           } else {
-             var transpiled_pass2 = pass2_semantics(parsed_pass2).pass2();
-             resultsString = resultsString + "<br>" + " " + transpiled_pass1.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_pass2;
+             var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
+             resultsString = resultsString + "<br>" + " " + transpiled_pass1.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_emitter;
           }
       }
 
