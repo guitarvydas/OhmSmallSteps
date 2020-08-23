@@ -144,32 +144,32 @@
             (back6 l g r e n c))))))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-newlist">
 (define goals '((some (? X))
                 (some (? Y))
                 (neq (? X) (? Y))))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-newlist">
 (define g '((a)))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-newlis">
 (define g '(a))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-newlist">
 (define g '(a b))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-newlist">
 (define g '())
     </script>
 
 
 
 
-    <script type="text/test">
+    <script type="text/test-prolog-6">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -793,8 +793,8 @@ lexical_AtNewListAt = space* "@newList@" space*
               LetVar: function(id) {return id.emitjs(); },
               LetClause: function(e) { return e.emitjs(); },
 
-              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "IF " + e.emitjs() + " THEN { return " + thenPart.emitjs() + ";} ELSE { return " + elsePart.emitjs() + ";} END IF";},
-              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "IF " + e.emitjs() + " THEN {return " + thenPart.emitjs() + "; END IF";},
+              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "(" + e.emitjs() + ") ?" + thenPart.emitjs() + " : " + elsePart.emitjs()},
+              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "(" + e.emitjs() + ") ?" + thenPart.emitjs() + ": null";},
               IfTestExpr: function(e) { return e.emitjs(); },
               ThenPart: function(f) { return f.emitjs(); },
               ElsePart: function(f) { return f.emitjs(); },
