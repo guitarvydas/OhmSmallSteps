@@ -440,7 +440,7 @@ Scm2JSPass2 {
   Form = SList | Atom
   SList = DottedList | SpecialForm | NullTerminatedList
 
-SpecialForm = CondExpression | LetExpression
+SpecialForm = CondExpression | LetExpression | IfThenElseExpression | IfThenExpression
 
 CondExpression = BEGIN lexical_COND CondFirstClause CondOtherClause* ElseClause* END
 lexical_COND = space* "cond" space*
@@ -457,6 +457,13 @@ LetBindings = BEGIN Binding+ END
 Binding = BEGIN LetVar LetClause END
 LetVar = lexical_symbol
 LetClause = Form
+
+IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
+IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
+IfTestExpr = Form
+ThenPart = Form
+ElsePart = Form
+lexical_IF = space* "if" space*
 
   DottedList = "(" ListItem+ "." ListItem ")"
   NullTerminatedList =   "(" ListItem+ ")"
@@ -645,7 +652,7 @@ LetClause = Form
               CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
                   return "COND: " + c.unity() + " " + firstClause.unity() + otherClauses.unity() + elseClause.unity() + " END COND"; },
               lexical_COND: function(_sp1,_,_sp2) {return "";},
-              ElseClause: function(_begin,_else,forms,_end) { return "ELSE: " + forms.unity(); },
+              ElseClause: function(_begin,_else,forms,_end) { return "CELSE: " + forms.unity(); },
               lexical_ELSE: function(_1,_else,_2) { return ""; },
               CondFirstClause: function(_begin,etest,body,_end) { return "cif (" + etest.unity() + ") { return " + body.unity() + "; })"; },
               CondOtherClause: function(_begin,etest,body,_end) { return " celseif (" + etest.unity() + ") { return " + body.unity() + "; })"; },
@@ -658,6 +665,13 @@ LetClause = Form
               Binding: function(_begin,v,e,_end) { return "let " + v.unity() + " = " + e.unity() + ";" },
               LetVar: function(id) {return id.unity(); },
               LetClause: function(e) { return e.unity(); },
+
+              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "IF " + e.unity() + " THEN { return " + thenPart.unity() + ";} ELSE { return " + elsePart.unity() + ";} END IF";},
+              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "IF " + e.unity() + " THEN {return " + thenPart.unity() + "; END IF";},
+              IfTestExpr: function(e) { return e.unity(); },
+              ThenPart: function(f) { return f.unity(); },
+              ElsePart: function(f) { return f.unity(); },
+              lexical_IF: function(_sp1,_if,_sp2) { return ""; },
 
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.unity()) + " . " + lastItem.unity() + ")"},
