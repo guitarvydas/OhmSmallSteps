@@ -430,7 +430,41 @@ Scm2JSBasic {
 
     <script type="text/ohm-js">
 
-// pass 2 grammar
+// pass 1 grammar
+
+      // An Ohm grammar for Scheme, step 1.
+Scm2JSListConstants {
+  Program = Form+
+  Form = SList | Atom
+  QuotedSexp = "'" Form
+  BackQuotedSexp = "`" Form
+  CommaSexp = "," Form
+  SList = DottedList | NullTerminatedList
+  DottedList = "(" ListItem+ "." ListItem ")"
+  NullTerminatedList =   "(" ListItem+ ")"
+  ListItem = (Atom | SList)
+  Atom = lexical_atom | Syntactic_Atom
+  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
+  lexical_nullList = "(" ")"
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+}
+</script>
+
+
+    <script type="text/ohm-js">
+
+// Emitter grammar
 
 Scm2JSEmitter {
     Program = (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
@@ -497,6 +531,7 @@ lexical_IF = space* "if" space*
 
       var g_namespace = ohm.grammarsFromScriptElements();
       var pass1_grammar = g_namespace["Scm2JSBasic"];
+      var listConstants_grammar = g_namespace["Scm2JSListConstants"];
       var emitter_grammar = g_namespace["Scm2JSEmitter"];
 
       var tests = document.querySelectorAll('script[type="text/test"]');
@@ -635,8 +670,42 @@ lexical_IF = space* "if" space*
       
 ////////
 
+// listConstants semantics
+      var listConstants_semantics = listConstants_grammar.createSemantics();
 
-// pass 2 semantics
+      listConstants_semantics.addOperation(
+	  'listConstants',
+	  {
+	      Program: function(tree) {return toListOfStrings(tree.listConstants())},
+	      Form: function(item) {return item.listConstants()},
+	      QuotedSexp: function(_, form) {return "'" + form.listConstants()},
+	      BackQuotedSexp: function(_, form) {return "`" + form.listConstants()},
+	      CommaSexp: function(_, form) {return "," + form.listConstants()},
+	      SList: function(lis) {return lis.listConstants()},
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
+	      NullTerminatedList: function(_lp, items, _rp) {
+		  return "(" + toListOfStrings(items.listConstants()) + ")"},
+	      ListItem: function(item) {return item.listConstants()},
+	      Atom: function(a) {return a.listConstants()},
+	      lexical_integer: function(ns) {return toPackedString(ns.listConstants());},
+	      lexical_symbol: function(c, cs) {return c.listConstants() + toPackedString(cs.listConstants());},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.listConstants()) + "\""},
+	      lexical_letchar: function(c) {return c.listConstants()},
+	      lexical_numchar: function(c) {return c.listConstants()},
+	      lexical_lc: function(c) {return c.listConstants()},
+	      lexical_uc: function(c) {return c.listConstants()},
+
+	      lexical_nullList: function(_lp,_rp) {return "()"},
+	      lexical_boolean: function(b) {return this.sourceString},
+	      _terminal: function() { return this.primitiveValue; }
+	  }
+      );
+      
+
+
+
+// emitter semantics
       var emitter_semantics = emitter_grammar.createSemantics();
       
       emitter_semantics.addOperation(
@@ -711,9 +780,15 @@ lexical_IF = space* "if" space*
 
       function doPipeline(testElement) {
 	  var testString = testElement.innerHTML;
+
           var parsed_pass1 = pass1_grammar.match(testString);
           var transpiled_pass1 = parsed_pass1.failed() ? "" : pass1_semantics(parsed_pass1).unbackquote();
-	  var parsed_emitter = emitter_grammar.match(transpiled_pass1);
+
+	  var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
+          var transpiled_listConstants = parsed_listConstants.failed() ? "" : listConstants_semantics(parsed_listConstants).listConstants();
+
+	  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
+
 	  var tail = "...";
 	  var charsToDisplay = 40;
 	  if (transpiled_pass1.length < charsToDisplay) {
@@ -721,6 +796,8 @@ lexical_IF = space* "if" space*
 	  }
 	  if (parsed_pass1.failed()) {
              resultsString = resultsString + "<br>" + "pass1 parse failed " + transpiled_pass1.substring(0,charsToDisplay);
+          } else if (parsed_listConstants.failed()) {
+             resultsString = resultsString + "<br>" + "listConstants parse failed " + transpiled_listConstants.substring(0,charsToDisplay);
           } else if (parsed_emitter.failed()) {
              resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_pass1.substring(0,charsToDisplay);
           } else {
@@ -753,7 +830,7 @@ lexical_IF = space* "if" space*
 
   </head>
   <body>
-    <button onclick="pipelinetest()">Click me (pass1&2 test)</button>
+    <button onclick="pipelinetest()">Click me (pass1 & listConstants & emitter test)</button>
     <p id="timestamp"></p>
     <p id="bool"></p>
     <p id="input"></p>
