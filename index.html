@@ -650,12 +650,12 @@ lexical_IF = space* "if" space*
 
               SpecialForm: function(e) { return e.unity(); },
               CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
-                  return "COND: " + c.unity() + " " + firstClause.unity() + otherClauses.unity() + elseClause.unity() + " END COND"; },
+                  return "COND "+ c.unity() + " " + firstClause.unity() + otherClauses.unity() + elseClause.unity() + " END COND"; },
               lexical_COND: function(_sp1,_,_sp2) {return "";},
-              ElseClause: function(_begin,_else,forms,_end) { return "CELSE: " + forms.unity(); },
+              ElseClause: function(_begin,_else,forms,_end) { return " CONDELSE: " + forms.unity(); },
               lexical_ELSE: function(_1,_else,_2) { return ""; },
-              CondFirstClause: function(_begin,etest,body,_end) { return "cif (" + etest.unity() + ") { return " + body.unity() + "; })"; },
-              CondOtherClause: function(_begin,etest,body,_end) { return " celseif (" + etest.unity() + ") { return " + body.unity() + "; })"; },
+              CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.unity() + ") { return " + body.unity() + "; })"; },
+              CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.unity() + ") { return " + body.unity() + "; })"; },
               TestExpr: function(form) { return form.unity(); },
               Body: function(form) { return form.unity(); },
 
