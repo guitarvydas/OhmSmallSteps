@@ -144,6 +144,12 @@
             (back6 l g r e n c))))))
     </script>
 
+    <script type="text/test">
+(define goals '((some (? X))
+                (some (? Y))
+                (neq (? X) (? Y))))
+    </script>
+
 
 
 
@@ -634,60 +640,60 @@ lexical_IF = space* "if" space*
       var pass2_semantics = pass2_grammar.createSemantics();
       
       pass2_semantics.addOperation(
-	  'unity',
+	  'pass2',
 	  {
-	      Program: function(listOfForms) {return toListOfStrings(listOfForms.unity())},
-              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.unity() + " = " + form.unity() + ";";},
-              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.unity() + " { return " + body.unity() + "; };";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.unity() + "(" + actuals.unity() + ");";},
-              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.unity() + "(" + formals.unity() + ")";},
-              Identifier: function(id) {return id.unity();},
+	      Program: function(listOfForms) {return toListOfStrings(listOfForms.pass2())},
+              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.pass2() + " = " + form.pass2() + ";";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.pass2() + " { return " + body.pass2() + "; };";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.pass2() + "(" + actuals.pass2() + ");";},
+              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.pass2() + "(" + formals.pass2() + ")";},
+              Identifier: function(id) {return id.pass2();},
               Define: function(_define) {return "";},
               END: function(_rp) {return "";},
      
-              Form: function(item) {return item.unity()},
-	      SList: function(lis) {return lis.unity()},
+              Form: function(item) {return item.pass2()},
+	      SList: function(lis) {return lis.pass2()},
 
-              SpecialForm: function(e) { return e.unity(); },
+              SpecialForm: function(e) { return e.pass2(); },
               CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
-                  return "COND "+ c.unity() + " " + firstClause.unity() + otherClauses.unity() + elseClause.unity() + " END COND"; },
+                  return "COND "+ c.pass2() + " " + firstClause.pass2() + otherClauses.pass2() + elseClause.pass2() + " END COND"; },
               lexical_COND: function(_sp1,_,_sp2) {return "";},
-              ElseClause: function(_begin,_else,forms,_end) { return " CONDELSE: " + forms.unity(); },
+              ElseClause: function(_begin,_else,forms,_end) { return " CONDELSE: " + forms.pass2(); },
               lexical_ELSE: function(_1,_else,_2) { return ""; },
-              CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.unity() + ") { return " + body.unity() + "; })"; },
-              CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.unity() + ") { return " + body.unity() + "; })"; },
-              TestExpr: function(form) { return form.unity(); },
-              Body: function(form) { return form.unity(); },
+              CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.pass2() + ") { return " + body.pass2() + "; })"; },
+              CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.pass2() + ") { return " + body.pass2() + "; })"; },
+              TestExpr: function(form) { return form.pass2(); },
+              Body: function(form) { return form.pass2(); },
 
-              LetExpression: function(_begin, _let, bindings, body, _end) { return "LET " + bindings.unity() + " IN " + body.unity() + "; END LET"; },
+              LetExpression: function(_begin, _let, bindings, body, _end) { return "LET " + bindings.pass2() + " IN " + body.pass2() + "; END LET"; },
               lexical_LET: function(_sp1,_let,_star,_sp2) { return ""; },
-              LetBindings: function(_begin,bindings,_end) { return bindings.unity(); },
-              Binding: function(_begin,v,e,_end) { return "let " + v.unity() + " = " + e.unity() + ";" },
-              LetVar: function(id) {return id.unity(); },
-              LetClause: function(e) { return e.unity(); },
+              LetBindings: function(_begin,bindings,_end) { return bindings.pass2(); },
+              Binding: function(_begin,v,e,_end) { return "let " + v.pass2() + " = " + e.pass2() + ";" },
+              LetVar: function(id) {return id.pass2(); },
+              LetClause: function(e) { return e.pass2(); },
 
-              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "IF " + e.unity() + " THEN { return " + thenPart.unity() + ";} ELSE { return " + elsePart.unity() + ";} END IF";},
-              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "IF " + e.unity() + " THEN {return " + thenPart.unity() + "; END IF";},
-              IfTestExpr: function(e) { return e.unity(); },
-              ThenPart: function(f) { return f.unity(); },
-              ElsePart: function(f) { return f.unity(); },
+              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "IF " + e.pass2() + " THEN { return " + thenPart.pass2() + ";} ELSE { return " + elsePart.pass2() + ";} END IF";},
+              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "IF " + e.pass2() + " THEN {return " + thenPart.pass2() + "; END IF";},
+              IfTestExpr: function(e) { return e.pass2(); },
+              ThenPart: function(f) { return f.pass2(); },
+              ElsePart: function(f) { return f.pass2(); },
               lexical_IF: function(_sp1,_if,_sp2) { return ""; },
 
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.unity()) + " . " + lastItem.unity() + ")"},
+		  return "(" + toListOfStrings(items.pass2()) + " . " + lastItem.pass2() + ")"},
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(" + toListOfStrings(items.unity()) + ")"},
-	      ListItem: function(item) {return item.unity()},
-	      Atom: function(a) {return a.unity()},
+		  return "(" + toListOfStrings(items.pass2()) + ")"},
+	      ListItem: function(item) {return item.pass2()},
+	      Atom: function(a) {return a.pass2()},
               QuotedNil: function(_begin, _q, _begin2, _end2, _end) { return "((new List()))"; },
 
-	      lexical_integer: function(ns) {return toPackedString(ns.unity());},
-	      lexical_symbol: function(c, cs) {return c.unity() + toPackedString(cs.unity());},
-	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.unity()) + "\""},
-	      lexical_letchar: function(c) {return c.unity()},
-	      lexical_numchar: function(c) {return c.unity()},
-	      lexical_lc: function(c) {return c.unity()},
-	      lexical_uc: function(c) {return c.unity()},
+	      lexical_integer: function(ns) {return toPackedString(ns.pass2());},
+	      lexical_symbol: function(c, cs) {return c.pass2() + toPackedString(cs.pass2());},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.pass2()) + "\""},
+	      lexical_letchar: function(c) {return c.pass2()},
+	      lexical_numchar: function(c) {return c.pass2()},
+	      lexical_lc: function(c) {return c.pass2()},
+	      lexical_uc: function(c) {return c.pass2()},
 
 	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return ("#f" == this.sourceString) ? "false" : "true" },
@@ -718,7 +724,7 @@ lexical_IF = space* "if" space*
           } else if (parsed_pass2.failed()) {
              resultsString = resultsString + "<br>" + "pass2 parse failed " + transpiled_pass1.substring(0,charsToDisplay);
           } else {
-             var transpiled_pass2 = pass2_semantics(parsed_pass2).unity();
+             var transpiled_pass2 = pass2_semantics(parsed_pass2).pass2();
              resultsString = resultsString + "<br>" + " " + transpiled_pass1.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_pass2;
           }
       }
