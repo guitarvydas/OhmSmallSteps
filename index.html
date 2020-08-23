@@ -468,7 +468,7 @@ Scm2JSEmitter <: Scm2JSBasic {
     Program := (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
     GlobalFunctionDefinition = BEGIN Define FunctionNameAndFormals Form+ END
     GlobalVariableDefinition = BEGIN Define Identifier Form END
-    FunctionCall = ~Define "(" Identifier ListItem* END
+    FunctionCall = BEGIN ~Define Identifier ListItem* END
     FunctionNameAndFormals = BEGIN Identifier ListItem* END
     Identifier = lexical_symbol
     Define = "define"
@@ -478,6 +478,7 @@ Scm2JSEmitter <: Scm2JSBasic {
   SList :=   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
            | DottedList 
            | SpecialForm 
+           | FunctionCall
            | NullTerminatedList
 
 SpecialForm = CondExpression | LetExpression | IfThenElseExpression | IfThenExpression
@@ -765,7 +766,7 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";";},
               GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "call " + id.emitjs() + "(" + actuals.emitjs() + ");";},
+              FunctionCall: function(_lp,id,actuals,_end) {return id.emitjs() + "(" + actuals.emitjs() + ");";},
               FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
               Identifier: function(id) {return id.emitjs();},
               Define: function(_define) {return "";},
@@ -784,7 +785,7 @@ lexical_AtNewListAt = space* "@newList@" space*
               CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.emitjs() + ") { return " + body.emitjs() + "; })"; },
               CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.emitjs() + ") { return " + body.emitjs() + "; })"; },
               TestExpr: function(form) { return form.emitjs(); },
-              Body: function(form) { return form.emitjs(); },
+              Body: function(form) { return "return " + form.emitjs() + ";"; },
 
               LetExpression: function(_begin, _let, bindings, body, _end) { return "LET " + bindings.emitjs() + " IN " + body.emitjs() + "; END LET"; },
               lexical_LET: function(_sp1,_let,_star,_sp2) { return ""; },
