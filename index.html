@@ -162,10 +162,14 @@
 (define g '(a b))
     </script>
 
+    <script type="text/test">
+(define g '())
+    </script>
 
 
 
-    <script type="text/test-prolog">
+
+    <script type="text/test-hold">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -419,13 +423,12 @@ Scm2JSBasic {
   CommaSexp = "," Form
   SList = DottedList | NullTerminatedList
   DottedList = "(" ListItem+ "." ListItem ")"
-  NullTerminatedList =   "(" ListItem+ ")"
+  NullTerminatedList =   "(" ListItem* ")"
   ListItem = (Atom | SList)
   Atom = lexical_atom | Syntactic_Atom
   Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
 
-  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
-  lexical_nullList = "(" ")"
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
   lexical_boolean = "#f" | "#t"
   lexical_integer = lexical_numchar+
   lexical_numchar = "0".."9"
@@ -448,7 +451,7 @@ Scm2JSListConstants <: Scm2JSBasic {
   SList := DottedList | ListConstant | NullTerminatedList
   ListConstant = "(" lexical_QUOTE QNullTerminatedList ")"
   lexical_QUOTE = space* "quote" space*
-  QNullTerminatedList =   "(" QListItem+ ")"
+  QNullTerminatedList =   "(" QListItem* ")"
   QListItem = QAtom | QSList
   QSList = DottedList | QNullTerminatedList 
   QAtom = Atom
@@ -461,32 +464,6 @@ Scm2JSListConstants <: Scm2JSBasic {
 
 // Emitter grammar
 
-/*
-Scm2JSBasic {
-  Form = SList | Atom
-  QuotedSexp = "'" Form
-  BackQuotedSexp = "`" Form
-  CommaSexp = "," Form
-  DottedList = "(" ListItem+ "." ListItem ")"
-  NullTerminatedList =   "(" ListItem+ ")"
-  ListItem = (Atom | SList)
-  Atom = lexical_atom | Syntactic_Atom
-  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
-
-  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
-  lexical_nullList = "(" ")"
-  lexical_boolean = "#f" | "#t"
-  lexical_integer = lexical_numchar+
-  lexical_numchar = "0".."9"
-  lexical_string = "\"" (~"\"" any)+ "\""
-  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
-  lexical_lc = "a".."z"
-  lexical_uc = "A".."Z"
-  semiColonComment = ";" (~"\n" any)* "\n"
-  space += semiColonComment
-}
-*/
 Scm2JSEmitter <: Scm2JSBasic {
     Program := (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
     GlobalFunctionDefinition = BEGIN Define FunctionNameAndFormals Form+ END
@@ -498,7 +475,7 @@ Scm2JSEmitter <: Scm2JSBasic {
     BEGIN = "("
     END = ")"
 
-  SList :=   BEGIN lexical_AtNewListAt ListItem+ END -- atnewlistat
+  SList :=   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
            | DottedList 
            | SpecialForm 
            | NullTerminatedList
@@ -581,7 +558,6 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      lexical_lc: function(c) {return c.unity()},
 	      lexical_uc: function(c) {return c.unity()},
 
-	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return this.sourceString},
 	      _terminal: function() { return this.primitiveValue; }
 	  }
@@ -611,7 +587,6 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      lexical_lc: function(c) {return c.unquote()},
 	      lexical_uc: function(c) {return c.unquote()},
 
-	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return this.sourceString},
 	      _terminal: function() { return this.primitiveValue; }
 	  }
@@ -642,7 +617,6 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      lexical_lc: function(c) {return c.unbackquote()},
 	      lexical_uc: function(c) {return c.unbackquote()},
 
-	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return this.sourceString},
 	      _terminal: function() { return this.primitiveValue; }
 	  }
@@ -671,7 +645,6 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      lexical_lc: function(c) {return c.inbackquote()},
 	      lexical_uc: function(c) {return c.inbackquote()},
 
-	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return this.sourceString},
 	      _terminal: function() { return this.primitiveValue; }
 	  }
@@ -712,7 +685,6 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      lexical_lc: function(c) {return c.listConstants()},
 	      lexical_uc: function(c) {return c.listConstants()},
 
-	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return this.sourceString},
 	      _terminal: function() { return this.primitiveValue; }
 	  }
@@ -782,7 +754,6 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      lexical_lc: function(c) {return c.emitter()},
 	      lexical_uc: function(c) {return c.emitter()},
 
-	      lexical_nullList: function(_lp,_rp) {return "()"},
 	      lexical_boolean: function(b) {return ("#f" == this.sourceString) ? "false" : "true" },
 	      _terminal: function() { return this.primitiveValue; }
 	  }
