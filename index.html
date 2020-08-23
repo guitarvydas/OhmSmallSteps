@@ -144,10 +144,22 @@
             (back6 l g r e n c))))))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-hold">
 (define goals '((some (? X))
                 (some (? Y))
                 (neq (? X) (? Y))))
+    </script>
+
+    <script type="text/test">
+(define g '((a)))
+    </script>
+
+    <script type="text/test">
+(define g '(a))
+    </script>
+
+    <script type="text/test">
+(define g '(a b))
     </script>
 
 
@@ -449,6 +461,32 @@ Scm2JSListConstants <: Scm2JSBasic {
 
 // Emitter grammar
 
+/*
+Scm2JSBasic {
+  Form = SList | Atom
+  QuotedSexp = "'" Form
+  BackQuotedSexp = "`" Form
+  CommaSexp = "," Form
+  DottedList = "(" ListItem+ "." ListItem ")"
+  NullTerminatedList =   "(" ListItem+ ")"
+  ListItem = (Atom | SList)
+  Atom = lexical_atom | Syntactic_Atom
+  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean | lexical_nullList
+  lexical_nullList = "(" ")"
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+}
+*/
 Scm2JSEmitter <: Scm2JSBasic {
     Program := (GlobalVariableDefinition | GlobalFunctionDefinition | FunctionCall)+
     GlobalFunctionDefinition = BEGIN Define FunctionNameAndFormals Form+ END
@@ -460,7 +498,10 @@ Scm2JSEmitter <: Scm2JSBasic {
     BEGIN = "("
     END = ")"
 
-  SList := DottedList | SpecialForm | NullTerminatedList
+  SList :=   BEGIN lexical_AtNewListAt ListItem+ END -- atnewlistat
+           | DottedList 
+           | SpecialForm 
+           | NullTerminatedList
 
 SpecialForm = CondExpression | LetExpression | IfThenElseExpression | IfThenExpression
 
@@ -487,10 +528,7 @@ ThenPart = Form
 ElsePart = Form
 lexical_IF = space* "if" space*
 
-  Atom := lexical_atom | QuotedNil
-  QuotedNil = BEGIN "quote" BEGIN END END
-
-  lexical_letchar := lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "@"
+lexical_AtNewListAt = space* "@newList@" space*
 }
 
     </script>
@@ -700,6 +738,7 @@ lexical_IF = space* "if" space*
      
               Form: function(item) {return item.emitter()},
 	      SList: function(lis) {return lis.emitter()},
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "new List(" + items.emitter() + ")"; },
 
               SpecialForm: function(e) { return e.emitter(); },
               CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
@@ -732,7 +771,8 @@ lexical_IF = space* "if" space*
 		  return "(" + toListOfStrings(items.emitter()) + ")"},
 	      ListItem: function(item) {return item.emitter()},
 	      Atom: function(a) {return a.emitter()},
-              QuotedNil: function(_begin, _q, _begin2, _end2, _end) { return "((new List()))"; },
+
+              lexical_AtNewListAt: function(_lp,_atnewlistat,_rp) { return "" ; },
 
 	      lexical_integer: function(ns) {return toPackedString(ns.emitter());},
 	      lexical_symbol: function(c, cs) {return c.emitter() + toPackedString(cs.emitter());},
@@ -765,6 +805,7 @@ lexical_IF = space* "if" space*
 	  var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
           var transpiled_listConstants = parsed_listConstants.failed() ? "" : listConstants_semantics(parsed_listConstants).listConstants();
 
+          console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
 	  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
 
 	  var tail = "...";
