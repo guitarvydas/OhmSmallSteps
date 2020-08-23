@@ -452,7 +452,7 @@ TestExpr = Form
 Body = Form
 
 LetExpression = BEGIN lexical_LET LetBindings Body+ END
-lexical_LET = space* "let" space*
+lexical_LET = space* "let" "*"? space*
 LetBindings = BEGIN Binding+ END
 Binding = BEGIN LetVar LetClause END
 LetVar = lexical_symbol
@@ -660,7 +660,7 @@ lexical_IF = space* "if" space*
               Body: function(form) { return form.unity(); },
 
               LetExpression: function(_begin, _let, bindings, body, _end) { return "LET " + bindings.unity() + " IN " + body.unity() + "; END LET"; },
-              lexical_LET: function(_sp1,_let,_sp2) { return ""; },
+              lexical_LET: function(_sp1,_let,_star,_sp2) { return ""; },
               LetBindings: function(_begin,bindings,_end) { return bindings.unity(); },
               Binding: function(_begin,v,e,_end) { return "let " + v.unity() + " = " + e.unity() + ";" },
               LetVar: function(id) {return id.unity(); },
