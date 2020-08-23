@@ -520,7 +520,7 @@ lexical_IF = space* "if" space*
   lexical_numchar = "0".."9"
   lexical_string = "\"" (~"\"" any)+ "\""
   lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "@"
   lexical_lc = "a".."z"
   lexical_uc = "A".."Z"
   semiColonComment = ";" (~"\n" any)* "\n"
@@ -686,7 +686,7 @@ lexical_IF = space* "if" space*
 	      SList: function(lis) {return lis.listConstants()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
-              ListConstant: function(_lp,_quote,listItem,_rp) { return "new List" + listItem.listConstants(); },
+              ListConstant: function(_lp,_quote,listItem,_rp) { return "(@newList@ " + listItem.listConstants() + ")"; },
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + ")"},
 	      ListItem: function(item) {return item.listConstants()},
