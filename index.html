@@ -210,6 +210,16 @@
 (define i (not a))
     </script>
 
+<-- if then else -->
+    <script type="text/test">
+(define ifTheElseTest (if a b c))
+    </script>
+
+<-- if then -->
+    <script type="text/test">
+(define ifThenTest (if a b))
+    </script>
+
 
 
 
@@ -792,8 +802,8 @@ lexical_AtNewListAt = space* "@newList@" space*
               LetVar: function(id) {return id.emitjs(); },
               LetClause: function(e) { return e.emitjs(); },
 
-              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "(" + e.emitjs() + ") ?" + thenPart.emitjs() + " : " + elsePart.emitjs()},
-              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "(" + e.emitjs() + ") ?" + thenPart.emitjs() + ": null";},
+              IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "(false != (" + e.emitjs() + ")()) ?" + thenPart.emitjs() + " : " + elsePart.emitjs()},
+              IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "(false != (" + e.emitjs() + ")()) ?" + thenPart.emitjs() + ": null";},
               IfTestExpr: function(e) { return e.emitjs(); },
               ThenPart: function(f) { return f.emitjs(); },
               ElsePart: function(f) { return f.emitjs(); },
