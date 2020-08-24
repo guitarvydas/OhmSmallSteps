@@ -809,7 +809,7 @@ lexical_AtNewListAt = space* "@newList@" space*
 
               AndExpression: function(_begin,_and,booleans,_end) { return "_and([" + booleans.emitjs() + "])"; },
               OrExpression: function(_begin,_or,booleans,_end) { return "_or([" + booleans.emitjs() + "])"; },
-              NotExpression: function(_begin,_not,boolean,_end) { return "if (false != (" + boolean.emitjs() + "())) {return true;}{return false;}"; },
+              NotExpression: function(_begin,_not,boolean,_end) { return "return (false == (" + boolean.emitjs() + "())) ? true : false;}"; },
               lexical_AND: function(_sp1,_and,_sp2) {return "";},
               lexical_OR: function(_sp1,_or,_sp2) {return "";},
               lexical_NOT: function(_sp1,_not,_sp2) {return "";},
