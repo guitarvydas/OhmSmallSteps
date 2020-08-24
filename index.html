@@ -212,7 +212,7 @@
 
 <-- if then else -->
     <script type="text/test">
-(define ifTheElseTest (if a b c))
+(define ifThenElseTest (if a b c))
     </script>
 
 <-- if then -->
@@ -828,7 +828,7 @@ lexical_AtNewListAt = space* "@newList@" space*
 
               AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
               OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
-              NotExpression: function(_begin,_not,boolean,_end) { return "return (false == (" + boolean.emitjs() + "())) ? true : false;}"; },
+              NotExpression: function(_begin,_not,boolean,_end) { return "(function(){return (false == (" + boolean.emitjs() + "())) ? true : false;};)"; },
               lexical_AND: function(_sp1,_and,_sp2) {return "";},
               lexical_OR: function(_sp1,_or,_sp2) {return "";},
               lexical_NOT: function(_sp1,_not,_sp2) {return "";},
