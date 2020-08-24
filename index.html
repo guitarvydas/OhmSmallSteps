@@ -220,6 +220,11 @@
 (define ifThenTest (if a b))
     </script>
 
+<-- cond -->
+    <script type="text/test">
+(define condTest (cond ((a b c) (d e f))))
+    </script>
+
 
 
 
@@ -540,21 +545,22 @@ Arg = ListItem
 
 SpecialForm = CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
 
-CondExpression = BEGIN lexical_COND CondFirstClause CondOtherClause* ElseClause* END
+CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
+CondExpressionWithElse = BEGIN lexical_COND CondClause+ CondElseClause END
+CondExpressionWithoutElse = BEGIN lexical_COND CondClause+ END
+CondClause = BEGIN ~lexical_ELSE ClauseBody+ END
+CondElseClause = BEGIN lexical_ELSE Form+ END
+ClauseBody = Form
 lexical_COND = space* "cond" space*
-ElseClause = BEGIN lexical_ELSE Form+ END
 lexical_ELSE = space* "else" space*
-CondFirstClause = BEGIN ~lexical_ELSE TestExpr Body+ END
-CondOtherClause = BEGIN ~lexical_ELSE TestExpr Body+ END
-TestExpr = Form
-Body = Form
 
-LetExpression = BEGIN lexical_LET LetBindings Body+ END
-lexical_LET = space* "let" "*"? space*
+LetExpression = BEGIN lexical_LET LetBindings LetBody+ END
 LetBindings = BEGIN Binding+ END
-Binding = BEGIN LetVar LetClause END
+Binding = BEGIN LetVar LetBindingClause END
 LetVar = lexical_symbol
-LetClause = Form
+LetBindingClause = Form
+LetBody = Form
+lexical_LET = space* "let" "*"? space*
 
 IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
 IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
@@ -783,15 +789,18 @@ lexical_AtNewListAt = space* "@newList@" space*
               SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + ";))"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
-              CondExpression: function(_begin,c,firstClause,otherClauses,elseClause,_end) { 
-                  return "return "+ c.emitjs() + " ? " + firstClause.emitjs() + otherClauses.emitjs() + " : " + elseClause.emitjs() + ";"; },
-              lexical_COND: function(_sp1,_,_sp2) {return "";},
-              ElseClause: function(_begin,_else,forms,_end) { return " CONDELSE: " + forms.emitjs(); },
-              lexical_ELSE: function(_1,_else,_2) { return ""; },
-              CondFirstClause: function(_begin,etest,body,_end) { return " CONDIF (" + etest.emitjs() + ") { return " + body.emitjs() + "; })"; },
-              CondOtherClause: function(_begin,etest,body,_end) { return " CONDELSIF (" + etest.emitjs() + ") { return " + body.emitjs() + "; })"; },
-              TestExpr: function(form) { return form.emitjs(); },
-              Body: function(form) { return form.emitjs(); },
+             
+              CondExpression: function(c){ return c.emitjs(); },
+              CondExpressionWithElse : function(_begin,_cond,clauses,elseClause,_end) {
+                 return "_cond([" + clauses.emitjs() + "]," + elseClause.emitjs() + ")"; },
+              CondExpressionWithoutElse : function(_begin,_cond,clauses,_end) {
+                 return "_cond([" + clauses.emitjs() + "],null)"; },
+              CondClause: function(_begin,clause,_end){return clause.emitjs();},
+              CondElseClause: function(_begin,_else,elseClause,_end){return elseClause.emitjs();},
+              ClauseBody: function(form){return form.emitjs();},
+              lexical_COND: function(_sp1,_,_sp2){return "";},
+              lexical_ELSE: function(_sp1,_,_sp2){return "";},
+
 
               LetExpression: function(_begin, _let, bindings, body, _end) { 
                                 return "((function(" + bindings.emitjs() + "){ " + body.emitjs() + "})()";
@@ -800,7 +809,7 @@ lexical_AtNewListAt = space* "@newList@" space*
               LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
               Binding: function(_begin,v,e,_end) { return v.emitjs() + "=" + e.emitjs() },
               LetVar: function(id) {return id.emitjs(); },
-              LetClause: function(e) { return e.emitjs(); },
+              LetBindingClause: function(e) { return e.emitjs(); },
 
               IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {return "(false != (" + e.emitjs() + ")()) ?" + thenPart.emitjs() + " : " + elsePart.emitjs()},
               IfThenExpression: function(_begin,_if,e,thenPart,_end) {return "(false != (" + e.emitjs() + ")()) ?" + thenPart.emitjs() + ": null";},
@@ -817,8 +826,8 @@ lexical_AtNewListAt = space* "@newList@" space*
 
 	      Atom: function(a) {return "(function(){return " + a.emitjs() + "};)";},
 
-              AndExpression: function(_begin,_and,booleans,_end) { return "_and([" + booleans.emitjs() + "])"; },
-              OrExpression: function(_begin,_or,booleans,_end) { return "_or([" + booleans.emitjs() + "])"; },
+              AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
+              OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
               NotExpression: function(_begin,_not,boolean,_end) { return "return (false == (" + boolean.emitjs() + "())) ? true : false;}"; },
               lexical_AND: function(_sp1,_and,_sp2) {return "";},
               lexical_OR: function(_sp1,_or,_sp2) {return "";},
