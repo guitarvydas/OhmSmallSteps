@@ -200,9 +200,14 @@
 (define h (and a b c))
     </script>
 
-<-- branching and -->
+<-- branching or -->
     <script type="text/test">
 (define h (or a b c))
+    </script>
+
+<-- not -->
+    <script type="text/test">
+(define i (not a))
     </script>
 
 
@@ -804,10 +809,10 @@ lexical_AtNewListAt = space* "@newList@" space*
 
               AndExpression: function(_begin,_and,booleans,_end) { return "_and([" + booleans.emitjs() + "])"; },
               OrExpression: function(_begin,_or,booleans,_end) { return "_or([" + booleans.emitjs() + "])"; },
-              NotExpression: function(_begin,_not,boolean,_end) { return boolean.emitjs(); },
+              NotExpression: function(_begin,_not,boolean,_end) { return "if (false != (" + boolean.emitjs() + "())) {return true;}{return false;}"; },
               lexical_AND: function(_sp1,_and,_sp2) {return "";},
               lexical_OR: function(_sp1,_or,_sp2) {return "";},
-              lexical_AND: function(_sp1,_not,_sp2) {return "";},
+              lexical_NOT: function(_sp1,_not,_sp2) {return "";},
               Boolean: function(form){return form.emitjs(); },
 
               lexical_AtNewListAt: function(_lp,_atnewlistat,_rp) { return "" ; },
