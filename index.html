@@ -10,7 +10,7 @@
     </script>
 
     <!-- test xyz --->
-    <script type=text/test>
+    <script type=text/test-simple>
 xyz
     </script>
     
@@ -38,7 +38,8 @@ xyz
       (define asymbol10)
     </script>
 
-    <script type="text/test-global-var">
+    <!-- global var -->
+    <script type="text/test">
       (define asymbol11 asymbol12)
     </script>
 
@@ -46,28 +47,36 @@ xyz
       (define (asymbol13 asymbol14))
     </script>
 
-    <script type="text/test-top-level-function-define">
+    <!-- top level define -->
+    <script type="text/test">
       (define (asymbol15 asymbol16) 5)
     </script>
 
-    <script type="text/test-top-level-function-define">
+
+    <!-- top level function define -->
+    <script type="text/test>
       (define (x15 x16) x17)
     </script>
 
-    <script type="text/test-top-level-function-define">
+    <script type="text/test">
       (define (x18 x19) (x20))
     </script>
 
-    <script type="text/test-form">
+
+    <!-- form -->
+    <script type="text/test">
       (asymbol1a asymbol2a)
       (asymbol3 asymbol4)
     </script>
 
-    <script type="text/test-top-level-call">
+
+    <!-- top level call -->
+    <script type="text/test">
       (prove5 '() goals db empty 1)
     </script>
 
-    <script type="text/test-top-level-function-define">
+    <!-- top level function define  -->
+    <script type="text/test">
       (define (funNoFormals) 1)
     </script>
 
@@ -149,75 +158,75 @@ xyz
             (back6 l g r e n c))))))
     </script>
 
-    <script type="text/test-newlist">
+    <script type="text/test">
 (define goals '((some (? X))
                 (some (? Y))
                 (neq (? X) (? Y))))
     </script>
 
 <!-- newlist -->
-    <script type="text/test-hold"> 
+    <script type="text/test"> 
 (define g '((a)))
     </script>
 
 <!-- newlist -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g '(a))
     </script>
 
 <!-- newlist -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g '(a b))
     </script>
 
 <!-- newlist -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g '())
     </script>
 
 <!-- function atom -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g a)
     </script>
 
 <!-- function atom -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g 42)
     </script>
 
 <!-- function atom -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g "abc")
     </script>
 
 <!-- function atom -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g #t)
     </script>
 
 <!-- function call -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define g (a b c))
     </script>
 
 <!-- branching and -->
-    <script type="text/test-hols">
+    <script type="text/test">
 (define h (and a b c))
     </script>
-    <script type="text/test-holds">
+    <script type="text/test">
 (define andTest (and a b c))
     </script>
-    <script type="text/test-hold">
-(define testAnd (and a b c))
+    <script type="text/test">
+(define testand (and a b c))
     </script>
 
 <!-- branching or -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define h (or a b c))
     </script>
 
 <!-- not -->
-    <script type="text/test-hold">
+    <script type="text/test">
 (define i (not a))
     </script>
 
@@ -486,9 +495,24 @@ xyz
 
 
     <script type="text/ohm-js">
+WSGrammar0 {
+  SyntacticRule = "xy" "z"
+  SyntacticRule2 = "xy" ~alnum "z"
+  lexicalRule = "xy" "z"
+}
+    </script>
+    <script type="text/ohm-js">
+WSGrammar1 {
+  SyntacticRule = "(" "xy" "z"
+  SyntacticRule2 = "(" "xy" ~alnum "z"
+  lexicalRule = "(" "xy" "z"
+}
+    </script>
+    <script type="text/ohm-js">
 WSGrammar {
   SyntacticRule = "xy" "z"
   lexicalRule = "xy" "z"
+  SyntacticRule2 = "xy" ~alnum "z"
 }
     </script>
 
@@ -579,7 +603,7 @@ IfTestExpr = Form
 ThenPart = Form
 ElsePart = Form
 
-AndExpression = BEGIN AND Boolean+ END
+AndExpression = BEGIN lexical_AND Boolean+ END
 OrExpression = BEGIN lexical_OR Boolean+ END
 NotExpression = BEGIN lexical_NOT Boolean END
 Boolean = Form
@@ -600,15 +624,15 @@ Keyword =   lexical_DEFINE
           | IF
           | lexical_LET
           | lexical_AtNewListAt 
-          | AND | lexical_OR | lexical_NOT
+          | lexical_AND | lexical_OR | lexical_NOT
           | lexical_ELSE
 
-AND = "and" ~alnum
-lexical_OR = "or" space*
-lexical_NOT = "not" space*
-lexical_AtNewListAt = space* "@newList@" space*
-lexical_DEFINE = "define" space*
-IF = ~alnum "if" ~alnum
+lexical_AND = "and" ~alnum space*
+lexical_OR = "or" ~alnum space*
+lexical_NOT = "not" ~alnum space*
+lexical_AtNewListAt = "@newList@" ~alnum space*
+lexical_DEFINE = "define" ~alnum space*
+IF = "if" ~alnum
 lexical_COND = space* "cond" space*
 lexical_ELSE = space* "else" space*
 }
@@ -861,7 +885,7 @@ lexical_ELSE = space* "else" space*
               AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
               OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
               NotExpression: function(_begin,_not,boolean,_end) { return "(function(){return (false == (" + boolean.emitjs() + "())) ? true : false;};)"; },
-              AND: function(_and) {return "";},
+              lexical_AND: function(_and,_sp) {return "";},
               lexical_OR: function(_or,_sp2) {return "";},
               lexical_NOT: function(_not,_sp) {return "";},
               Boolean: function(form){return form.emitjs(); },
@@ -869,12 +893,12 @@ lexical_ELSE = space* "else" space*
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";";},
               GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };";},
               TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "(function()/*function call*/{return " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "(function(){return " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
               FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
               Identifier: function(id) {return id.emitjs();},
               END: function(_rp) {return "";},
      
-              lexical_AtNewListAt: function(_lp,_atnewlistat,_rp) { return "" ; },
+              lexical_AtNewListAt: function(_atnewlistat,_rp) { return "" ; },
               lexical_DEFINE: function(_,sp2){return "";},
 
 	      lexical_integer: function(ns) {return toPackedString(ns.emitjs());},
@@ -949,8 +973,13 @@ nnn          } else if (parsed_emitter.failed()) {
       function simpleTest() {
           var parsed = ws_grammar.match("xy z",'SyntacticRule');
           displayTestResults(parsed,'input');
-          var parsed = ws_grammar.match("xy z",'lexicalRule');
+
+          parsed = ws_grammar.match("xy z",'lexicalRule');
           displayTestResults(parsed,'secondResult');
+
+          parsed = ws_grammar.match("xy z",'SyntacticRule2');
+          displayTestResults(parsed,'thirdResult');
+
 	  displayDate();
       }
           
@@ -963,11 +992,12 @@ nnn          } else if (parsed_emitter.failed()) {
 
   </head>
   <body>
-    <!-- <button onclick="pipelinetest()">Click me (pass1 & listConstants & emitter test)</button> -->
-    <button onclick="simpleTest()">Click me (simple test)</button>
+    <button onclick="pipelinetest()">Click me (pass1 & listConstants & emitter test)</button> -->
+    <!-- <button onclick="simpleTest()">Click me (simple test)</button> -->
     <p id="timestamp"></p>
     <p id="bool"></p>
     <p id="input"></p>
     <p id="secondResult"></p>
+    <p id="thirdResult"></p>
   </body>
 </html>
