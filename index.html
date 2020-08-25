@@ -8,6 +8,11 @@
     <script type="text/test-form">
       (#t #f)
     </script>
+
+    <!-- test xyz --->
+    <script type=text/test>
+xyz
+    </script>
     
     <script type="text/test-form">
       ( #t #f . #t)
@@ -116,7 +121,7 @@
           (and e* (unify (cdr x) (cdr y) e*)))))))
     </script>
 
-    <script type="text/test-hols">
+    <script type="text/test-hold">
 (define (prove6 l g r e n c)
   (cond
     ((null? g)
@@ -150,79 +155,90 @@
                 (neq (? X) (? Y))))
     </script>
 
-<-- newlist -->
+<!-- newlist -->
     <script type="text/test-hold"> 
 (define g '((a)))
     </script>
 
-<-- newlist -->
+<!-- newlist -->
     <script type="text/test-hold">
 (define g '(a))
     </script>
 
-<-- newlist -->
+<!-- newlist -->
     <script type="text/test-hold">
 (define g '(a b))
     </script>
 
-<-- newlist -->
+<!-- newlist -->
     <script type="text/test-hold">
 (define g '())
     </script>
 
-<-- function atom -->
-    <script type="text/test">
+<!-- function atom -->
+    <script type="text/test-hold">
 (define g a)
     </script>
 
-<-- function atom -->
-    <script type="text/test">
+<!-- function atom -->
+    <script type="text/test-hold">
 (define g 42)
     </script>
 
-<-- function atom -->
-    <script type="text/test">
+<!-- function atom -->
+    <script type="text/test-hold">
 (define g "abc")
     </script>
 
-<-- function atom -->
-    <script type="text/test">
+<!-- function atom -->
+    <script type="text/test-hold">
 (define g #t)
     </script>
 
-<-- function call -->
-    <script type="text/test">
+<!-- function call -->
+    <script type="text/test-hold">
 (define g (a b c))
     </script>
 
-<-- branching and -->
-    <script type="text/test">
+<!-- branching and -->
+    <script type="text/test-hols">
 (define h (and a b c))
     </script>
+    <script type="text/test-holds">
+(define andTest (and a b c))
+    </script>
+    <script type="text/test-hold">
+(define testAnd (and a b c))
+    </script>
 
-<-- branching or -->
-    <script type="text/test">
+<!-- branching or -->
+    <script type="text/test-hold">
 (define h (or a b c))
     </script>
 
-<-- not -->
-    <script type="text/test">
+<!-- not -->
+    <script type="text/test-hold">
 (define i (not a))
     </script>
 
-<-- if then else -->
-    <script type="text/test">
+<!-- if then else -->
+    <script type="text/test-if-then-else">
 (define ifThenElseTest (if a b c))
     </script>
 
-<-- if then -->
-    <script type="text/test">
+<!-- if then -->
+    <script type="text/test-if-then">
 (define ifThenTest (if a b))
     </script>
 
-<-- cond -->
-    <script type="text/test-hold">
-(define condTest (cond ((a b c) (d e f))))
+<!-- cond -->
+    <script type="text/test-cond">
+(define condTestWElse (cond (a b c) (d e f) (else g))))
+    </script>
+
+<!-- cond -->
+    <script type="text/test-cond">
+(define condTestWOElse (cond (a b c) (d e f)))
     </script>
 
 
@@ -470,6 +486,13 @@
 
 
     <script type="text/ohm-js">
+WSGrammar {
+  SyntacticRule = "xy" "z"
+  lexicalRule = "xy" "z"
+}
+    </script>
+
+    <script type="text/ohm-js">
 
 // pass 1 grammar
 
@@ -522,18 +545,8 @@ Scm2JSListConstants <: Scm2JSBasic {
     <script type="text/ohm-js">
 
 // Emitter grammar
-
 Scm2JSEmitter <: Scm2JSBasic {
     Program := (GlobalVariableDefinition | GlobalFunctionDefinition | TopLevelFunctionCall)+
-    GlobalFunctionDefinition = BEGIN Define FunctionNameAndFormals Form+ END
-    GlobalVariableDefinition = BEGIN Define Identifier Form END
-    TopLevelFunctionCall = FunctionCall
-    FunctionCall = BEGIN ~Define Identifier Arg* END
-    FunctionNameAndFormals = BEGIN Identifier Arg* END
-    Identifier = lexical_symbol
-    Define = "define"
-    BEGIN = "("
-    END = ")"
 
 Arg = ListItem
 
@@ -551,8 +564,6 @@ CondExpressionWithoutElse = BEGIN lexical_COND CondClause+ END
 CondClause = BEGIN ~lexical_ELSE ClauseBody+ END
 CondElseClause = BEGIN lexical_ELSE Form+ END
 ClauseBody = Form
-lexical_COND = space* "cond" space*
-lexical_ELSE = space* "else" space*
 
 LetExpression = BEGIN lexical_LET LetBindings LetBody+ END
 LetBindings = BEGIN Binding+ END
@@ -562,25 +573,45 @@ LetBindingClause = Form
 LetBody = Form
 lexical_LET = space* "let" "*"? space*
 
-IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
-IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
+IfThenElseExpression = BEGIN IF IfTestExpr ThenPart+ ElsePart* END
+IfThenExpression = BEGIN IF IfTestExpr ThenPart+ END
 IfTestExpr = Form
 ThenPart = Form
 ElsePart = Form
-lexical_IF = space* "if" space*
 
-AndExpression = BEGIN lexical_AND Boolean+ END
+AndExpression = BEGIN AND Boolean+ END
 OrExpression = BEGIN lexical_OR Boolean+ END
 NotExpression = BEGIN lexical_NOT Boolean END
-lexical_AND = space* "and" space*
-lexical_OR = space* "or" space*
-lexical_NOT = space* "not" space*
 Boolean = Form
 
+    GlobalFunctionDefinition = BEGIN lexical_DEFINE FunctionNameAndFormals Form+ END
+    GlobalVariableDefinition = BEGIN lexical_DEFINE Identifier Form END
+    TopLevelFunctionCall = FunctionCall
+    FunctionCall = BEGIN ~Keyword Identifier Arg* END
+    FunctionNameAndFormals = BEGIN Identifier Arg* END
+    Identifier = ~Keyword lexical_symbol
+    BEGIN = "("
+    END = ")"
+
+  Form := Keyword | SList | Atom
+
+Keyword =   lexical_DEFINE
+          | lexical_COND 
+          | IF
+          | lexical_LET
+          | lexical_AtNewListAt 
+          | AND | lexical_OR | lexical_NOT
+          | lexical_ELSE
+
+AND = "and" ~alnum
+lexical_OR = "or" space*
+lexical_NOT = "not" space*
 lexical_AtNewListAt = space* "@newList@" space*
-
+lexical_DEFINE = "define" space*
+IF = ~alnum "if" ~alnum
+lexical_COND = space* "cond" space*
+lexical_ELSE = space* "else" space*
 }
-
     </script>
 
 
@@ -589,6 +620,7 @@ lexical_AtNewListAt = space* "@newList@" space*
     <script>
 
       var g_namespace = ohm.grammarsFromScriptElements();
+      var ws_grammar = g_namespace["WSGrammar"];
       var pass1_grammar = g_namespace["Scm2JSBasic"];
       var listConstants_grammar = g_namespace["Scm2JSListConstants"];
       var emitter_grammar = g_namespace["Scm2JSEmitter"];
@@ -773,15 +805,6 @@ lexical_AtNewListAt = space* "@newList@" space*
 	  'emitjs',
 	  {
 	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
-              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";";},
-              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };";},
-              TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "(function(){return " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
-              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
-              Identifier: function(id) {return id.emitjs();},
-              Define: function(_define) {return "";},
-              END: function(_rp) {return "";},
-     
               Arg: function(a) {return a.emitjs() + "()";},
 
               Form: function(item) {return item.emitjs()},
@@ -790,7 +813,7 @@ lexical_AtNewListAt = space* "@newList@" space*
 
               SpecialForm: function(e) { return e.emitjs(); },
              
-              CondExpression: function(c){ return c.emitjs(); },
+              CondExpression: function(c){ return "(function(){return " + c.emitjs() + "};)"; },
               CondExpressionWithElse : function(_begin,_cond,clauses,elseClause,_end) {
                  return "_cond([" + clauses.emitjs() + "]," + elseClause.emitjs() + ")"; },
               CondExpressionWithoutElse : function(_begin,_cond,clauses,_end) {
@@ -825,7 +848,7 @@ lexical_AtNewListAt = space* "@newList@" space*
                                     },
               ThenPart: function(f) { return f.emitjs(); },
               ElsePart: function(f) { return f.emitjs(); },
-              lexical_IF: function(_sp1,_if,_sp2) { return ""; },
+              IF: function(_if) { return ""; },
 
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs() + ")"},
@@ -838,12 +861,21 @@ lexical_AtNewListAt = space* "@newList@" space*
               AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
               OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
               NotExpression: function(_begin,_not,boolean,_end) { return "(function(){return (false == (" + boolean.emitjs() + "())) ? true : false;};)"; },
-              lexical_AND: function(_sp1,_and,_sp2) {return "";},
-              lexical_OR: function(_sp1,_or,_sp2) {return "";},
-              lexical_NOT: function(_sp1,_not,_sp2) {return "";},
+              AND: function(_and) {return "";},
+              lexical_OR: function(_or,_sp2) {return "";},
+              lexical_NOT: function(_not,_sp) {return "";},
               Boolean: function(form){return form.emitjs(); },
 
+              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };";},
+              TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "(function()/*function call*/{return " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
+              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
+              Identifier: function(id) {return id.emitjs();},
+              END: function(_rp) {return "";},
+     
               lexical_AtNewListAt: function(_lp,_atnewlistat,_rp) { return "" ; },
+              lexical_DEFINE: function(_,sp2){return "";},
 
 	      lexical_integer: function(ns) {return toPackedString(ns.emitjs());},
 	      lexical_symbol: function(c, cs) {return c.emitjs() + toPackedString(cs.emitjs());},
@@ -884,11 +916,14 @@ lexical_AtNewListAt = space* "@newList@" space*
 	      tail = "";
 	  }
 	  if (parsed_pass1.failed()) {
-             resultsString = resultsString + "<br>" + "pass1 parse failed " + transpiled_pass1.substring(0,charsToDisplay);
+             resultsString = resultsString + "<br>" + "pass1 parse *FAILED* " + transpiled_pass1.substring(0,charsToDisplay);
           } else if (parsed_listConstants.failed()) {
-             resultsString = resultsString + "<br>" + "listConstants parse failed " + transpiled_listConstants.substring(0,charsToDisplay);
-          } else if (parsed_emitter.failed()) {
-             resultsString = resultsString + "<br>" + "emitter parse failed " + transpiled_listConstants.toString();
+             resultsString = resultsString + "<br>" + "listConstants parse *FAILED* " + transpiled_listConstants.substring(0,charsToDisplay);
+nnn          } else if (parsed_emitter.failed()) {
+             resultsString = resultsString + "<br>" + "emitter parse *FAILED* " + transpiled_listConstants.toString();
+             console.log(transpiled_listConstants);
+             console.log( emitter_grammar.match(transpiled_listConstants).toString() );
+             console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
           } else {
              // var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
              var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
@@ -911,6 +946,14 @@ lexical_AtNewListAt = space* "@newList@" space*
 	  displayDate();
       }
 
+      function simpleTest() {
+          var parsed = ws_grammar.match("xy z",'SyntacticRule');
+          displayTestResults(parsed,'input');
+          var parsed = ws_grammar.match("xy z",'lexicalRule');
+          displayTestResults(parsed,'secondResult');
+	  displayDate();
+      }
+          
 </script>
 
 
@@ -920,7 +963,8 @@ lexical_AtNewListAt = space* "@newList@" space*
 
   </head>
   <body>
-    <button onclick="pipelinetest()">Click me (pass1 & listConstants & emitter test)</button>
+    <!-- <button onclick="pipelinetest()">Click me (pass1 & listConstants & emitter test)</button> -->
+    <button onclick="simpleTest()">Click me (simple test)</button>
     <p id="timestamp"></p>
     <p id="bool"></p>
     <p id="input"></p>
