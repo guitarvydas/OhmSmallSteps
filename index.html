@@ -231,18 +231,18 @@ xyz
     </script>
 
 <!-- if then else -->
-    <script type="text/test-if-then-else">
+    <script type="text/test">
 (define ifThenElseTest (if a b c))
     </script>
 
 <!-- if then -->
-    <script type="text/test-if-then">
+    <script type="text/test">
 (define ifThenTest (if a b))
     </script>
 
 <!-- cond -->
-    <script type="text/test-cond">
-(define condTestWElse (cond (a b c) (d e f) (else g))))
+    <script type="text/test">
+(define condTestWElse (cond (a b c) (d e f) (else g)))
     </script>
 
 <!-- cond -->
@@ -597,8 +597,8 @@ LetBindingClause = Form
 LetBody = Form
 lexical_LET = space* "let" "*"? space*
 
-IfThenElseExpression = BEGIN IF IfTestExpr ThenPart+ ElsePart* END
-IfThenExpression = BEGIN IF IfTestExpr ThenPart+ END
+IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
+IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
 IfTestExpr = Form
 ThenPart = Form
 ElsePart = Form
@@ -621,7 +621,7 @@ Boolean = Form
 
 Keyword =   lexical_DEFINE
           | lexical_COND 
-          | IF
+          | lexical_IF
           | lexical_LET
           | lexical_AtNewListAt 
           | lexical_AND | lexical_OR | lexical_NOT
@@ -632,9 +632,9 @@ lexical_OR = "or" ~alnum space*
 lexical_NOT = "not" ~alnum space*
 lexical_AtNewListAt = "@newList@" ~alnum space*
 lexical_DEFINE = "define" ~alnum space*
-IF = "if" ~alnum
-lexical_COND = space* "cond" space*
-lexical_ELSE = space* "else" space*
+lexical_IF = "if" ~alnum space*
+lexical_COND = "cond" ~alnum space*
+lexical_ELSE = "else" ~alnum space*
 }
     </script>
 
@@ -845,8 +845,8 @@ lexical_ELSE = space* "else" space*
               CondClause: function(_begin,clause,_end){return clause.emitjs();},
               CondElseClause: function(_begin,_else,elseClause,_end){return elseClause.emitjs();},
               ClauseBody: function(form){return form.emitjs();},
-              lexical_COND: function(_sp1,_,_sp2){return "";},
-              lexical_ELSE: function(_sp1,_,_sp2){return "";},
+              lexical_COND: function(_,_sp2){return "";},
+              lexical_ELSE: function(_,_sp2){return "";},
 
 
               LetExpression: function(_begin, _let, bindings, body, _end) { 
@@ -872,7 +872,8 @@ lexical_ELSE = space* "else" space*
                                     },
               ThenPart: function(f) { return f.emitjs(); },
               ElsePart: function(f) { return f.emitjs(); },
-              IF: function(_if) { return ""; },
+              lexical_IF: function(_if,_sp) { return ""; },
+              lexical_ELSE: function(_else,_sp) { return ""; },
 
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
 		  return "(" + toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs() + ")"},
@@ -880,7 +881,7 @@ lexical_ELSE = space* "else" space*
 		  return "(" + toListOfStrings(items.emitjs()) + ")"},
 	      ListItem: function(item) {return item.emitjs()},
 
-	      Atom: function(a) {return "(function(){return " + a.emitjs() + "};)";},
+	      Atom: function(a) {return "(function(){return " + a.emitjs() + ";})";},
 
               AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
               OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
@@ -941,6 +942,7 @@ lexical_ELSE = space* "else" space*
 	  }
 	  if (parsed_pass1.failed()) {
              resultsString = resultsString + "<br>" + "pass1 parse *FAILED* " + transpiled_pass1.substring(0,charsToDisplay);
+             console.log(testString);
           } else if (parsed_listConstants.failed()) {
              resultsString = resultsString + "<br>" + "listConstants parse *FAILED* " + transpiled_listConstants.substring(0,charsToDisplay);
 nnn          } else if (parsed_emitter.failed()) {
