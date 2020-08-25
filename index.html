@@ -246,11 +246,14 @@ xyz
     </script>
 
 <!-- cond -->
-    <script type="text/test-cond">
+    <script type="text/test">
 (define condTestWOElse (cond (a b c) (d e f)))
     </script>
 
-
+<!-- let -->
+    <script type="text/test">
+(define letTest (let ((a b) (c d)) X))
+    </script>
 
 
     <script type="text/test-prolog-6">
@@ -589,13 +592,12 @@ CondClause = BEGIN ~lexical_ELSE ClauseBody+ END
 CondElseClause = BEGIN lexical_ELSE Form+ END
 ClauseBody = Form
 
-LetExpression = BEGIN lexical_LET LetBindings LetBody+ END
+LetExpression = BEGIN lexical_LET LetBindings LetBody END
 LetBindings = BEGIN Binding+ END
 Binding = BEGIN LetVar LetBindingClause END
 LetVar = lexical_symbol
 LetBindingClause = Form
 LetBody = Form
-lexical_LET = space* "let" "*"? space*
 
 IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
 IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
@@ -635,6 +637,7 @@ lexical_DEFINE = "define" ~alnum space*
 lexical_IF = "if" ~alnum space*
 lexical_COND = "cond" ~alnum space*
 lexical_ELSE = "else" ~alnum space*
+lexical_LET = "let" ~alnum space*
 }
     </script>
 
@@ -842,7 +845,7 @@ lexical_ELSE = "else" ~alnum space*
                  return "_cond([" + clauses.emitjs() + "]," + elseClause.emitjs() + ")"; },
               CondExpressionWithoutElse : function(_begin,_cond,clauses,_end) {
                  return "_cond([" + clauses.emitjs() + "],null)"; },
-              CondClause: function(_begin,clause,_end){return clause.emitjs();},
+              CondClause: function(_begin,clause,_end){return "[" + clause.emitjs() + "]";},
               CondElseClause: function(_begin,_else,elseClause,_end){return elseClause.emitjs();},
               ClauseBody: function(form){return form.emitjs();},
               lexical_COND: function(_,_sp2){return "";},
@@ -850,11 +853,11 @@ lexical_ELSE = "else" ~alnum space*
 
 
               LetExpression: function(_begin, _let, bindings, body, _end) { 
-                                return "((function(" + bindings.emitjs() + "){ " + body.emitjs() + "})()";
+                                return "(function(" + bindings.emitjs() + "){ return " + body.emitjs() + ";});";
                              },
-              lexical_LET: function(_sp1,_let,_star,_sp2) { return ""; },
+              lexical_LET: function(_let,_sp2) { return ""; },
               LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
-              Binding: function(_begin,v,e,_end) { return v.emitjs() + "=" + e.emitjs() },
+              Binding: function(_begin,v,e,_end) { return v.emitjs() + "=" + e.emitjs() + "()"; },
               LetVar: function(id) {return id.emitjs(); },
               LetBindingClause: function(e) { return e.emitjs(); },
 
