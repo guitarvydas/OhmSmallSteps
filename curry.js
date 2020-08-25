@@ -40,5 +40,7 @@ console.log(a);
 var L_1 = (function(x){return car(x);});
 console.log(L_1(a));
 
+// see https://javascript.info/currying-partials
+
 // pr((function(){return car})([8,9]));
 // pr((function(){return car})(cons(10,11)));
