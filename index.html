@@ -39,7 +39,7 @@ xyz
     </script>
 
     <!-- global var -->
-    <script type="text/test">
+    <script type="text/test-all">
       (define asymbol11 asymbol12)
     </script>
 
@@ -48,7 +48,7 @@ xyz
     </script>
 
     <!-- top level define -->
-    <script type="text/test">
+    <script type="text/test-all">
       (define (asymbol15 asymbol16) 5)
     </script>
 
@@ -58,25 +58,25 @@ xyz
       (define (x15 x16) x17)
     </script>
 
-    <script type="text/test">
+    <script type="text/test-all">
       (define (x18 x19) (x20))
     </script>
 
 
     <!-- form -->
-    <script type="text/test">
+    <script type="text/test-all">
       (asymbol1a asymbol2a)
       (asymbol3 asymbol4)
     </script>
 
 
     <!-- top level call -->
-    <script type="text/test">
+    <script type="text/test-all">
       (prove5 '() goals db empty 1)
     </script>
 
     <!-- top level function define  -->
-    <script type="text/test">
+    <script type="text/test-all">
       (define (funNoFormals) 1)
     </script>
 
@@ -158,136 +158,136 @@ xyz
             (back6 l g r e n c))))))
     </script>
 
-    <script type="text/test">
+    <script type="text/test-all">
 (define goals '((some (? X))
                 (some (? Y))
                 (neq (? X) (? Y))))
     </script>
 
 <!-- newlist -->
-    <script type="text/test"> 
+    <script type="text/test-all"> 
 (define g '((a)))
     </script>
 
 <!-- newlist -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g '(a))
     </script>
 
 <!-- newlist -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g '(a b))
     </script>
 
 <!-- newlist -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g '())
     </script>
 
 <!-- function atom -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g a)
     </script>
 
 <!-- function atom -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g 42)
     </script>
 
 <!-- function atom -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g "abc")
     </script>
 
 <!-- function atom -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g #t)
     </script>
 
 <!-- function call -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define g (a b c))
     </script>
 
 <!-- branching and -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define h (and a b c))
     </script>
-    <script type="text/test">
+    <script type="text/test-all">
 (define andTest (and a b c))
     </script>
-    <script type="text/test">
+    <script type="text/test-all">
 (define testand (and a b c))
     </script>
 
 <!-- branching or -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define h (or a b c))
     </script>
 
 <!-- not -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define i (not a))
     </script>
 
 <!-- if then else -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define ifThenElseTest (if a b c))
     </script>
 
 <!-- if then -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define ifThenTest (if a b))
     </script>
 
 <!-- cond -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define condTestWElse (cond (a b c) (d e f) (else g)))
     </script>
 
 <!-- cond -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define condTestWOElse (cond (a b c) (d e f)))
     </script>
 
 <!-- let -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define letTest (let ((a b) (c d)) X))
     </script>
 
 
 <!-- quote -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define quoteTest (quote abc))
     </script>
 
 <!-- quote -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define quoteTest (quote #t))
     </script>
 
 <!-- quote -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define quoteTest (quote #f))
     </script>
 
 <!-- quote -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define quoteTest (quote 123))
     </script>
 
 <!-- quote -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define quoteTest (quote "string"))
     </script>
 
 <!-- symbol macro -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define L_l car)
     </script>
 
 <!-- symbol macro -->
-    <script type="text/test">
+    <script type="text/test-all">
 (L_1 a)
     </script>
 
@@ -296,7 +296,36 @@ xyz
 (L_1 '(a b c))
     </script>
 
-    <script type="text/test-prolog-6">
+<!-- define revisited -->
+    <script type="text/test-all" -->
+(define goals '((path a f (? P))))
+    </script>
+
+<!-- define revisited -->
+    <script type="text/test-all" -->
+(define L_l car)
+    </script>
+
+<!-- define revisited -->
+    <script type="text/test-all" -->
+(define v '?)
+    </script>
+<!-- define revisited -->
+    <script type="text/test-all" -->
+(define name cadr)
+    </script>
+
+<!-- define revisited -->
+    <script type="text/test" -->
+(define (prove3 g e n)
+  (cond ((null? g)
+          (print-frame e))
+        (else
+          (try g db e n))))
+    </script>
+
+<!-- prolog-6.scm -->
+    <script type="text/test-prolog">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -945,9 +974,9 @@ lexical_QUOTE = "quote" ~alnum space*
 	      QuotedOther: function(_lp,_q,sym,_rp){ return sym.emitjs()},
               lexical_QUOTE: function(_quote,_sp) {return "";},
 
-              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";";},
-              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };";},
-              TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";";},
+              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };<br>";},
+              TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";<br>";},
               FunctionCall: function(_lp,id,actuals,_end) {return "(function(){return " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
               FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
               Identifier: function(id) {return id.emitjs();},
