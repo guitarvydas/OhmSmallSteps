@@ -256,6 +256,32 @@ xyz
     </script>
 
 
+<!-- quote -->
+    <script type="text/test">
+(define quoteTest (quote abc))
+    </script>
+
+<!-- quote -->
+    <script type="text/test">
+(define quoteTest (quote #t))
+    </script>
+
+<!-- quote -->
+    <script type="text/test">
+(define quoteTest (quote #f))
+    </script>
+
+<!-- quote -->
+    <script type="text/test">
+(define quoteTest (quote 123))
+    </script>
+
+<!-- quote -->
+    <script type="text/test">
+(define quoteTest (quote "string"))
+    </script>
+
+
     <script type="text/test-prolog-6">
 (define (try g r e n)
   (if (null? r)
@@ -583,7 +609,7 @@ Arg = ListItem
            | FunctionCall
            | NullTerminatedList
 
-SpecialForm = CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
+SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
 
 CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
 CondExpressionWithElse = BEGIN lexical_COND CondClause+ CondElseClause END
@@ -608,7 +634,11 @@ ElsePart = Form
 AndExpression = BEGIN lexical_AND Boolean+ END
 OrExpression = BEGIN lexical_OR Boolean+ END
 NotExpression = BEGIN lexical_NOT Boolean END
-Boolean = Form
+    Boolean = Form
+
+    QuotedExpression = QuotedSymbol | QuotedOther
+    QuotedSymbol = BEGIN lexical_QUOTE lexical_symbol END
+    QuotedOther = BEGIN lexical_QUOTE (lexical_integer | lexical_string | lexical_boolean) END
 
     GlobalFunctionDefinition = BEGIN lexical_DEFINE FunctionNameAndFormals Form+ END
     GlobalVariableDefinition = BEGIN lexical_DEFINE Identifier Form END
@@ -628,6 +658,7 @@ Keyword =   lexical_DEFINE
           | lexical_AtNewListAt 
           | lexical_AND | lexical_OR | lexical_NOT
           | lexical_ELSE
+          | lexical_QUOTE
 
 lexical_AND = "and" ~alnum space*
 lexical_OR = "or" ~alnum space*
@@ -638,6 +669,7 @@ lexical_IF = "if" ~alnum space*
 lexical_COND = "cond" ~alnum space*
 lexical_ELSE = "else" ~alnum space*
 lexical_LET = "let" ~alnum space*
+lexical_QUOTE = "quote" ~alnum space*
 }
     </script>
 
@@ -893,6 +925,11 @@ lexical_LET = "let" ~alnum space*
               lexical_OR: function(_or,_sp2) {return "";},
               lexical_NOT: function(_not,_sp) {return "";},
               Boolean: function(form){return form.emitjs(); },
+
+	      QuotedExpression: function(x) {return x.emitjs();},
+	      QuotedSymbol: function(_lp,_q,sym,_rp){ return '"' + sym.emitjs() + '"'},
+	      QuotedOther: function(_lp,_q,sym,_rp){ return sym.emitjs()},
+              lexical_QUOTE: function(_quote,_sp) {return "";},
 
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";";},
               GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " { return " + body.emitjs() + "; };";},
