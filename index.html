@@ -644,7 +644,9 @@ Scm2JSListConstants <: Scm2JSBasic {
 Scm2JSEmitter <: Scm2JSBasic {
     Program := (GlobalVariableDefinition | GlobalFunctionDefinition | TopLevelFunctionCall)+
 
-Arg = ListItem
+Arg = AtomicArg | NonAtomicArg
+AtomicArg = ListItem
+NonAtomicArg = ListItem
 
   SList :=   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
            | DottedList 
@@ -692,7 +694,7 @@ NotExpression = BEGIN lexical_NOT Boolean END
     BEGIN = "("
     END = ")"
 
-  Form := Keyword | SList | Atom
+    Form := Keyword | SList | Atom
 
 Keyword =   lexical_DEFINE
           | lexical_COND 
@@ -907,7 +909,9 @@ lexical_QUOTE = "quote" ~alnum space*
 	  'emitjs',
 	  {
 	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
-              Arg: function(a) {return a.emitjs() + "()";},
+              Arg: function(a) {return a.emitjs()},
+              NonAtomicArg: function(a) {return a.emitjs() + "()";},
+              AtomicArg: function(a) {return a.emitjs();},
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
@@ -959,7 +963,7 @@ lexical_QUOTE = "quote" ~alnum space*
 		  return "(" + toListOfStrings(items.emitjs()) + ")"},
 	      ListItem: function(item) {return item.emitjs()},
 
-	      Atom: function(a) {return "(function(){return " + a.emitjs() + ";})";},
+	      Atom: function(a) {return a.emitjs();},
 
               AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
               OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
