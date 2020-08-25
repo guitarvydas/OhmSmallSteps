@@ -281,6 +281,20 @@ xyz
 (define quoteTest (quote "string"))
     </script>
 
+<!-- symbol macro -->
+    <script type="text/test">
+(define L_l car)
+    </script>
+
+<!-- symbol macro -->
+    <script type="text/test">
+(L_1 a)
+    </script>
+
+<!-- symbol macro -->
+    <script type="text/test-hold">
+(L_1 '(a b c))
+    </script>
 
     <script type="text/test-prolog-6">
 (define (try g r e n)
