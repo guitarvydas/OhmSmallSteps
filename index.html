@@ -1083,6 +1083,9 @@ nnn          } else if (parsed_emitter.failed()) {
              // var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
              var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
              resultsString = resultsString + "<br>" + " " + transpiled_listConstants.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_emitter;
+             console.log(transpiled_emitter);
+             console.log( emitter_grammar.match(transpiled_emitter).toString() );
+             console.log( emitter_grammar.trace(transpiled_emitter).toString() );
           }
       }
 
