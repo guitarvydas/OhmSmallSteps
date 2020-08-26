@@ -325,7 +325,7 @@ xyz
 (define (try g r e n)
   (if nn
       #f
-      (let ()
+      (let ((a 2))
         p1
         )))
     </script>
@@ -1076,6 +1076,13 @@ lexical_QUOTE = "quote" ~alnum space*
 		      resultsString = resultsString + "<br>input:<br>" + testString + " --><br><br>";
 		      resultsString = resultsString + transpiled_listConstants + " --><br><br>";
 		      resultsString = resultsString + transpiled_emitter;
+
+		      var debugParse = false; // use https://ohmlang.github.io/editor/
+		      if (debugParse) {
+			  var tr = emitter_grammar.trace(transpiled_listConstants);
+			  console.log(tr);
+			  console.log(tr.toString());
+		      }
 		  }
 	      }
 	  }
