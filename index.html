@@ -1056,37 +1056,29 @@ lexical_QUOTE = "quote" ~alnum space*
 	  var testString = testElement.innerHTML;
 
           var parsed_pass1 = pass1_grammar.match(testString);
-          var transpiled_pass1 = parsed_pass1.failed() ? "" : pass1_semantics(parsed_pass1).unbackquote();
-
-	  var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
-          var transpiled_listConstants = parsed_listConstants.failed() ? "" : listConstants_semantics(parsed_listConstants).listConstants();
-
-          // console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
-	  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
-
-	  var tail = "...";
-	  var charsToDisplay = 40;
-	  if (transpiled_pass1.length < charsToDisplay) {
-	      tail = "";
-	  }
 	  if (parsed_pass1.failed()) {
-             resultsString = resultsString + "<br>" + "pass1 parse *FAILED* " + transpiled_pass1.substring(0,charsToDisplay);
-             console.log(testString);
-          } else if (parsed_listConstants.failed()) {
-             resultsString = resultsString + "<br>" + "listConstants parse *FAILED* " + transpiled_listConstants.substring(0,charsToDisplay);
-nnn          } else if (parsed_emitter.failed()) {
-             resultsString = resultsString + "<br>" + "emitter parse *FAILED* " + transpiled_listConstants.toString();
-             console.log(transpiled_listConstants);
-             console.log( emitter_grammar.match(transpiled_listConstants).toString() );
-             console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
-          } else {
-             // var transpiled_emitter = emitter_semantics(parsed_emitter).emitter();
-             var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
-             resultsString = resultsString + "<br>" + " " + transpiled_listConstants.substring(0,charsToDisplay) + tail + " <--- <br>" + transpiled_emitter;
-             console.log(transpiled_emitter);
-             console.log( emitter_grammar.match(transpiled_emitter).toString() );
-             console.log( emitter_grammar.trace(transpiled_emitter).toString() );
-          }
+	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>";
+	  } else {
+              var transpiled_pass1 = pass1_semantics(parsed_pass1).unbackquote();
+	      
+	      var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
+	      if (parsed_listConstants.failed()) {
+		  resultsString = resultsString + "<br>listConstants parse *FAILED*<br>";
+	      } else {		  
+		  var transpiled_listConstants = listConstants_semantics(parsed_listConstants).listConstants();
+		  
+		  // console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
+		  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
+		  if (parsed_emitter.failed()) {
+		      resultsString = resultsString + "<br>emitter parse *FAILED*<br>";
+		  } else {
+		      var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
+		      resultsString = resultsString + "<br>input:<br>" + testString + " --><br><br>";
+		      resultsString = resultsString + transpiled_listConstants + " --><br><br>";
+		      resultsString = resultsString + transpiled_emitter;
+		  }
+	      }
+	  }
       }
 
       function displayTestResults(s,el) {
