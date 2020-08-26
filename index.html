@@ -251,12 +251,12 @@ xyz
     </script>
 
 <!-- let -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define letTest (let ((a b) (c d)) X))
     </script>
 
 <!-- let* -->
-    <script type="text/test">
+    <script type="text/test-all">
 (define letStarTest (let* ((a b) (c d)) X))
     </script>
 
@@ -320,19 +320,29 @@ xyz
 (define name cadr)
     </script>
 
-<!-- prolog-6 top level 1 -->
+<!-- prolog-6 top level 1a -->
     <script type="text/test" -->
 (define (try g r e n)
   (if nn
       #f
-      (let* ((a  (copy (car r) (list n)))
+      (let ()
+        p1
+        )))
+    </script>
+
+<!-- prolog-6 top level 1 -->
+    <script type="text/test-hold" -->
+(define (try g r e n)
+  (if nn
+      #f
+      (let ((a  (copy (car r) (list n)))
              (ne (unify (car g) (car a) e)))
         (if ne
             (prove3 (append (cdr a) (cdr g)) ne (+ 1 n)))
         (try g (cdr r) e n))))
     </script>
 
-    <script type="text/test" -->
+    <script type="text/test-prolog6" -->
 (define (try g r e n)
   (if (null? r)
       #f
@@ -677,10 +687,10 @@ AtomicArg = ListItem
 NonAtomicArg = ListItem
 
   SList :=   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
-           | DottedList 
            | SpecialForm 
            | FunctionCall
            | NullTerminatedList
+           | DottedList 
 
 SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
 
@@ -721,8 +731,6 @@ NotExpression = BEGIN lexical_NOT Boolean END
     Identifier = ~Keyword lexical_symbol
     BEGIN = "("
     END = ")"
-
-    Form := Keyword | SList | Atom
 
 Keyword =   lexical_DEFINE
           | lexical_COND 
