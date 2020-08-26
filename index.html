@@ -251,8 +251,13 @@ xyz
     </script>
 
 <!-- let -->
-    <script type="text/test-all">
+    <script type="text/test">
 (define letTest (let ((a b) (c d)) X))
+    </script>
+
+<!-- let* -->
+    <script type="text/test">
+(define letStarTest (let* ((a b) (c d)) X))
     </script>
 
 
@@ -315,8 +320,20 @@ xyz
 (define name cadr)
     </script>
 
-<!-- define revisited -->
-    <script type="text/test" -->
+<!-- prolog-6 top level 1 -->
+    <script type="text/test-tl1" -->
+(define (try g r e n)
+  (if (null? r)
+      #f
+      (let* ((a  (copy (car r) (list n)))
+             (ne (unify (car g) (car a) e)))
+        (if ne
+            (prove3 (append (cdr a) (cdr g)) ne (+ 1 n)))
+        (try g (cdr r) e n))))
+    </script>
+
+<!-- prolog-6 top level 2 -->
+    <script type="text/test-prolog-6-tl2" -->
 (define (prove3 g e n)
   (cond ((null? g)
           (print-frame e))
@@ -713,7 +730,7 @@ lexical_DEFINE = "define" ~alnum space*
 lexical_IF = "if" ~alnum space*
 lexical_COND = "cond" ~alnum space*
 lexical_ELSE = "else" ~alnum space*
-lexical_LET = "let" ~alnum space*
+lexical_LET = ("let*" | "let") ~alnum space*
 lexical_QUOTE = "quote" ~alnum space*
 }
     </script>
@@ -932,7 +949,7 @@ lexical_QUOTE = "quote" ~alnum space*
 
 
               LetExpression: function(_begin, _let, bindings, body, _end) { 
-                                return "(function(" + bindings.emitjs() + "){ return " + body.emitjs() + ";});";
+                                return "(function(" + bindings.emitjs() + "){ return " + body.emitjs() + ";})";
                              },
               lexical_LET: function(_let,_sp2) { return ""; },
               LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
