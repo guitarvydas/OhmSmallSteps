@@ -954,11 +954,11 @@ lexical_QUOTE = "quote" ~alnum space*
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "(@F1(){@R new List(" + items.emitjs() + ";))"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "(@F(){@R new List(" + items.emitjs() + ";))"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
              
-              CondExpression: function(c){ return "(@F2(){@R " + c.emitjs() + "};)"; },
+              CondExpression: function(c){ return "(@F(){@R " + c.emitjs() + "};)"; },
               CondExpressionWithElse : function(_begin,_cond,clauses,elseClause,_end) {
                  return "_cond([" + clauses.emitjs() + "]," + elseClause.emitjs() + ")"; },
               CondExpressionWithoutElse : function(_begin,_cond,clauses,_end) {
@@ -971,7 +971,7 @@ lexical_QUOTE = "quote" ~alnum space*
 
 
               LetExpression: function(_begin, _let, bindings, body, _end) { 
-                                return "(@F2(" + bindings.emitjs() + "){@R " + body.emitjs() + ";})";
+                                return "(@F(" + bindings.emitjs() + "){@R " + body.emitjs() + ";})";
                              },
               lexical_LET: function(_let,_sp2) { return ""; },
               LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
@@ -980,7 +980,7 @@ lexical_QUOTE = "quote" ~alnum space*
               LetBindingClause: function(e) { return e.emitjs(); },
 
               IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {
-                  return "(@F4(){@R (false != (" + e.emitjs() + ")()) ?" 
+                  return "(@F(){@R (false != (" + e.emitjs() + ")()) ?" 
                          + thenPart.emitjs()
                          + "()"
                          + " : " + elsePart.emitjs()
@@ -988,7 +988,7 @@ lexical_QUOTE = "quote" ~alnum space*
                          + "()";
                                     },
               IfThenExpression: function(_begin,_if,e,thenPart,_end) {
-                  return "(@F5(){@R (false != (" + e.emitjs() + ")()) ?" 
+                  return "(@F(){@R (false != (" + e.emitjs() + ")()) ?" 
                          + thenPart.emitjs()
                          + "()"
                          + " : null"
@@ -1005,11 +1005,11 @@ lexical_QUOTE = "quote" ~alnum space*
 		  return "(" + toListOfStrings(items.emitjs()) + ")"},
 	      ListItem: function(item) {return item.emitjs()},
 
-	      Atom: function(a) {return "(@F6(){@R " + a.emitjs() + "};)";},
+	      Atom: function(a) {return "(@F(){@R " + a.emitjs() + "};)";},
 
-              AndExpression: function(_begin,_and,booleans,_end) { return "(@F7(){@R _and([" + booleans.emitjs() + "]);})"; },
-              OrExpression: function(_begin,_or,booleans,_end) { return "(@F8(){@R _or([" + booleans.emitjs() + "]);})"; },
-              NotExpression: function(_begin,_not,boolean,_end) { return "(@F9(){@R (false == (" + boolean.emitjs() + "())) ? true : false;};)"; },
+              AndExpression: function(_begin,_and,booleans,_end) { return "(@F(){@R _and([" + booleans.emitjs() + "]);})"; },
+              OrExpression: function(_begin,_or,booleans,_end) { return "(@F(){@R _or([" + booleans.emitjs() + "]);})"; },
+              NotExpression: function(_begin,_not,boolean,_end) { return "(@F(){@R (false == (" + boolean.emitjs() + "())) ? true : false;};)"; },
               lexical_AND: function(_and,_sp) {return "";},
               lexical_OR: function(_or,_sp2) {return "";},
               lexical_NOT: function(_not,_sp) {return "";},
@@ -1023,8 +1023,8 @@ lexical_QUOTE = "quote" ~alnum space*
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
               GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " {@R" + body.emitjs() + "; };<br>";},
               TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";<br>";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "@C(@Fa(){@R " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
-              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "@Fb " + id.emitjs() + "(" + formals.emitjs() + ")";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "(@F(){@R " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
+              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "@F " + id.emitjs() + "(" + formals.emitjs() + ")";},
               Identifier: function(id) {return id.emitjs();},
               END: function(_rp) {return "";},
      
