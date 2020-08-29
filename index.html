@@ -320,33 +320,12 @@ xyz
 (define name cadr)
     </script>
 
-<!-- prolog-6 top level 1a -->
-    <script type="text/test-all" -->
-(define (try g r e n)
-  (if nn
-      #f
-      (let ((a 2))
-        p1
-        )))
-    </script>
-
 <!-- prolog-6 top level 1 -->
-    <script type="text/test-hold" -->
+    <script type="text/test">
 (define (try g r e n)
   (if nn
       #f
       (let ((a  (copy (car r) (list n)))
-             (ne (unify (car g) (car a) e)))
-        (if ne
-            (prove3 (append (cdr a) (cdr g)) ne (+ 1 n)))
-        (try g (cdr r) e n))))
-    </script>
-
-    <script type="text/test-all" -->
-(define (try g r e n)
-  (if (null? r)
-      #f
-      (let* ((a  (copy (car r) (list n)))
              (ne (unify (car g) (car a) e)))
         (if ne
             (prove3 (append (cdr a) (cdr g)) ne (+ 1 n)))
@@ -363,7 +342,7 @@ xyz
     </script>
 
 <!-- prolog-6.scm -->
-    <script type="text/test">
+    <script type="text/test-prolog-6">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -1032,7 +1011,7 @@ function number_to_list(n) {
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + ");})"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + "()" + ");})"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
              
@@ -1198,21 +1177,6 @@ function number_to_list(n) {
 	  displayDate();
       }
 
-      /*
-        function simpleTest() {
-          var parsed = ws_grammar.match("xy z",'SyntacticRule');
-          displayTestResults(parsed,'input');
-
-          parsed = ws_grammar.match("xy z",'lexicalRule');
-          displayTestResults(parsed,'secondResult');
-
-          parsed = ws_grammar.match("xy z",'SyntacticRule2');
-          displayTestResults(parsed,'thirdResult');
-
-	  displayDate();
-      }
-      */
-          
 </script>
 
 
