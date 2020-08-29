@@ -1041,7 +1041,7 @@ function number_to_list(n) {
               LetBindingClause: function(e) { return e.emitjs(); },
 
               IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {
-                  return "(function(){return (false != (" + e.emitjs() + ")()) ? " 
+                  return "(function(){return (" + e.emitjs() + ")() ? " 
                          + thenPart.emitjs()
                          + "()"
                          + " : " 
@@ -1050,7 +1050,7 @@ function number_to_list(n) {
                          + "})";
                                     },
               IfThenExpression: function(_begin,_if,e,thenPart,_end) {
-                  return "(function(){return (false != (" + e.emitjs() + ")()) ? " 
+                  return "(function(){return (" + e.emitjs() + ")() ? " 
                          + thenPart.emitjs()
                          + "()"
                          + " : null"
