@@ -723,9 +723,7 @@ Scm2JSEmitter {
   semiColonComment = ";" (~"\n" any)* "\n"
   space += semiColonComment
 
-Arg = AtomicArg | NonAtomicArg
-AtomicArg = ListItem
-NonAtomicArg = ListItem
+  Arg = ListItem
 
   SList =   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
            | SpecialForm 
@@ -733,74 +731,74 @@ NonAtomicArg = ListItem
            | NullTerminatedList
            | DottedList 
 
-SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
+  SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
 
-CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
-CondExpressionWithElse = BEGIN lexical_COND CondClause+ CondElseClause END
-CondExpressionWithoutElse = BEGIN lexical_COND CondClause+ END
-CondClause = BEGIN ~lexical_ELSE ClauseBody+ END
-CondElseClause = BEGIN lexical_ELSE Form+ END
-ClauseBody = Form
+  CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
+  CondExpressionWithElse = BEGIN lexical_COND CondClause+ CondElseClause END
+  CondExpressionWithoutElse = BEGIN lexical_COND CondClause+ END
+  CondClause = BEGIN ~lexical_ELSE ClauseBody+ END
+  CondElseClause = BEGIN lexical_ELSE Form+ END
+  ClauseBody = Form
 
-LetExpression = LetSequential | LetParallel
+  LetExpression = LetSequential | LetParallel
 
-LetSequential = BEGIN lexical_LETSTAR LetBindings LetBody END
-LetParallel = BEGIN lexical_LET LetBindings LetBody END
+  LetSequential = BEGIN lexical_LETSTAR LetBindings LetBody END
+  LetParallel = BEGIN lexical_LET LetBindings LetBody END
 
-LetBindings = BEGIN Binding+ END
-Binding = BEGIN LetVar LetBindingClause END
-LetVar = lexical_symbol
-LetBindingClause = Form
-LetBody = ExecutableForm+
+  LetBindings = BEGIN Binding+ END
+  Binding = BEGIN LetVar LetBindingClause END
+  LetVar = lexical_symbol
+  LetBindingClause = Form
+  LetBody = ExecutableForm+
 
-IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
-IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
-IfTestExpr = Form
-ThenPart = ExecutableForm
-ElsePart = ExecutableForm
+  IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
+  IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
+  IfTestExpr = Form
+  ThenPart = ExecutableForm
+  ElsePart = ExecutableForm
 
-AndExpression = BEGIN lexical_AND Boolean+ END
-OrExpression = BEGIN lexical_OR Boolean+ END
-NotExpression = BEGIN lexical_NOT Boolean END
-    Boolean = Form
+  AndExpression = BEGIN lexical_AND Boolean+ END
+  OrExpression = BEGIN lexical_OR Boolean+ END
+  NotExpression = BEGIN lexical_NOT Boolean END
+  Boolean = Form
 
-    QuotedExpression = QuotedSymbol | QuotedOther
-    QuotedSymbol = BEGIN lexical_QUOTE lexical_symbol END
-    QuotedOther = BEGIN lexical_QUOTE (lexical_integer | lexical_string | lexical_boolean) END
+  QuotedExpression = QuotedSymbol | QuotedOther
+  QuotedSymbol = BEGIN lexical_QUOTE lexical_symbol END
+  QuotedOther = BEGIN lexical_QUOTE (lexical_integer | lexical_string | lexical_boolean) END
 
-    GlobalFunctionDefinition = BEGIN lexical_DEFINE FunctionNameAndFormals FunctionDefinitionBody END
-    GlobalVariableDefinition = BEGIN lexical_DEFINE Identifier Form END
-    TopLevelFunctionCall = FunctionCall
-    FunctionCall = BEGIN Identifier Arg* END
-    FunctionNameAndFormals = BEGIN Identifier Identifier* END
-    Identifier = ~Keyword lexical_symbol
-    BEGIN = "("
-    END = ")"
+  GlobalFunctionDefinition = BEGIN lexical_DEFINE FunctionNameAndFormals FunctionDefinitionBody END
+  GlobalVariableDefinition = BEGIN lexical_DEFINE Identifier Form END
+  TopLevelFunctionCall = FunctionCall
+  FunctionCall = BEGIN Identifier Arg* END
+  FunctionNameAndFormals = BEGIN Identifier Identifier* END
+  Identifier = ~Keyword lexical_symbol
+  BEGIN = "("
+  END = ")"
 
-FunctionDefinitionBody = ExecutableForm+
-ExecutableForm = SpecialForm | Form
+  FunctionDefinitionBody = ExecutableForm+
+  ExecutableForm = SpecialForm | Form
 
-Keyword =   lexical_DEFINE
-          | lexical_COND 
-          | lexical_IF
-          | lexical_LET
-          | lexical_LETSTAR
-          | lexical_AtNewListAt 
-          | lexical_AND | lexical_OR | lexical_NOT
-          | lexical_ELSE
-          | lexical_QUOTE
+  Keyword =   lexical_DEFINE
+            | lexical_COND 
+            | lexical_IF
+            | lexical_LET
+            | lexical_LETSTAR
+            | lexical_AtNewListAt 
+            | lexical_AND | lexical_OR | lexical_NOT
+            | lexical_ELSE
+            | lexical_QUOTE
 
-lexical_AND = "and" ~alnum space*
-lexical_OR = "or" ~alnum space*
-lexical_NOT = "not" ~alnum space*
-lexical_AtNewListAt = "@newList@" ~alnum space*
-lexical_DEFINE = "define" ~alnum space*
-lexical_IF = "if" ~alnum space*
-lexical_COND = "cond" ~alnum space*
-lexical_ELSE = "else" ~alnum space*
-lexical_LETSTAR = "let*" ~alnum space*
-lexical_LET = "let" ~alnum space*
-lexical_QUOTE = "quote" ~alnum space*
+  lexical_AND = "and" ~alnum space*
+  lexical_OR = "or" ~alnum space*
+  lexical_NOT = "not" ~alnum space*
+  lexical_AtNewListAt = "@newList@" ~alnum space*
+  lexical_DEFINE = "define" ~alnum space*
+  lexical_IF = "if" ~alnum space*
+  lexical_COND = "cond" ~alnum space*
+  lexical_ELSE = "else" ~alnum space*
+  lexical_LETSTAR = "let*" ~alnum space*
+  lexical_LET = "let" ~alnum space*
+  lexical_QUOTE = "quote" ~alnum space*
 }
 
       /*
@@ -1030,18 +1028,15 @@ function number_to_list(n) {
 	  'emitjs',
 	  {
 	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
-              Arg: function(a) {return a.emitjs()},
-              NonAtomicArg: function(a) {return a.emitjs() + "()";},
-              AtomicArg: function(a) {return a.emitjs() + "()";},
-              // AtomicArg: function(a) {return a.emitjs();},
+              Arg: function(a) {return a.emitjs() + "()";},
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "(@F(){@R new List(" + items.emitjs() + ";))"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + ");})"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
              
-              CondExpression: function(c){ return "(@F(){@R " + c.emitjs() + "};)"; },
+              CondExpression: function(c){ return "(function(){return " + c.emitjs() + ";})"; },
               CondExpressionWithElse : function(_begin,_cond,clauses,elseClause,_end) {
                  return "_cond([" + clauses.emitjs() + "]," + elseClause.emitjs() + ")"; },
               CondExpressionWithoutElse : function(_begin,_cond,clauses,_end) {
@@ -1055,10 +1050,10 @@ function number_to_list(n) {
 
               LetExpression: function(e) { return e.emitjs() },
               LetSequential: function(_begin, _let, bindings, body, _end) { 
-                                return "(@F(" + bindings.emitjs() + "){@R " + body.emitjs() + ";})";
+                                return "(function(" + bindings.emitjs() + "){return " + body.emitjs() + ";})";
                              },
               LetParallel: function(_begin, _let, bindings, body, _end) { 
-                                return "(@F(" + bindings.emitjs() + "){@R " + body.emitjs() + ";})";
+                                return "(function(" + bindings.emitjs() + "){return " + body.emitjs() + ";})";
                              },
               lexical_LET: function(_let,_sp2) { return ""; },
               LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
@@ -1067,19 +1062,20 @@ function number_to_list(n) {
               LetBindingClause: function(e) { return e.emitjs(); },
 
               IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {
-                  return "(@F(){@R (false != (" + e.emitjs() + ")()) ?" 
+                  return "(function(){return (false != (" + e.emitjs() + ")()) ? " 
                          + thenPart.emitjs()
                          + "()"
-                         + " : " + elsePart.emitjs()
-                         + "};)"
-                         + "()";
+                         + " : " 
+		         + elsePart.emitjs()
+		         + "()"
+                         + "})";
                                     },
               IfThenExpression: function(_begin,_if,e,thenPart,_end) {
-                  return "(@F(){@R (false != (" + e.emitjs() + ")()) ?" 
+                  return "(function(){return (false != (" + e.emitjs() + ")()) ? " 
                          + thenPart.emitjs()
                          + "()"
                          + " : null"
-                         + "};)";
+                         + "})";
                                     },
               ThenPart: function(f) { return f.emitjs(); },
               ElsePart: function(f) { return f.emitjs(); },
@@ -1092,11 +1088,12 @@ function number_to_list(n) {
 		  return "(" + toListOfStrings(items.emitjs()) + ")"},
 	      ListItem: function(item) {return item.emitjs()},
 
-	      Atom: function(a) {return "(@F(){@R " + a.emitjs() + "};)";},
+	      Atom: function(a) {return "(function(){return " + a.emitjs() + "};)";},
+	      //Atom: function(a) {return a.emitjs();},
 
-              AndExpression: function(_begin,_and,booleans,_end) { return "(@F(){@R _and([" + booleans.emitjs() + "]);})"; },
-              OrExpression: function(_begin,_or,booleans,_end) { return "(@F(){@R _or([" + booleans.emitjs() + "]);})"; },
-              NotExpression: function(_begin,_not,boolean,_end) { return "(@F(){@R (false == (" + boolean.emitjs() + "())) ? true : false;};)"; },
+              AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
+              OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
+              NotExpression: function(_begin,_not,boolean,_end) { return "(function(){return (!(" + boolean.emitjs() + "()));})"; },
               lexical_AND: function(_and,_sp) {return "";},
               lexical_OR: function(_or,_sp2) {return "";},
               lexical_NOT: function(_not,_sp) {return "";},
@@ -1108,10 +1105,10 @@ function number_to_list(n) {
               lexical_QUOTE: function(_quote,_sp) {return "";},
 
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
-              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " {@R" + body.emitjs() + "; };<br>";},
+              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " {return" + body.emitjs() + "; };<br>";},
               TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";<br>";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "(@F(){@R " + id.emitjs() + "(" + actuals.emitjs() + ")};)";},
-              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "@F " + id.emitjs() + "(" + formals.emitjs() + ")";},
+              FunctionCall: function(_lp,id,actuals,_end) {return "(function(){return " + id.emitjs() + "(" + actuals.emitjs() + ");})";},
+              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
               Identifier: function(id) {return id.emitjs();},
               END: function(_rp) {return "";},
      
@@ -1182,15 +1179,27 @@ function number_to_list(n) {
       function displayStringsEqual(s1,s2,el) {
           document.getElementById(el).innerHTML = (s1 == s2);
       }
+
+      function doReplacements(inputString) {
+	  var r = inputString.replace(/try/g,"_try")
+	      .replace(/null[?]/g,"null_Q_")
+	      .replace(/pair[?]/g,"pair_Q_")
+	      .replace(/[+]/g,"_plus")
+	      .replace(/[-]/g,"_D_")
+	  ;
+	  return r;
+      }
       
       function pipelinetest() {
 	  resultsString = '';
 	  tests.forEach(doPipeline);
-	  displayTestResults(resultsString,'input');
+	  var str = doReplacements(resultsString);
+	  displayTestResults(str,'input');
 	  displayDate();
       }
 
-      function simpleTest() {
+      /*
+        function simpleTest() {
           var parsed = ws_grammar.match("xy z",'SyntacticRule');
           displayTestResults(parsed,'input');
 
@@ -1202,6 +1211,7 @@ function number_to_list(n) {
 
 	  displayDate();
       }
+      */
           
 </script>
 
