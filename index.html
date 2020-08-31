@@ -337,8 +337,55 @@ xyz
     <script type="text/test-a" -->
 (define (fn) (cond ((a) (b) (c)) (else (d))))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-b" -->
 (define (fn) (cond ((a) (b) (c)) ((d) (e) (f)) (else (g))))
+    </script>
+    <script type="text/test-c" -->
+(define db
+  '(((edge a b))
+    ((edge a f))
+    ((edge a g))
+    ((edge b c))
+    ((edge b d))
+    ((edge c d))
+    ((edge c e))
+    ((edge g h))
+    ((edge d h))
+    ((edge h e))
+    ((edge h f))
+
+    ((path (? A) (? B) ((? A) (? B)))
+     (edge (? A) (? B)))
+
+    ;((path (? A) (? B) ((? A) . (? CB)))
+    ((path (? A) (? B) ((? A) (? CB)))
+     (edge (? A) (? C))
+     (path (? C) (? B) (? CB)))))
+    </script>
+    <script type="text/test" -->
+(define db
+  '(5))
+    </script>
+    <script type="text/test" -->
+(define db
+  '(sym))
+    </script>
+    <script type="text/test" -->
+(define db
+  '("string"))
+    </script>
+    <script type="text/test" -->
+(define db
+  '(#f))
+    </script>
+    <script type="text/test" -->
+(define db
+  '(#t))
+    </script>
+    <script type="text/test-d" -->
+(define db
+  '(((edge a b))
+))
     </script>
 <!-- prolog-6.scm -->
     <script type="text/test-prolog-6">
@@ -665,9 +712,10 @@ Scm2JSListConstants <: Scm2JSBasic {
   QNullTerminatedList =   "(" QListItem* ")"
   QListItem = QAtom | QSList
   QSList = DottedList | QNullTerminatedList 
-  QAtom = Atom
+  QAtom = QAtomicSymbol | QAtomicNonSymbol
+  QAtomicNonSymbol = lexical_integer | lexical_string | lexical_boolean
+  QAtomicSymbol = lexical_symbol
 }
-
 </script>
 
 
@@ -1003,10 +1051,12 @@ function number_to_list(n) {
 		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
               ListConstant: function(_lp,_quote,listItem,_rp) { return "(@newList@ " + listItem.listConstants() + ")"; },
 
-             QNullTerminatedList: function(_lp,qitem,_rp) { return toListOfStrings(qitem.listConstants()); },
-             QListItem: function(item) { return item.listConstants(); },
-             QSList: function(slist) { return "(@newList@ " + slist.listConstants() + ")"; },
-             QAtom: function(a) { return '"' + a.listConstants() + '"'; },
+              QNullTerminatedList: function(_lp,qitem,_rp) { return toListOfStrings(qitem.listConstants()); },
+              QListItem: function(item) { return item.listConstants(); },
+              QSList: function(slist) { return "(@newList@ " + slist.listConstants() + ")"; },
+              QAtom: function(a) { return a.listConstants(); },
+              QAtomicNonSymbol: function(a) { return a.listConstants(); },
+              QAtomicSymbol: function(a) { return '"' + a.listConstants() + '"'; },
 
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + ")"},
