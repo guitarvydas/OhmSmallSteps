@@ -320,8 +320,9 @@ xyz
 (define name cadr)
     </script>
 
+</script>
 <!-- prolog-6 top level 1 -->
-    <script type="text/test">
+    <script type="text/test-hold">
 (define (try g r e n)
   (if nn
       #f
@@ -333,14 +334,12 @@ xyz
     </script>
 
 <!-- prolog-6 top level 2 -->
-    <script type="text/test-tl2" -->
-(define (prove3 g e n)
-  (cond ((null? g)
-          (print-frame e))
-        (else
-          (try g db e n))))
+    <script type="text/test-a" -->
+(define (fn) (cond ((a) (b) (c)) (else (d))))
     </script>
-
+    <script type="text/test" -->
+(define (fn) (cond ((a) (b) (c)) ((d) (e) (f)) (else (g))))
+    </script>
 <!-- prolog-6.scm -->
     <script type="text/test-prolog-6">
 (define (try g r e n)
@@ -679,7 +678,7 @@ Scm2JSListConstants <: Scm2JSBasic {
 // see https://ohmlang.github.io/editor/
 
 Scm2JSEmitter {
-    Program = (GlobalVariableDefinition | GlobalFunctionDefinition | TopLevelFunctionCall)+
+  Program = (GlobalVariableDefinition | GlobalFunctionDefinition | TopLevelFunctionCall)+
   Form = SList | Atom
   QuotedSexp = "'" Form
   BackQuotedSexp = "`" Form
@@ -702,7 +701,6 @@ Scm2JSEmitter {
   semiColonComment = ";" (~"\n" any)* "\n"
   space += semiColonComment
 
-  Arg = ListItem
 
   SList =   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
            | SpecialForm 
@@ -712,12 +710,28 @@ Scm2JSEmitter {
 
   SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
 
+
   CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
-  CondExpressionWithElse = BEGIN lexical_COND CondClause+ CondElseClause END
-  CondExpressionWithoutElse = BEGIN lexical_COND CondClause+ END
-  CondClause = BEGIN ~lexical_ELSE ClauseBody+ END
-  CondElseClause = BEGIN lexical_ELSE Form+ END
-  ClauseBody = Form
+  CondExpressionWithElse = BEGIN lexical_COND FirstCondClause MoreCondClause CondElseClause END
+  CondExpressionWithoutElse = BEGIN lexical_COND FirstCondClause MoreCondClause END
+    
+  FirstCondClause = CondClause
+  MoreCondClause = CondClause*
+  CondClause = BEGIN ~lexical_ELSE CondTest CondStatementBlock END
+
+  CondTest = Form
+
+  CondElseClause = BEGIN lexical_ELSE CondStatementBlock END
+
+  CondStatementBlock = StatementBlock
+
+  StatementBlock = Atom | SequentialStatement
+  SequentialStatement = MidStatement* LastStatement
+  MidStatement = Statement &Statement
+  LastStatement = Statement ~Statement
+  Statement = Form
+
+
 
   LetExpression = LetSequential | LetParallel
 
@@ -728,34 +742,39 @@ Scm2JSEmitter {
   Binding = BEGIN LetVar LetBindingClause END
   LetVar = lexical_symbol
   LetBindingClause = Form
-  LetBody = ExecutableForm+
+  LetBody = StatementBlock
+    
 
   IfThenElseExpression = BEGIN lexical_IF IfTestExpr ThenPart ElsePart END
   IfThenExpression = BEGIN lexical_IF IfTestExpr ThenPart END
   IfTestExpr = Form
-  ThenPart = ExecutableForm
-  ElsePart = ExecutableForm
+  ThenPart = Form
+  ElsePart = Form
 
-  AndExpression = BEGIN lexical_AND Boolean+ END
-  OrExpression = BEGIN lexical_OR Boolean+ END
-  NotExpression = BEGIN lexical_NOT Boolean END
-  Boolean = Form
+  AndExpression = BEGIN lexical_AND Bool+ END
+  OrExpression = BEGIN lexical_OR Bool+ END
+  NotExpression = BEGIN lexical_NOT Bool END
+  Bool = Form
+
+
+  FunctionCall = BEGIN Identifier Arg* END
+  Identifier = ~Keyword lexical_symbol
+  Arg = ListItem
+
+
+  GlobalFunctionDefinition = BEGIN lexical_DEFINE BEGIN Identifier Identifier* END StatementBlock END
+    
+  GlobalVariableDefinition = BEGIN lexical_DEFINE Identifier Form END
+  TopLevelFunctionCall = FunctionCall
+
+
+  BEGIN = "("
+  END = ")"
 
   QuotedExpression = QuotedSymbol | QuotedOther
   QuotedSymbol = BEGIN lexical_QUOTE lexical_symbol END
   QuotedOther = BEGIN lexical_QUOTE (lexical_integer | lexical_string | lexical_boolean) END
 
-  GlobalFunctionDefinition = BEGIN lexical_DEFINE FunctionNameAndFormals FunctionDefinitionBody END
-  GlobalVariableDefinition = BEGIN lexical_DEFINE Identifier Form END
-  TopLevelFunctionCall = FunctionCall
-  FunctionCall = BEGIN Identifier Arg* END
-  FunctionNameAndFormals = BEGIN Identifier Identifier* END
-  Identifier = ~Keyword lexical_symbol
-  BEGIN = "("
-  END = ")"
-
-  FunctionDefinitionBody = ExecutableForm+
-  ExecutableForm = SpecialForm | Form
 
   Keyword =   lexical_DEFINE
             | lexical_COND 
@@ -779,6 +798,7 @@ Scm2JSEmitter {
   lexical_LET = "let" ~alnum space*
   lexical_QUOTE = "quote" ~alnum space*
 }
+
 
       /*
         see https://stackoverflow.com/questions/31909121/how-does-the-named-let-in-the-form-of-a-loop-work
@@ -831,6 +851,14 @@ function number_to_list(n) {
 
       function toListOfStrings(a) {
 	  return a.join(' ');
+      }
+      
+      function toBranchingAnd(a) {
+	  return a.join(' && ');
+      }
+      
+      function toBranchingOr(a) {
+	  return a.join(' || ');
       }
       
       function toPackedString(a) {
@@ -1007,92 +1035,124 @@ function number_to_list(n) {
 	  'emitjs',
 	  {
 	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
-              Arg: function(a) {return a.emitjs() + "()";},
+              Arg: function(a) {return a.emitjs();},
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
               SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + "()" + ");})"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
-             
-              CondExpression: function(c){ return "(function(){return " + c.emitjs() + ";})"; },
-              CondExpressionWithElse : function(_begin,_cond,clauses,elseClause,_end) {
-                 return "_cond([" + clauses.emitjs() + "]," + elseClause.emitjs() + ")"; },
-              CondExpressionWithoutElse : function(_begin,_cond,clauses,_end) {
-                 return "_cond([" + clauses.emitjs() + "],null)"; },
-              CondClause: function(_begin,clause,_end){return "[" + clause.emitjs() + "]";},
-              CondElseClause: function(_begin,_else,elseClause,_end){return elseClause.emitjs();},
-              ClauseBody: function(form){return form.emitjs();},
-              lexical_COND: function(_,_sp2){return "";},
-              lexical_ELSE: function(_,_sp2){return "";},
 
+	      // CondExpression contains CondClauses (optional else clause)
+	      // CondClause contains Statements
+	      //
+	      // the first clause is emitted with "if"
+	      // subsequent (more) clauses are emitted with "} else if "
+	      //
+	      // statements are emitted suffixed by ':'
+	      // last statement is emitted as ' return ... ; '
+	      //
+              CondExpression: function(c){ return c.emitjs(); },
+              CondExpressionWithElse : function(_begin,_cond,firstClause,moreClauses,elseClause,_end) {
+                  return "(function(){" + firstClause.emitjs() + moreClauses.emitjs() + elseClause.emitjs() + "})()" ; },
+              CondExpressionWithoutElse : function(_begin,_cond,firstClause,moreClauses,_end) {
+                  return "(function(){"+ firstClause.emitjs() + moreClauses.emitjs() + " else " + "{ return null; }" + "})()" ; },
 
-              LetExpression: function(e) { return e.emitjs() },
-              LetSequential: function(_begin, _let, bindings, body, _end) { 
-                                return "(function(" + bindings.emitjs() + "){return " + body.emitjs() + ";})";
-                             },
-              LetParallel: function(_begin, _let, bindings, body, _end) { 
-                                return "(function(" + bindings.emitjs() + "){return " + body.emitjs() + ";})";
-                             },
-              lexical_LET: function(_let,_sp2) { return ""; },
+              FirstCondClause: function(c) { return "if " + c.emitjs(); },
+              MoreCondClause: function(c) { 
+		  //console.log('c ' + c.toString());
+		  //console.log('node(raw)    ' + c._node);
+		  //console.log('node(string) ' + c._node.toString());
+                  //console.log('node(nChild) ' + c._node.numChildren());
+		  if (c._node.numChildren() == 0) {
+		      return "";
+		  } else {
+		      return " else if " + c.emitjs();
+		  }
+	      },
+	      CondClause: function(_begin,ctest,block,_end) {return "(" + ctest.emitjs() + ") {" +  block.emitjs() + "}"; },
+
+	      CondTest: function(f) { return f.emitjs(); },
+	      CondElseClause: function(_begin,_else,block,_end){ return "else {" + block.emitjs() + "}"; },
+
+              CondStatementBlock: function(sb) { return sb.emitjs(); },
+
+	      StatementBlock: function(atomOrSequential) { return atomOrSequential.emitjs(); },
+              SequentialStatement: function(midStatements, lastStatement) {
+		  return toListOfStrings(midStatements.emitjs()) + lastStatement.emitjs()},
+              MidStatement: function(s,_lookahead) { if (s._node.numChildren() > 0) {return s.emitjs() + ";" ;} else {return "";}},
+              LastStatement: function(s) { return "return " + s.emitjs() + ";" ;},
+              Statement: function(f) { return f.emitjs() ;},
+
+	      LetExpression: function(e) { return e.emitjs(); },
+              LetSequential: function(_begin,_letstar,bindings,body,_end) {
+		  return "(function(" + bindings.emitjs() + ") {"+ body.emitjs() + "})()"},
+              LetParallel: function(_begin,_let,bindings,body,_end) {
+		  return "(function(" + bindings.emitjs() + ") {"+ body.emitjs() + "})()"},
+
               LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
-              Binding: function(_begin,v,e,_end) { return v.emitjs() + "=" + e.emitjs() + "()"; },
+              Binding: function(_begin,v,e,_end) { return v.emitjs() + "=" + e.emitjs(); },
               LetVar: function(id) {return id.emitjs(); },
               LetBindingClause: function(e) { return e.emitjs(); },
 
+	      
               IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {
-                  return "(function(){return (" + e.emitjs() + ")() ? " 
-                         + thenPart.emitjs()
-                         + "()"
-                         + " : " 
-		         + elsePart.emitjs()
-		         + "()"
-                         + "})";
-                                    },
-              IfThenExpression: function(_begin,_if,e,thenPart,_end) {
-                  return "(function(){return (" + e.emitjs() + ")() ? " 
-                         + thenPart.emitjs()
-                         + "()"
-                         + " : null"
-                         + "})";
-                                    },
-              ThenPart: function(f) { return f.emitjs(); },
-              ElsePart: function(f) { return f.emitjs(); },
-              lexical_IF: function(_if,_sp) { return ""; },
-              lexical_ELSE: function(_else,_sp) { return ""; },
+                  return "(function(){ if (" + e.emitjs() + ") {return " + thenPart.emitjs() + ";} else {return " + elsePart.emitjs() + ";}})()";
+              },
 
-	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs() + ")"},
+              IfThenExpression: function(_begin,_if,e,thenPart,_end) {
+                  return "(function(){ if (" + e.emitjs() + ") {return " + thenPart.emitjs() + ";} else {" + "  return null;" + "}})()";
+              },
+
+              ThenPart: function(b) { return b.emitjs(); },
+              ElsePart: function(b) { return b.emitjs(); },
+
+              AndExpression: function(_begin,_and,booleans,_end) {
+		  return "(function(){if" + toBranchingAnd(booleans.emitjs()) + " { return true; } else { return false; }))()"; },
+              OrExpression: function(_begin,_and,booleans,_end) {
+		  return "(function(){if" + toBranchingOr(booleans.emitjs()) + " { return true; } else { return false; }))()"; },
+              NotExpression: function(_begin,_not,bool,_end) { return "!" + bool.emitjs(); },
+              Bool: function(form){return form.emitjs(); },
+
+
+              FunctionCall: function(_lp,id,actuals,_end) {return id.emitjs() + "(" + actuals.emitjs() + ")";},
+
+              GlobalFunctionDefinition: function(_begin,_define,_begin2,id,formals,_end2,body,_end) {
+		  return "function " + id.emitjs() + "(" + formals.emitjs() + ")" + " {" + body.emitjs() + "};<br>"; },
+
+              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {
+		  return "var " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
+              TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";<br>";},
+	      
+
+
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(" + toListOfStrings(items.emitjs()) + ")"},
+		  return toListOfStrings(items.emitjs()) ;},
 	      ListItem: function(item) {return item.emitjs()},
 
-	      Atom: function(a) {return "(function(){return " + a.emitjs() + "};)";},
-	      //Atom: function(a) {return a.emitjs();},
-
-              AndExpression: function(_begin,_and,booleans,_end) { return "(function(){return _and([" + booleans.emitjs() + "]);})"; },
-              OrExpression: function(_begin,_or,booleans,_end) { return "(function(){return _or([" + booleans.emitjs() + "]);})"; },
-              NotExpression: function(_begin,_not,boolean,_end) { return "(function(){return (!(" + boolean.emitjs() + "()));})"; },
-              lexical_AND: function(_and,_sp) {return "";},
-              lexical_OR: function(_or,_sp2) {return "";},
-              lexical_NOT: function(_not,_sp) {return "";},
-              Boolean: function(form){return form.emitjs(); },
+	      Atom: function(a) {return a.emitjs() ;},
 
 	      QuotedExpression: function(x) {return x.emitjs();},
 	      QuotedSymbol: function(_lp,_q,sym,_rp){ return '"' + sym.emitjs() + '"'},
 	      QuotedOther: function(_lp,_q,sym,_rp){ return sym.emitjs()},
               lexical_QUOTE: function(_quote,_sp) {return "";},
 
-              GlobalVariableDefinition: function(_begin,_define,id,form,_end) {return "var " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
-              GlobalFunctionDefinition: function(_begin,_define,nf,body,_end) {return nf.emitjs() + " {return" + body.emitjs() + "; };<br>";},
-              TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";<br>";},
-              FunctionCall: function(_lp,id,actuals,_end) {return "(function(){return " + id.emitjs() + "(" + actuals.emitjs() + ");})";},
-              FunctionNameAndFormals: function(_begin,id,formals,_end) {return "function " + id.emitjs() + "(" + formals.emitjs() + ")";},
               Identifier: function(id) {return id.emitjs();},
               END: function(_rp) {return "";},
      
+              lexical_IF: function(_if,_sp) { return ""; },
+              lexical_ELSE: function(_else,_sp) { return ""; },
+              lexical_AND: function(_and,_sp) {return "";},
+              lexical_OR: function(_or,_sp2) {return "";},
+              lexical_NOT: function(_not,_sp) {return "";},
               lexical_AtNewListAt: function(_atnewlistat,_rp) { return "" ; },
               lexical_DEFINE: function(_,sp2){return "";},
+              lexical_LETSTAR: function(_let,_sp2) { return ""; },
+              lexical_LET: function(_let,_sp2) { return ""; },
+              lexical_COND: function(_,_sp2){return "";},
+              lexical_ELSE: function(_,_sp2){return "";},
+
 
 	      lexical_integer: function(ns) {return toPackedString(ns.emitjs());},
 	      lexical_symbol: function(c, cs) {return c.emitjs() + toPackedString(cs.emitjs());},
@@ -1120,7 +1180,10 @@ function number_to_list(n) {
 
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
-	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>";
+	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
+	      console.log(parsed_pass1.shortMessage);
+              console.log(parsed_pass1.getRightmostFailures());
+              console.log(parsed_pass1.getRightmostFailures().toString());
 	  } else {
               var transpiled_pass1 = pass1_semantics(parsed_pass1).unbackquote();
 	      
@@ -1136,9 +1199,9 @@ function number_to_list(n) {
 		      resultsString = resultsString + "<br>emitter parse *FAILED*<br>";
 		  } else {
 		      var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
-		      resultsString = resultsString + "<br>input:<br>" + testString + " --><br><br>";
-		      resultsString = resultsString + transpiled_listConstants + " --><br><br>";
-		      resultsString = resultsString + transpiled_emitter;
+		      resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
+		      resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants + " ==><br><br>";
+		      resultsString = resultsString + "<br>final:<br>" + transpiled_emitter;
 
 		      var debugParse = false; // use https://ohmlang.github.io/editor/
 		      if (debugParse) {
@@ -1171,9 +1234,10 @@ function number_to_list(n) {
       
       function pipelinetest() {
 	  resultsString = '';
+	  //console.log(tests);
 	  tests.forEach(doPipeline);
 	  var str = doReplacements(resultsString);
-	  displayTestResults(str,'input');
+	  displayTestResults(str,'result');
 	  displayDate();
       }
 
@@ -1190,8 +1254,6 @@ function number_to_list(n) {
     <!-- <button onclick="simpleTest()">Click me (simple test)</button> -->
     <p id="timestamp"></p>
     <p id="bool"></p>
-    <p id="input"></p>
-    <p id="secondResult"></p>
-    <p id="thirdResult"></p>
+    <p id="result"></p>
   </body>
 </html>
