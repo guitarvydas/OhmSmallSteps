@@ -362,42 +362,41 @@ xyz
      (edge (? A) (? C))
      (path (? C) (? B) (? CB)))))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '(5))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '(sym))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '("string"))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '(#f))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '(#t))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '())
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '(1 2 3))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '(((edge a b))))
     </script>
-    <script type="text/test-d" -->
+    <script type="text/test" -->
 (define db
-  '(((edge a b))
-))
+  '(x))
     </script>
 <!-- prolog-6.scm -->
     <script type="text/test-prolog-6">
@@ -717,13 +716,38 @@ Scm2JSBasic {
 
 // grammar for ListConstant pattern matching
 
-Scm2JSListConstants <: Scm2JSBasic {
-  SList := DottedList | ListConstant | NullTerminatedList
-  ListConstant = "(" lexical_QUOTE QNullTerminatedList ")"
+Scm2JSListConstants {
+  Program = Form+
+  Form = SList | Atom
+  QuotedSexp = "'" Form
+  BackQuotedSexp = "`" Form
+  CommaSexp = "," Form
+  DottedList = "(" ListItem+ "." ListItem ")"
+  NullTerminatedList =   "(" ListItem* ")"
+  ListItem = (Atom | SList)
+  Atom = lexical_atom | Syntactic_Atom
+  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+  SList = ListConstant | DottedList | NullTerminatedList
+  ListConstant = ListConstant_DottedList | ListConstant_List
+  ListConstant_DottedList = "(" lexical_QUOTE QDottedList ")"
+  ListConstant_List = "(" lexical_QUOTE QNullTerminatedList ")"
   lexical_QUOTE = space* "quote" space*
   QNullTerminatedList =   "(" QListItem* ")"
+  QDottedList = "(" QListItem+ "." QListItem ")"
   QListItem = QAtom | QSList
-  QSList = DottedList | QNullTerminatedList 
+  QSList = QDottedList | QNullTerminatedList 
   QAtom = QAtomicSymbol | QAtomicNonSymbol
   QAtomicNonSymbol = lexical_integer | lexical_string | lexical_boolean
   QAtomicSymbol = lexical_symbol
@@ -1059,10 +1083,13 @@ function number_to_list(n) {
 	      BackQuotedSexp: function(_, form) {return "`" + form.listConstants()},
 	      CommaSexp: function(_, form) {return "," + form.listConstants()},
 	      SList: function(lis) {return lis.listConstants();},
-	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
-              ListConstant: function(_lp,_quote,listItem,_rp) { return "(@newList@ " + listItem.listConstants() + ")"; },
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "this solution does not support dotted list (except when quoted)"},
+              ListConstant: function(lis) { return lis.listConstants() },
+              ListConstant_List: function(_lp,_quote,listItem,_rp) { return "(@newList@ " + listItem.listConstants() + ")"; },
+              ListConstant_DottedList: function(_lp,_quote,listItem,_rp) { return "(@newDottedList@ " + listItem.listConstants() + ")"; },
 
+	      QDottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
               QNullTerminatedList: function(_lp,qitem,_rp) { return toListOfStrings(qitem.listConstants()); },
               QListItem: function(item) { return item.listConstants(); },
               QSList: function(slist) { return "(@newList@ " + slist.listConstants() + ")"; },
@@ -1087,6 +1114,45 @@ function number_to_list(n) {
 	  }
       );
       
+listConstants_semantics.addOperation(
+ 'toCL',
+ {
+     Program: function(form){return "(:Program " + form.toCL() + ")";},
+     Form: function(slistOrAtom) {return "(:Form " + slistOrAtom.toCL() + ")";},
+     QuotedSexp: function(_q,form) {return "(:QuotedSexp " + form.toCL() + ")";},
+     BackQuotedSexp: function(_q,form) {return "(:BackQuotedSexp " + form.toCL() + ")";},
+     CommaSexp: function(_comma,form) {return "(:CommaSexp " + form.toCL() + ")";},
+     DottedList: function(_lp,items,_dot,lastItem,_rp) {return "(:DottedList " + items.toCL() + lastItem.toCL() + ")";},
+     NullTerminatedList: function(_lp,items,_rp) {return "(:NullTerminatedList " + items.toCL() + ")"; },
+     ListItem: function(atomOrSlist) {return "(:ListItem " + atomOrSlist.toCL() + ")";},
+     Atom: function(atom) {return "(:Atom " + atom.toCL() + ")";},
+     Syntactic_Atom: function(atom) {return ":Syntactic_Atom " + atom.toCL() + ")";},
+     
+     lexical_atom: function(latom) { return "(:lexical_atom [[" + this.sourceString + "]])";},
+     //lexical_atom: function(latom) { return "(:lexical_atom " + latom.toCL() + ")";},
+     lexical_boolean: function(b) {return "(:lexical_boolean " + this.sourceString + ")";},
+     lexical_integer: function(ns) {return "(:lexical_integer " + ns.toCL() + ")";},
+     lexical_numchar: function(n) {return "(:lexical_numchar " + n.toCL() + ")";},
+     lexical_string: function(_q1,cs,_q2) {return "(:lexical_string " + cs.toCL() + ")";},
+     lexical_symbol: function(c1,cs) {return "(:lexical_symbol " + c1.toCL() + cs.toCL() + ")";},
+     lexical_letchar: function(c) {return "(:lexical_letchar " + c.toCL() + ")";},
+     lexical_lc: function(c) {return "(:lexical_lc " + c.toCL() + ")";},
+     lexical_uc: function(c) {return "(:lexical_uc " + c.toCL() + ")";},
+     SList: function(l) {return "(:SList " + l.toCL() + ")";},
+     ListConstant: function(lc) {return "(:ListConstant " + lc.toCL() + ")";},
+     ListConstant_DottedList: function(_lp,_q,dl,_rp) {return "(:ListConstant_DottedList " + dl.toCL() + ")";},
+     ListConstant_List: function(_lp,_q,l,_rp){return "(:ListConstant_List " + l.toCL() + ")";},
+     lexical_QUOTE: function(_sp1,_q,_sp2) {return "(:lexical_QUOTE)";},
+     QNullTerminatedList: function(_lp,ql,_rp){return "(:QNullTerminatedList " + ql.toCL() + ")";},
+     QDottedList: function(_lp,qitems,_dot,qLastItem,_rp){return "(:QDottedList " + qitems.toCL() + qLastItem.toCL() + ")";},
+     QListItem: function(q){return "(:QListItem " + q.toCL() + ")";},
+     QSList: function(q){return "(:QSList " + q.toCL() + ")";},
+     QAtom: function(q) {return "(:QAtom [[" + this.sourceString + "]])";},
+     //QAtom: function(q) {return "(:QAtom " + q.toCL() + ")";},
+     QAtomicNonSymbol: function(q) {return "(:QAtomicNonSymbol " + q.toCL() + ")";},
+     QAtomicSymbol: function(q) {return "(:QAtomicSymbol " + q.toCL() + ")";},
+     _terminal: function() { return "(:_terminal " + this.primitiveValue + ")"; }
+ });
 
 
 
@@ -1188,7 +1254,8 @@ function number_to_list(n) {
 	      
 
 
-	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
+	      //DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) { return toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs(); },
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return toListOfStrings(items.emitjs()) ;},
 	      ListItem: function(item) {return item.emitjs()},
@@ -1232,11 +1299,36 @@ function number_to_list(n) {
 ////////
 
       var resultsString = '';
+      var clString = '';
       
       function displayDate () {
 	  document.getElementById('timestamp').innerHTML = Date();
       }
 
+      function doListConstantsPipeline(testElement) {
+	  var testString = testElement.innerHTML;
+
+          var parsed_pass1 = pass1_grammar.match(testString);
+	  if (parsed_pass1.failed()) {
+	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
+	      console.log(parsed_pass1.shortMessage);
+              console.log(parsed_pass1.getRightmostFailures());
+              console.log(parsed_pass1.getRightmostFailures().toString());
+	  } else {
+              var transpiled_pass1 = pass1_semantics(parsed_pass1).unbackquote();
+	      
+	      var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
+	      if (parsed_listConstants.failed()) {
+		  resultsString = resultsString + "<br>listConstants parse *FAILED*<br>";
+	      } else {		  
+		  var transpiled_listConstants = listConstants_semantics(parsed_listConstants).listConstants();
+		  resultsString = resultsString + "<br>input:<br>" + testString + " ==>";
+		  resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants;
+		  clString = listConstants_semantics(parsed_listConstants).toCL();
+	      }
+	  }
+      }
+      
       function doPipeline(testElement) {
 	  var testString = testElement.innerHTML;
 
@@ -1264,13 +1356,6 @@ function number_to_list(n) {
 		      resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
 		      resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants + " ==><br><br>";
 		      resultsString = resultsString + "<br>final:<br>" + transpiled_emitter;
-
-		      var debugParse = false; // use https://ohmlang.github.io/editor/
-		      if (debugParse) {
-			  var tr = emitter_grammar.trace(transpiled_listConstants);
-			  console.log(tr);
-			  console.log(tr.toString());
-		      }
 		  }
 	      }
 	  }
@@ -1294,9 +1379,16 @@ function number_to_list(n) {
 	  return r;
       }
       
+      function listConstantsPipelinetest() {
+	  resultsString = '';
+	  clString = '';
+	  tests.forEach(doListConstantsPipeline);
+	  displayTestResults(resultsString,'result');
+	  displayTestResults(clString,'cl');
+	  displayDate();
+      }
       function pipelinetest() {
 	  resultsString = '';
-	  //console.log(tests);
 	  tests.forEach(doPipeline);
 	  var str = doReplacements(resultsString);
 	  displayTestResults(str,'result');
@@ -1312,10 +1404,11 @@ function number_to_list(n) {
 
   </head>
   <body>
+    <button onclick="listConstantsPipelinetest()">Click me (pass1 & listConstants)</button> -->
     <button onclick="pipelinetest()">Click me (pass1 & listConstants & emitter test)</button> -->
     <!-- <button onclick="simpleTest()">Click me (simple test)</button> -->
     <p id="timestamp"></p>
-    <p id="bool"></p>
     <p id="result"></p>
+    <p id="cl"></p>
   </body>
 </html>
