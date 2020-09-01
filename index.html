@@ -398,6 +398,9 @@ xyz
 (define db
   '(x))
     </script>
+    <script type="text/test-x" -->
+(define db
+  '(x . y))
 <!-- prolog-6.scm -->
     <script type="text/test-prolog-6">
 (define (try g r e n)
@@ -1089,7 +1092,7 @@ function number_to_list(n) {
               ListConstant_DottedList: function(_lp,_quote,listItem,_rp) { return "(@newDottedList@ " + listItem.listConstants() + ")"; },
 
 	      QDottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.listConstants()) + " . " + lastItem.listConstants() + ")"},
+		  return "(" + toListOfStrings(items.listConstants()) + lastItem.listConstants() + ")"},
               QNullTerminatedList: function(_lp,qitem,_rp) { return toListOfStrings(qitem.listConstants()); },
               QListItem: function(item) { return item.listConstants(); },
               QSList: function(slist) { return "(@newList@ " + slist.listConstants() + ")"; },
@@ -1128,7 +1131,7 @@ listConstants_semantics.addOperation(
      Atom: function(atom) {return "(:Atom " + atom.toCL() + ")";},
      Syntactic_Atom: function(atom) {return ":Syntactic_Atom " + atom.toCL() + ")";},
      
-     lexical_atom: function(latom) { return "(:lexical_atom [[" + this.sourceString + "]])";},
+     lexical_atom: function(latom) { return "(:lexical_atom [[" + this.sourceString + "]] )";},
      //lexical_atom: function(latom) { return "(:lexical_atom " + latom.toCL() + ")";},
      lexical_boolean: function(b) {return "(:lexical_boolean " + this.sourceString + ")";},
      lexical_integer: function(ns) {return "(:lexical_integer " + ns.toCL() + ")";},
@@ -1147,7 +1150,7 @@ listConstants_semantics.addOperation(
      QDottedList: function(_lp,qitems,_dot,qLastItem,_rp){return "(:QDottedList " + qitems.toCL() + qLastItem.toCL() + ")";},
      QListItem: function(q){return "(:QListItem " + q.toCL() + ")";},
      QSList: function(q){return "(:QSList " + q.toCL() + ")";},
-     QAtom: function(q) {return "(:QAtom [[" + this.sourceString + "]])";},
+     QAtom: function(q) {return "(:QAtom [[" + this.sourceString + "]] )";},
      //QAtom: function(q) {return "(:QAtom " + q.toCL() + ")";},
      QAtomicNonSymbol: function(q) {return "(:QAtomicNonSymbol " + q.toCL() + ")";},
      QAtomicSymbol: function(q) {return "(:QAtomicSymbol " + q.toCL() + ")";},
