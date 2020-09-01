@@ -386,6 +386,14 @@ xyz
 (define db
   '())
     </script>
+    <script type="text/test" -->
+(define db
+  '(1 2 3))
+    </script>
+    <script type="text/test" -->
+(define db
+  '(((edge a b))))
+    </script>
     <script type="text/test-d" -->
 (define db
   '(((edge a b))
@@ -1093,7 +1101,7 @@ function number_to_list(n) {
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + ");})"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "new List(" + items.emitjs() + ")"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
 
