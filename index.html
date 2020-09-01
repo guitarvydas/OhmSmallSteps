@@ -1093,7 +1093,7 @@ function number_to_list(n) {
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + "()" + ");})"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "(function(){return new List(" + items.emitjs() + ");})"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
 
