@@ -406,9 +406,12 @@ xyz
 (define db
   '(x . y))
 </script>
-<script type="text/test" -->
+<script type="text/test-x" -->
 (define db
   '(p q (r . s)))
+</script>
+<script type="text/test" -->
+(define db (@newList@ "x" "y"))
 </script>
 <!-- prolog-6.scm -->
 <script type="text/test-prolog-6">
@@ -777,27 +780,11 @@ Scm2JSListConstants {
 Scm2JSEmitter {
   Program = (GlobalVariableDefinition | GlobalFunctionDefinition | TopLevelFunctionCall)+
   Form = SList | Atom
-  QuotedSexp = "'" Form
-  BackQuotedSexp = "`" Form
-  CommaSexp = "," Form
+
   DottedList = "(" ListItem+ "." ListItem ")"
   NullTerminatedList =   "(" ListItem* ")"
   ListItem = (Atom | SList)
-  Atom = lexical_atom | Syntactic_Atom
-  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
-
-  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
-  lexical_boolean = "#f" | "#t"
-  lexical_integer = lexical_numchar+
-  lexical_numchar = "0".."9"
-  lexical_string = "\"" (~"\"" any)+ "\""
-  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
-  lexical_lc = "a".."z"
-  lexical_uc = "A".."Z"
-  semiColonComment = ";" (~"\n" any)* "\n"
-  space += semiColonComment
-
+  Atom = lexical_atom
 
   SList =   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
           | BEGIN lexical_AtNewDottedListAt ListItem* END -- atnewdottedlistat
@@ -897,6 +884,20 @@ Scm2JSEmitter {
   lexical_LETSTAR = "let*" ~alnum space*
   lexical_LET = "let" ~alnum space*
   lexical_QUOTE = "quote" ~alnum space*
+
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+
+    
 }
 
 
