@@ -412,11 +412,7 @@ xyz
 </script>
 
 <script type="text/test">
-(define db '(5 6))
-</script>
-
-<script type="text/test-z">
-(define db '("x" "y"))
+(define db '("x" . "y"))
 </script>
 
 <!-- prolog-6.scm -->
@@ -960,6 +956,10 @@ function number_to_list(n) {
 	  return a.join(' ');
       }
       
+      function toDotted(a) {
+	  return a.join(' . ');
+      }
+      
       function toBranchingAnd(a) {
 	  return a.join(' && ');
       }
@@ -1193,7 +1193,7 @@ listConstants_semantics.addOperation(
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
               SList_atnewlistat: function(_begin,_at,items,_end) { return "new List(" + items.emitjs() + ")"; },
-              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Pair(" + items.emitjs() + ")"; },
+              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Pair(" + toDotted(items.emitjs()) + ")"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
 
@@ -1280,8 +1280,9 @@ listConstants_semantics.addOperation(
 	      
 
 
-	      //DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
-	      DottedList: function(_lp, items, _dot, lastItem, _rp) { return toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs(); },
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
+	      //DottedList: function(_lp, items, _dot, lastItem, _rp) { return toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs(); },
+
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return toListOfStrings(items.emitjs()) ;},
 	      ListItem: function(item) {return item.emitjs()},
