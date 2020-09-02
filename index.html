@@ -394,15 +394,27 @@ xyz
 (define db
   '(((edge a b))))
     </script>
-    <script type="text/test" -->
+    <script type="text/test-hold" -->
 (define db
   '(x))
     </script>
-    <script type="text/test-x" -->
+<script type="text/test-x" -->
+(define db
+  '(x y))
+</script>
+<script type="text/test-x" -->
 (define db
   '(x . y))
+</script>
+<script type="text/test-x" -->
+(define db
+  '(p q (r . s)))
+</script>
+<script type="text/test" -->
+(define db (@newList@ "x" "y"))
+</script>
 <!-- prolog-6.scm -->
-    <script type="text/test-prolog-6">
+<script type="text/test-prolog-6">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -694,7 +706,7 @@ Scm2JSBasic {
   BackQuotedSexp = "`" Form
   CommaSexp = "," Form
   SList = DottedList | NullTerminatedList
-  DottedList = "(" ListItem+ "." ListItem ")"
+  DottedList = "(" ListItem+ lexical_DOT ListItem ")"
   NullTerminatedList =   "(" ListItem* ")"
   ListItem = (Atom | SList)
   Atom = lexical_atom | Syntactic_Atom
@@ -709,6 +721,7 @@ Scm2JSBasic {
   lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
   lexical_lc = "a".."z"
   lexical_uc = "A".."Z"
+  lexical_DOT = space* "." space*
   semiColonComment = ";" (~"\n" any)* "\n"
   space += semiColonComment
 }
@@ -721,8 +734,10 @@ Scm2JSBasic {
 
 Scm2JSListConstants {
   Program = Form+
-  Form = SList | Atom
-  QuotedSexp = "'" Form
+  Form = QuotedSexp | SList | Atom
+  SList = DottedList | NullTerminatedList
+  QuotedSexp = "(" lexical_QUOTE QuotedForm ")"
+  QuotedForm = QuotedSList | Atom
   BackQuotedSexp = "`" Form
   CommaSexp = "," Form
   DottedList = "(" ListItem+ "." ListItem ")"
@@ -730,6 +745,16 @@ Scm2JSListConstants {
   ListItem = (Atom | SList)
   Atom = lexical_atom | Syntactic_Atom
   Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
+
+  QuotedSList = QuotedDottedList | QuotedNullTerminatedList
+  QuotedNullTerminatedList =   "(" QListItem* ")"
+  QuotedDottedList = "(" QListItem+ "." QListItem ")"
+  QListItem = QAtom | QuotedSList
+  QAtom = QAtomicSymbol | QAtomicNonSymbol
+  QAtomicNonSymbol = lexical_integer | lexical_string | lexical_boolean
+  QAtomicSymbol = lexical_symbol
+
+  lexical_QUOTE = space* "quote" space*
 
   lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
   lexical_boolean = "#f" | "#t"
@@ -742,18 +767,6 @@ Scm2JSListConstants {
   lexical_uc = "A".."Z"
   semiColonComment = ";" (~"\n" any)* "\n"
   space += semiColonComment
-  SList = ListConstant | DottedList | NullTerminatedList
-  ListConstant = ListConstant_DottedList | ListConstant_List
-  ListConstant_DottedList = "(" lexical_QUOTE QDottedList ")"
-  ListConstant_List = "(" lexical_QUOTE QNullTerminatedList ")"
-  lexical_QUOTE = space* "quote" space*
-  QNullTerminatedList =   "(" QListItem* ")"
-  QDottedList = "(" QListItem+ "." QListItem ")"
-  QListItem = QAtom | QSList
-  QSList = QDottedList | QNullTerminatedList 
-  QAtom = QAtomicSymbol | QAtomicNonSymbol
-  QAtomicNonSymbol = lexical_integer | lexical_string | lexical_boolean
-  QAtomicSymbol = lexical_symbol
 }
 </script>
 
@@ -767,33 +780,18 @@ Scm2JSListConstants {
 Scm2JSEmitter {
   Program = (GlobalVariableDefinition | GlobalFunctionDefinition | TopLevelFunctionCall)+
   Form = SList | Atom
-  QuotedSexp = "'" Form
-  BackQuotedSexp = "`" Form
-  CommaSexp = "," Form
+
   DottedList = "(" ListItem+ "." ListItem ")"
   NullTerminatedList =   "(" ListItem* ")"
   ListItem = (Atom | SList)
-  Atom = lexical_atom | Syntactic_Atom
-  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
-
-  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
-  lexical_boolean = "#f" | "#t"
-  lexical_integer = lexical_numchar+
-  lexical_numchar = "0".."9"
-  lexical_string = "\"" (~"\"" any)+ "\""
-  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
-  lexical_lc = "a".."z"
-  lexical_uc = "A".."Z"
-  semiColonComment = ";" (~"\n" any)* "\n"
-  space += semiColonComment
-
+  Atom = lexical_atom
 
   SList =   BEGIN lexical_AtNewListAt ListItem* END -- atnewlistat
-           | SpecialForm 
-           | FunctionCall
-           | NullTerminatedList
-           | DottedList 
+          | BEGIN lexical_AtNewDottedListAt ListItem* END -- atnewdottedlistat
+          | SpecialForm 
+          | FunctionCall
+          | NullTerminatedList
+          | DottedList 
 
   SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
 
@@ -869,6 +867,7 @@ Scm2JSEmitter {
             | lexical_LET
             | lexical_LETSTAR
             | lexical_AtNewListAt 
+            | lexical_AtNewDottedListAt 
             | lexical_AND | lexical_OR | lexical_NOT
             | lexical_ELSE
             | lexical_QUOTE
@@ -877,6 +876,7 @@ Scm2JSEmitter {
   lexical_OR = "or" ~alnum space*
   lexical_NOT = "not" ~alnum space*
   lexical_AtNewListAt = "@newList@" ~alnum space*
+  lexical_AtNewDottedListAt = "@newDottedList@" ~alnum space*
   lexical_DEFINE = "define" ~alnum space*
   lexical_IF = "if" ~alnum space*
   lexical_COND = "cond" ~alnum space*
@@ -884,6 +884,20 @@ Scm2JSEmitter {
   lexical_LETSTAR = "let*" ~alnum space*
   lexical_LET = "let" ~alnum space*
   lexical_QUOTE = "quote" ~alnum space*
+
+  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
+  lexical_boolean = "#f" | "#t"
+  lexical_integer = lexical_numchar+
+  lexical_numchar = "0".."9"
+  lexical_string = "\"" (~"\"" any)+ "\""
+  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_lc = "a".."z"
+  lexical_uc = "A".."Z"
+  semiColonComment = ";" (~"\n" any)* "\n"
+  space += semiColonComment
+
+    
 }
 
 
@@ -1082,37 +1096,38 @@ function number_to_list(n) {
 	  {
 	      Program: function(tree) {return toListOfStrings(tree.listConstants())},
 	      Form: function(item) {return item.listConstants()},
-	      QuotedSexp: function(_, form) {return "'" + form.listConstants()},
-	      BackQuotedSexp: function(_, form) {return "`" + form.listConstants()},
-	      CommaSexp: function(_, form) {return "," + form.listConstants()},
 	      SList: function(lis) {return lis.listConstants();},
+	      QuotedSexp: function(_lp,_q,form,_rp) {return form.listConstants()},
+	      BackQuotedSexp: function(_, form) {throw "can't happen";},
+	      CommaSexp: function(_, form) {throw "can't happen";},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "this solution does not support dotted list (except when quoted)"},
-              ListConstant: function(lis) { return lis.listConstants() },
-              ListConstant_List: function(_lp,_quote,listItem,_rp) { return "(@newList@ " + listItem.listConstants() + ")"; },
-              ListConstant_DottedList: function(_lp,_quote,listItem,_rp) { return "(@newDottedList@ " + listItem.listConstants() + ")"; },
-
-	      QDottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.listConstants()) + lastItem.listConstants() + ")"},
-              QNullTerminatedList: function(_lp,qitem,_rp) { return toListOfStrings(qitem.listConstants()); },
-              QListItem: function(item) { return item.listConstants(); },
-              QSList: function(slist) { return "(@newList@ " + slist.listConstants() + ")"; },
-              QAtom: function(a) { return a.listConstants(); },
-              QAtomicNonSymbol: function(a) { return a.listConstants(); },
-              QAtomicSymbol: function(a) { return '"' + a.listConstants() + '"'; },
-
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return "(" + toListOfStrings(items.listConstants()) + ")"},
 	      ListItem: function(item) {return item.listConstants()},
 	      Atom: function(a) {return a.listConstants()},
+	      Syntactic_Atom: function(a) { return a.listConstants();},
+
+              QuotedSList: function(slist) { return slist.listConstants(); },
+              QuotedNullTerminatedList: function(_lp,qitem,_rp) { return "(@newList@ " + toListOfStrings(qitem.listConstants()); },
+	      QuotedDottedList: function(_lp, items, _dot, lastItem, _rp) {
+		  return "(@newDottedList@ " + toListOfStrings(items.listConstants()) + " " + lastItem.listConstants()},
+              QListItem: function(item) { return item.listConstants(); },
+              QAtom: function(a) { return a.listConstants(); },
+              QAtomicNonSymbol: function(a) { return a.listConstants(); },
+              QAtomicSymbol: function(a) { return '"' + a.listConstants() + '"'; },
+
+	      lexical_QUOTE: function(_sp1,_q,_sp2) {return "";},
+
+	      lexical_atom: function(a) {return a.listConstants(); },
+	      lexical_boolean: function(b) {return this.sourceString},
 	      lexical_integer: function(ns) {return toPackedString(ns.listConstants());},
-	      lexical_symbol: function(c, cs) {return c.listConstants() + toPackedString(cs.listConstants());},
-	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.listConstants()) + "\""},
-	      lexical_letchar: function(c) {return c.listConstants()},
 	      lexical_numchar: function(c) {return c.listConstants()},
+	      lexical_string: function(_q1, chars, _q2) {return "\"" + toPackedString(chars.listConstants()) + "\""},
+	      lexical_symbol: function(c, cs) {return c.listConstants() + toPackedString(cs.listConstants());},
+	      lexical_letchar: function(c) {return c.listConstants()},
 	      lexical_lc: function(c) {return c.listConstants()},
 	      lexical_uc: function(c) {return c.listConstants()},
 
-	      lexical_boolean: function(b) {return this.sourceString},
 	      _terminal: function() { return this.primitiveValue; }
 	  }
       );
@@ -1122,7 +1137,9 @@ listConstants_semantics.addOperation(
  {
      Program: function(form){return "(:Program " + form.toCL() + ")";},
      Form: function(slistOrAtom) {return "(:Form " + slistOrAtom.toCL() + ")";},
-     QuotedSexp: function(_q,form) {return "(:QuotedSexp " + form.toCL() + ")";},
+     SList: function(l) {return "(:SList " + l.toCL() + ")";},
+     QuotedSexp: function(_lp,_q,form,_rp) {return "(:QuotedSexp " + form.toCL() + ")";},
+     QuotedForm: function(slistOrAtom) {return "(:QuotedForm " + slistOrAtom.toCL() + ")";},
      BackQuotedSexp: function(_q,form) {return "(:BackQuotedSexp " + form.toCL() + ")";},
      CommaSexp: function(_comma,form) {return "(:CommaSexp " + form.toCL() + ")";},
      DottedList: function(_lp,items,_dot,lastItem,_rp) {return "(:DottedList " + items.toCL() + lastItem.toCL() + ")";},
@@ -1131,6 +1148,17 @@ listConstants_semantics.addOperation(
      Atom: function(atom) {return "(:Atom " + atom.toCL() + ")";},
      Syntactic_Atom: function(atom) {return ":Syntactic_Atom " + atom.toCL() + ")";},
      
+     QuotedSList: function (x) { return "(:QuotedSList " + x.toCL(); },
+     QuotedNullTerminatedList: function(_lp,ql,_rp){return "(:QuotedNullTerminatedList " + ql.toCL() + ")";},
+     QuotedDottedList: function(_lp,qitems,_dot,qLastItem,_rp){return "(:QuotedDottedList " + qitems.toCL() + qLastItem.toCL() + ")";},
+     QListItem: function(q){return "(:QListItem " + q.toCL() + ")";},
+     QAtom: function(q) {return "(:QAtom [[" + this.sourceString + "]] )";},
+     //QAtom: function(q) {return "(:QAtom " + q.toCL() + ")";},
+     QAtomicNonSymbol: function(q) {return "(:QAtomicNonSymbol " + q.toCL() + ")";},
+     QAtomicSymbol: function(q) {return "(:QAtomicSymbol " + q.toCL() + ")";},
+
+     lexical_QUOTE: function(_sp1,_q,_sp2) {return "(:lexical_QUOTE)";},
+
      lexical_atom: function(latom) { return "(:lexical_atom [[" + this.sourceString + "]] )";},
      //lexical_atom: function(latom) { return "(:lexical_atom " + latom.toCL() + ")";},
      lexical_boolean: function(b) {return "(:lexical_boolean " + this.sourceString + ")";},
@@ -1141,19 +1169,7 @@ listConstants_semantics.addOperation(
      lexical_letchar: function(c) {return "(:lexical_letchar " + c.toCL() + ")";},
      lexical_lc: function(c) {return "(:lexical_lc " + c.toCL() + ")";},
      lexical_uc: function(c) {return "(:lexical_uc " + c.toCL() + ")";},
-     SList: function(l) {return "(:SList " + l.toCL() + ")";},
-     ListConstant: function(lc) {return "(:ListConstant " + lc.toCL() + ")";},
-     ListConstant_DottedList: function(_lp,_q,dl,_rp) {return "(:ListConstant_DottedList " + dl.toCL() + ")";},
-     ListConstant_List: function(_lp,_q,l,_rp){return "(:ListConstant_List " + l.toCL() + ")";},
-     lexical_QUOTE: function(_sp1,_q,_sp2) {return "(:lexical_QUOTE)";},
-     QNullTerminatedList: function(_lp,ql,_rp){return "(:QNullTerminatedList " + ql.toCL() + ")";},
-     QDottedList: function(_lp,qitems,_dot,qLastItem,_rp){return "(:QDottedList " + qitems.toCL() + qLastItem.toCL() + ")";},
-     QListItem: function(q){return "(:QListItem " + q.toCL() + ")";},
-     QSList: function(q){return "(:QSList " + q.toCL() + ")";},
-     QAtom: function(q) {return "(:QAtom [[" + this.sourceString + "]] )";},
-     //QAtom: function(q) {return "(:QAtom " + q.toCL() + ")";},
-     QAtomicNonSymbol: function(q) {return "(:QAtomicNonSymbol " + q.toCL() + ")";},
-     QAtomicSymbol: function(q) {return "(:QAtomicSymbol " + q.toCL() + ")";},
+
      _terminal: function() { return "(:_terminal " + this.primitiveValue + ")"; }
  });
 
@@ -1171,6 +1187,7 @@ listConstants_semantics.addOperation(
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
               SList_atnewlistat: function(_begin,_at,items,_end) { return "new List(" + items.emitjs() + ")"; },
+              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Pair(" + items.emitjs() + ")"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
 
@@ -1314,6 +1331,7 @@ listConstants_semantics.addOperation(
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
 	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
+              console.log(testString);
 	      console.log(parsed_pass1.shortMessage);
               console.log(parsed_pass1.getRightmostFailures());
               console.log(parsed_pass1.getRightmostFailures().toString());
@@ -1407,8 +1425,8 @@ listConstants_semantics.addOperation(
 
   </head>
   <body>
-    <button onclick="listConstantsPipelinetest()">Click me (pass1 & listConstants)</button> -->
-    <button onclick="pipelinetest()">Click me (pass1 & listConstants & emitter test)</button> -->
+    <button onclick="listConstantsPipelinetest()">pass1 & listConstants</button>
+    <button onclick="pipelinetest()">pass1 & listConstants & emitter test</button>
     <!-- <button onclick="simpleTest()">Click me (simple test)</button> -->
     <p id="timestamp"></p>
     <p id="result"></p>
