@@ -412,7 +412,7 @@ xyz
 </script>
 
 <script type="text/test">
-(define db '("x" . "y"))
+(define db '(p q ("r" . "s")))
 </script>
 
 <!-- prolog-6.scm -->
@@ -1338,6 +1338,7 @@ listConstants_semantics.addOperation(
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
 	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
+	      console.log(pass1_grammar.trace(testString).toString());
               console.log(testString);
 	      console.log(parsed_pass1.shortMessage);
               console.log(parsed_pass1.getRightmostFailures());
@@ -1362,6 +1363,7 @@ listConstants_semantics.addOperation(
 
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
+	      console.log(pass1_grammar.trace(testString).toString());
 	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
 	      console.log(parsed_pass1.shortMessage);
               console.log(parsed_pass1.getRightmostFailures());
