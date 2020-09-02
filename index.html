@@ -410,9 +410,11 @@ xyz
 (define db
   '(p q (r . s)))
 </script>
-<script type="text/test" -->
-(define db (@newList@ "x" "y"))
+
+<script type="text/test">
+(define db '(p q ("r" . "s")))
 </script>
+
 <!-- prolog-6.scm -->
 <script type="text/test-prolog-6">
 (define (try g r e n)
@@ -954,6 +956,10 @@ function number_to_list(n) {
 	  return a.join(' ');
       }
       
+      function toDotted(a) {
+	  return a.join(' . ');
+      }
+      
       function toBranchingAnd(a) {
 	  return a.join(' && ');
       }
@@ -1108,9 +1114,9 @@ function number_to_list(n) {
 	      Syntactic_Atom: function(a) { return a.listConstants();},
 
               QuotedSList: function(slist) { return slist.listConstants(); },
-              QuotedNullTerminatedList: function(_lp,qitem,_rp) { return "(@newList@ " + toListOfStrings(qitem.listConstants()); },
+              QuotedNullTerminatedList: function(_lp,qitem,_rp) { return "(@newList@ " + toListOfStrings(qitem.listConstants()) + ")"; },
 	      QuotedDottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(@newDottedList@ " + toListOfStrings(items.listConstants()) + " " + lastItem.listConstants()},
+		  return "(@newDottedList@ " + toListOfStrings(items.listConstants()) + " " + lastItem.listConstants() + ")"},
               QListItem: function(item) { return item.listConstants(); },
               QAtom: function(a) { return a.listConstants(); },
               QAtomicNonSymbol: function(a) { return a.listConstants(); },
@@ -1187,7 +1193,7 @@ listConstants_semantics.addOperation(
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
               SList_atnewlistat: function(_begin,_at,items,_end) { return "new List(" + items.emitjs() + ")"; },
-              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Pair(" + items.emitjs() + ")"; },
+              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Pair(" + toDotted(items.emitjs()) + ")"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
 
@@ -1274,8 +1280,9 @@ listConstants_semantics.addOperation(
 	      
 
 
-	      //DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
-	      DottedList: function(_lp, items, _dot, lastItem, _rp) { return toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs(); },
+	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
+	      //DottedList: function(_lp, items, _dot, lastItem, _rp) { return toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs(); },
+
 	      NullTerminatedList: function(_lp, items, _rp) {
 		  return toListOfStrings(items.emitjs()) ;},
 	      ListItem: function(item) {return item.emitjs()},
@@ -1331,6 +1338,7 @@ listConstants_semantics.addOperation(
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
 	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
+	      console.log(pass1_grammar.trace(testString).toString());
               console.log(testString);
 	      console.log(parsed_pass1.shortMessage);
               console.log(parsed_pass1.getRightmostFailures());
@@ -1355,6 +1363,7 @@ listConstants_semantics.addOperation(
 
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
+	      console.log(pass1_grammar.trace(testString).toString());
 	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
 	      console.log(parsed_pass1.shortMessage);
               console.log(parsed_pass1.getRightmostFailures());
@@ -1371,7 +1380,10 @@ listConstants_semantics.addOperation(
 		  // console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
 		  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
 		  if (parsed_emitter.failed()) {
-		      resultsString = resultsString + "<br>emitter parse *FAILED*<br>";
+		      resultsString = resultsString + "<br>emitter parse *FAILED*";
+		      resultsString = resultsString + "<br>transpiled listConstants=<br>" + transpiled_listConstants;
+		      resultsString = resultsString + "<br>trace in console";
+		      console.log(emitter_grammar.trace(transpiled_listConstants).toString());
 		  } else {
 		      var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
 		      resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
