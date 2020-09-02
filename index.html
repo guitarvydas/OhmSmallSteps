@@ -411,12 +411,12 @@ xyz
   '(p q (r . s)))
 </script>
 
-<script type="text/test">
-(define db '(p q ("r" . "s")))
+<script type="text/test-xx">
+(define db '(p q (u ("r" . "s"))))
 </script>
 
 <!-- prolog-6.scm -->
-<script type="text/test-prolog-6">
+<script type="text/test">
 (define (try g r e n)
   (if (null? r)
       #f
