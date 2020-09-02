@@ -410,9 +410,15 @@ xyz
 (define db
   '(p q (r . s)))
 </script>
-<script type="text/test" -->
-(define db (@newList@ "x" "y"))
+
+<script type="text/test">
+(define db '(5 6))
 </script>
+
+<script type="text/test-z">
+(define db '("x" "y"))
+</script>
+
 <!-- prolog-6.scm -->
 <script type="text/test-prolog-6">
 (define (try g r e n)
@@ -1108,9 +1114,9 @@ function number_to_list(n) {
 	      Syntactic_Atom: function(a) { return a.listConstants();},
 
               QuotedSList: function(slist) { return slist.listConstants(); },
-              QuotedNullTerminatedList: function(_lp,qitem,_rp) { return "(@newList@ " + toListOfStrings(qitem.listConstants()); },
+              QuotedNullTerminatedList: function(_lp,qitem,_rp) { return "(@newList@ " + toListOfStrings(qitem.listConstants()) + ")"; },
 	      QuotedDottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(@newDottedList@ " + toListOfStrings(items.listConstants()) + " " + lastItem.listConstants()},
+		  return "(@newDottedList@ " + toListOfStrings(items.listConstants()) + " " + lastItem.listConstants() + ")"},
               QListItem: function(item) { return item.listConstants(); },
               QAtom: function(a) { return a.listConstants(); },
               QAtomicNonSymbol: function(a) { return a.listConstants(); },
@@ -1371,7 +1377,10 @@ listConstants_semantics.addOperation(
 		  // console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
 		  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
 		  if (parsed_emitter.failed()) {
-		      resultsString = resultsString + "<br>emitter parse *FAILED*<br>";
+		      resultsString = resultsString + "<br>emitter parse *FAILED*";
+		      resultsString = resultsString + "<br>transpiled listConstants=<br>" + transpiled_listConstants;
+		      resultsString = resultsString + "<br>trace in console";
+		      console.log(emitter_grammar.trace(transpiled_listConstants).toString());
 		  } else {
 		      var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
 		      resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
