@@ -416,7 +416,14 @@ xyz
 </script>
 
 <!-- test harness -->
-<script type="text/test">
+<script type="text/test-xx">
+(define link list)
+(define L_l car)
+(define L_g cadr)
+(define L_r caddr)
+(define L_e cadddr)
+(define (L_n x) (car (cddddr x)))
+
 (define (back5 l g r e n)
   (if (and (pair? g)
            (pair? r))
@@ -429,7 +436,7 @@ xyz
 </script>
 
 <!-- prolog-6.scm -->
-<script type="text/test-prolog">
+<script type="text/test">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -454,7 +461,7 @@ xyz
 (define (L_n x) (car (cddddr x)))
 
 
-(define (back5 l g r e n)
+(Define (back5 l g r e n)
   (if (and (pair? g)
            (pair? r))
       (prove5 l g (cdr r) e n)
@@ -536,13 +543,13 @@ xyz
 
 (define empty '((bottom)))
 
-(define var '?)
+;(define var '?) ; removed for transpilation
 (define name cadr)
 (define time cddr)
 
 (define (var? x)
   (and (pair? x)
-       (eq? var (car x))))
+       (eq? "?" (car x))))
 
 (define (lookup v e)
   (let ((id (name v))
@@ -1198,6 +1205,120 @@ listConstants_semantics.addOperation(
       var emitter_semantics = emitter_grammar.createSemantics();
 
       emitter_semantics.addOperation(
+	  'toCL',
+	  {
+	      Program: function(tl) { return "(:Program " + tl.toCL() + ")";},
+	      Form: function(form) { return "(:Form " + form.toCL() + ")";},
+
+	      DottedList: function(_lp,items,_dot,lastItem,_rp) { 
+		  return "(:DottedList " + items.toCL() + " " + lastItem.toCL() + ")";},
+	      NullTerminatedList: function(_lp,items,_rp) { return "(:NullTerminatedList " + items.toCL() + ")";},
+	      ListItem: function(item) { return "(:ListItem " +  item.toCL() + ")";},
+	      Atom: function(a) { return "(:Atom " + a.toCL() + ")";},
+
+	      SList: function(form) { return "(:SList " + form.toCL() + ")";},
+	      SList_atnewlistat: function(_begin,_at,items,_end) { return "(:atnewlist " + items.toCL() + ")";},
+	      SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "(:atnewdottedlist " + items.toCL() + ")";},
+
+	      SpecialForm: function(specialForm) { return "(:SpecialForm " + specialForm.toCL() + ")";},
+
+	      CondExpression: function(ce) { return "(:CondExpression " + ce.toCL() + ")";},
+	      CondExpressionWithElse: function(_begin,_cond,firstCondClause,moreCondClauses,condElseClause,_end) { 
+		  return "(:CondExpressionWithElse " + firstCondClause.toCL() + " " + moreCondClauses.toCL() + ")";},
+	      CondExpressionWithoutElse: function(_begin,_cond,firstCondClause,moreCondClauses,_end) { 
+		  return "(:CondExpressionWithoutElse " + firstCondClause.toCL + " " + moreCondClauses.toCL() + ")";},
+    
+	      FirstCondClause: function(clause) { return "(:FirstCondClause " + clause.toCL() + ")";},
+	      MoreCondClause: function(clause) { return "(:MoreCondClause " + clause.toCL() + ")";},
+	      CondClause: function(_begin,condTest,statementBlock,_end) { 
+		  return "(:CondClause " + condTest.toCL() + " "  + statementBlock.toCL() + ")";},
+	      CondTest: function(form) { return "(:CondTest " + form.toCL() + ")";},
+
+	      CondElseClause: function(_begin,_else,statementBlock,_end) { 
+		  return "(:CondElseClause " + statementBlock.toCL() + ")";},
+
+	      CondStatementBlock: function(statementBlock) { 
+		  return "(:CondStatementBlock " + statementBlock.toCL() + ")";},
+
+	      StatementBlock: function(s) { return "(:StatementBlock " + s.toCL() + ")";},
+	      SequentialStatement: function(mids,last) { 
+		  return "(:SequentialStatement " + mids.toCL() + " " + last.toCL() + ")";},
+	      MidStatement: function(statement,_lookahead) { return "(:MidStatement " + statement.toCL() + ")";},
+	      LastStatement: function(statement) { return "(:LastStatement " + statement.toCL() + ")";},
+	      Statement: function(form) { return "(:Statement " + form.toCL() + ")";},
+
+	      LetExpression: function(le) { return "(:LetExpression " + le.toCL() + ")";},
+
+	      LetSequential: function(_begin,_letstar,bindings,body,_end) { 
+		  return "(:LetSequential " + bindings.toCL() + " " + body.toCL() + ")";},
+	      LetParallel: function(_begin,_let,bindings,body,_end) { 
+		  return "(:LetParallel " + bindings.toCL() + " " + body.toCL() + ")";},
+	      
+	      LetBindings: function(_begin,bindings,_end) { return "(:LetBindings " + bindings.toCL() + ")";},
+	      Binding: function(_begin,v,rhs,_end) { return "(:Binding " + v.toCL() + " " + rhs.toCL() + ")";},
+	      LetVar: function(v) { return "(:LetVar " + v.toCL() + ")";},
+	      LetBindingClause: function(form) { return "(:LetBindingClause " + form.toCL() + ")";},
+	      LetBody: function(statementBlock) { return "(:LetBodyClause " + statementsBlock.toCL() + ")";},    
+
+	      IfThenElseExpression: function(_begin,_if,testExpr,thenPart,elsePart,_end) { 
+		  return "(:IfThenElseExpressio " + testExpr.toCL() + " " + thenPart.toCL() + " " + elsePart.toCL() + ")";},
+	      IfThenExpression: function(_begin,_if,testExpr,thenPart,_end) { 
+		  return "(:IfThenExpression " + testExpr.toCL() + " " + thenPart.toCL() + ")";},
+	      IfTestExpr: function(form) { return "(:IfTestExpr " + form.toCL() + ")";},
+	      ThenPart: function(form) { return "(:ThenPart " + form.toCL() + ")";},
+	      ElsePart: function(form) { return "(:ElsePart " + form.toCL() + ")";},
+
+	      AndExpression: function(_begin,_and,exprs,_end) { return "(:AndExpression " + exprs.toCL() + ")";},
+	      OrExpression: function(_begin,_or,exprs,_end) { return "(:OrExpression " + exprs.toCL() + ")";},
+	      NotExpression: function(_begin,_not,expr,_end) { return "(:NotExpression " + expr.toCL() + ")";},
+	      Bool: function(form) { return "(:Bool " + form.toCL() + ")";},
+
+	      FunctionCall: function(_begin,id,args,_end) { return "(:FunctionCall " + id.toCL() + args.toCL() + ")";},
+	      Identifier: function(sym) { return "(:Identifier " + sym.toCL() + ")";},
+	      Arg: function(listItem) { return "(:Arg " + listItem.toCL() + ")";},
+
+
+	      GlobalFunctionDefinition: function(_begin,_define,_begin2,id,actuals,_end2,statementBlock,_end) { 
+		  return "(:GlobalFunctionDefinition " + id.toCL() + " " + actuals.toCL() + " " + statementBlock.toCL() + ")";},
+	      GlobalVariableDefinition: function(_begin,_define,id,form,_end) { 
+		  return "(:GlobalVariableDefinition " + id.toCL() + " " + form.toCL() + ")";},
+	      TopLevelFunctionCall: function(functionCall) { return "(:TopLevelFunctionCall " + functionCall.toCL() + ")";},
+
+	      BEGIN: function(_lp) { return "(:BEGIN)";},
+	      END: function(_rp) { return "(:END)";},
+	      
+	      QuotedExpression: function(e) { return "(:QuotedExpression " + e.toCL() + ")";},
+	      QuotedSymbol: function(_begin,_q,sym,_end) { return "(:QuotedSymbol " + sym.toCL() + ")";},
+	      QuotedOther: function(_begin,_q,e,_end) { return "(:QuoteOther " + e.toCL() + ")";},
+	      
+	      Keyword: function(lex) { return "(:Keyword " + lex.toCL() + ")";},
+	      
+	      lexical_AND: function(lex,_sp) { return "(:AND)";},
+	      lexical_OR: function(lex,_sp) { return "(:OR)";},
+	      lexical_NOT: function(lex,_sp) { return "(:NOT)";},
+	      lexical_AtNewListAt: function(lex,_sp) { return "(:AtNewList)";},
+	      lexical_AtNewDottedListAt: function(lex,_sp) { return "(:AtNewDottedList)";},
+	      lexical_DEFINE: function(lex,_sp) { return "(:DEFINE)";},
+	      lexical_IF: function(lex,_sp) { return "(:IF)";},
+	      lexical_COND: function(lex,_sp) { return "(:COND)";},
+	      lexical_ELSE: function(lex,_sp) { return "(:ELSE)";},
+	      lexical_LETSTAR: function(lex,_sp) { return "(LETSTAR)";},
+	      lexical_LET: function(lex,_sp) { return "(:LET)";},
+	      lexical_QUOTE: function(lex,_sp) { return "(:QUOTE)";},
+	      
+	      lexical_atom: function(a) { return "(:atom " + a.toCL() + ")";},
+	      lexical_boolean: function(b) { return "(:boolean";},
+	      lexical_integer: function(cs) { return "(:integer " + cs.toCL() + ")";},
+	      lexical_numchar: function(c) { return "(:numchar " + c.toCL() + ")";},
+	      lexical_string: function(_q1,cs,_q2) { return "(:string " + cs.toCL() + ")";},
+	      lexical_symbol: function(c,cs) { return "(:symbol [[" + this.sourceString + "]] )";},
+	      lexical_letchar: function(c) { return "(:letchar " + c.toCL() + ")";},
+	      lexical_lc: function(c) { return "(:lc " + c.toCL() + ")";},
+	      lexical_uc: function(c) { return "(:uc " + c.toCL() + ")";},
+	      _terminal: function() { return this.primitiveValue; }
+	  });
+
+      emitter_semantics.addOperation(
 	  'emitjs',
 	  {
 	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
@@ -1275,10 +1396,10 @@ listConstants_semantics.addOperation(
               ElsePart: function(b) { return b.emitjs(); },
 
               AndExpression: function(_begin,_and,booleans,_end) {
-		  return "(function(){if (" + toBranchingAnd(booleans.emitjs()) + " { return true; } else { return false; })))()"; },
+		  return toBranchingAnd(booleans.emitjs());},
               OrExpression: function(_begin,_and,booleans,_end) {
-		  return "(function(){if (" + toBranchingOr(booleans.emitjs()) + " { return true; } else { return false; })))()"; },
-              NotExpression: function(_begin,_not,bool,_end) { return "!" + bool.emitjs(); },
+		  return toBranchingOr(booleans.emitjs())},
+              NotExpression: function(_begin,_not,bool,_end) { return "(!" + bool.emitjs() + ")"; },
               Bool: function(form){return form.emitjs(); },
 
 
@@ -1341,12 +1462,36 @@ listConstants_semantics.addOperation(
       var resultsString = '';
       var clString = '';
       
+      function doPreReplacements(inputString) {
+	  var r = inputString
+	      .replace(/'!/g,'"!"')
+	      .replace(/[(][+]/g,"(_plus ")
+	      .replace(/'r!/g,'"r!"')
+	      .replace(/try/g,"_try")
+	      .replace(/null[?]/g,"null_Q_")
+	      .replace(/pair[?]/g,"pair_Q_")
+	      .replace(/e[*]/g,"e_A_")
+	      .replace(/car[!]/g,"car_B_")
+	      .replace(/var[?]/g,"var_Q_")
+	      .replace(/eqv[?]/g,"eqv_Q_")
+	      .replace(/eq[?]/g,"eq_Q_")
+	  ;
+	  return r;
+      }
+      
+      function doPostReplacements(inputString) {
+	  var r = inputString
+	      .replace(/list[(]r!,l[)]/g,'list("r!",l)')
+	  ;
+	  return r;
+      }
+      
       function displayDate () {
 	  document.getElementById('timestamp').innerHTML = Date();
       }
 
       function doListConstantsPipeline(testElement) {
-	  var testString = testElement.innerHTML;
+	  var testString = doPreReplacements(testElement.innerHTML);
 
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
@@ -1363,7 +1508,7 @@ listConstants_semantics.addOperation(
 	      if (parsed_listConstants.failed()) {
 		  resultsString = resultsString + "<br>listConstants parse *FAILED*<br>";
 	      } else {		  
-		  var transpiled_listConstants = listConstants_semantics(parsed_listConstants).listConstants();
+		  var transpiled_listConstants = doPostReplacements(listConstants_semantics(parsed_listConstants).listConstants());
 		  resultsString = resultsString + "<br>input:<br>" + testString + " ==>";
 		  resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants;
 		  clString = listConstants_semantics(parsed_listConstants).toCL();
@@ -1371,8 +1516,8 @@ listConstants_semantics.addOperation(
 	  }
       }
       
-      function doPipeline(testElement) {
-	  var testString = testElement.innerHTML;
+      function doTree(testElement) {
+	  var testString = doPreReplacements(testElement.innerHTML);
 
           var parsed_pass1 = pass1_grammar.match(testString);
 	  if (parsed_pass1.failed()) {
@@ -1398,9 +1543,48 @@ listConstants_semantics.addOperation(
 		      resultsString = resultsString + "<br>trace in console";
 		      console.log(emitter_grammar.trace(transpiled_listConstants).toString());
 		  } else {
-		      var transpiled_emitter = emitter_semantics(parsed_emitter).emitjs();
+		      var tree = doPostReplacements(emitter_semantics(parsed_emitter).toCL());
 		      resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
 		      resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants + " ==><br><br>";
+		      resultsString = resultsString + "<br>final:<br>" + tree;
+		  }
+	      }
+	  }
+      }
+      
+      function doPipeline(testElement) {
+	  var testString = testElement.innerHTML;
+	  var str = doPreReplacements(testString);
+
+          var parsed_pass1 = pass1_grammar.match(str);
+	  if (parsed_pass1.failed()) {
+	      console.log(pass1_grammar.trace(str).toString());
+	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
+	      resultsString = resultsString + "<br>pre Replacements<br>input:<br>" + str;
+	      console.log(parsed_pass1.shortMessage);
+              console.log(parsed_pass1.getRightmostFailures());
+              console.log(parsed_pass1.getRightmostFailures().toString());
+	  } else {
+              var transpiled_pass1 = pass1_semantics(parsed_pass1).unbackquote();
+	      
+	      var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
+	      if (parsed_listConstants.failed()) {
+		  resultsString = resultsString + "<br>listConstants parse *FAILED*<br>";
+	      } else {		  
+		  var transpiled_listConstants = listConstants_semantics(parsed_listConstants).listConstants();
+
+		  // console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
+		  var str = doPreReplacements(transpiled_listConstants);
+		  var parsed_emitter = emitter_grammar.match(str);
+		  if (parsed_emitter.failed()) {
+		      resultsString = resultsString + "<br>emitter parse *FAILED*";
+		      resultsString = resultsString + "<br>transpiled listConstants=<br>" + transpiled_listConstants;
+		      resultsString = resultsString + "<br>trace in console";
+		      console.log(emitter_grammar.trace(transpiled_listConstants).toString());
+		  } else {
+		      var transpiled_emitter = doPostReplacements(emitter_semantics(parsed_emitter).emitjs());
+		      // resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
+		      // resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants + " ==><br><br>";
 		      resultsString = resultsString + "<br>final:<br>" + transpiled_emitter;
 		  }
 	      }
@@ -1415,16 +1599,6 @@ listConstants_semantics.addOperation(
           document.getElementById(el).innerHTML = (s1 == s2);
       }
 
-      function doReplacements(inputString) {
-	  var r = inputString.replace(/try/g,"_try")
-	      .replace(/null[?]/g,"null_Q_")
-	      .replace(/pair[?]/g,"pair_Q_")
-	      .replace(/[+]/g,"_plus")
-	      .replace(/[-]/g,"_D_")
-	  ;
-	  return r;
-      }
-      
       function listConstantsPipelinetest() {
 	  resultsString = '';
 	  clString = '';
@@ -1433,11 +1607,17 @@ listConstants_semantics.addOperation(
 	  displayTestResults(clString,'cl');
 	  displayDate();
       }
+      function tree() {
+	  resultsString = '';
+	  tests.forEach(doTree);
+	  var str = doPortReplacements(resultsString);
+	  displayTestResults(str,'result');
+	  displayDate();
+      }
       function pipelinetest() {
 	  resultsString = '';
 	  tests.forEach(doPipeline);
-	  var str = doReplacements(resultsString);
-	  displayTestResults(str,'result');
+	  displayTestResults(resultsString,'result');
 	  displayDate();
       }
 
@@ -1451,8 +1631,8 @@ listConstants_semantics.addOperation(
   </head>
   <body>
     <button onclick="listConstantsPipelinetest()">pass1 & listConstants</button>
+    <button onclick="tree()">pass1 & listConstants & emitter tree</button>
     <button onclick="pipelinetest()">pass1 & listConstants & emitter test</button>
-    <!-- <button onclick="simpleTest()">Click me (simple test)</button> -->
     <p id="timestamp"></p>
     <p id="result"></p>
     <p id="cl"></p>
