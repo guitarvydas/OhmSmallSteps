@@ -590,9 +590,12 @@ xyz
 (define (bind x y e)
   (cons (list x y) e))
 
-(define (unify x y e)
-  (let ((x (value x e))
-        (y (value y e)))
+; (define (unify x y e)
+;   (let ((x (value x e))
+;         (y (value y e)))
+(define (unify x1 y1 e)
+  (let ((x (value x1 e))
+        (y (value y1 e)))
     (cond
       ((eq? x y) e)
       ((var? x) (bind x y e))
