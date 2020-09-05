@@ -976,7 +976,7 @@ function number_to_list(n) {
 
       var tests = document.querySelectorAll('script[type="text/test"]');
 
-      function toListOfStrings(a) {
+      function toSpaceDelimitedList(a) {
 	  return a.join(' ');
       }
       
@@ -1004,16 +1004,16 @@ function number_to_list(n) {
       pass1_semantics.addOperation(
 	  'unity',
 	  {
-	      Program: function(tree) {return toListOfStrings(tree.unity())},
+	      Program: function(tree) {return toSpaceDelimitedList(tree.unity())},
 	      Form: function(item) {return item.unity()},
 	      QuotedSexp: function(_, form) {return "'" + form.unity()},
 	      BackQuotedSexp: function(_, form) {return "`" + form.unity()},
 	      CommaSexp: function(_, form) {return "," + form.unity()},
 	      SList: function(lis) {return lis.unity()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.unity()) + " . " + lastItem.unity() + ")"},
+		  return "(" + toSpaceDelimitedList(items.unity()) + " . " + lastItem.unity() + ")"},
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(" + toListOfStrings(items.unity()) + ")"},
+		  return "(" + toSpaceDelimitedList(items.unity()) + ")"},
 	      ListItem: function(item) {return item.unity()},
 	      Atom: function(a) {return a.unity()},
 	      lexical_integer: function(ns) {return toPackedString(ns.unity());},
@@ -1033,16 +1033,16 @@ function number_to_list(n) {
           pass1_semantics.addOperation(
 	  'unquote',
 	  {
-	      Program: function(tree) {return toListOfStrings(tree.unquote())},
+	      Program: function(tree) {return toSpaceDelimitedList(tree.unquote())},
 	      Form: function(item) {return item.unquote()},
 	      QuotedSexp: function(_, form) {return "(quote " + form.unquote() + ")"},
 	      BackQuotedSexp: function(_, form) {return "`" + form.unquote()},
 	      CommaSexp: function(_, form) {return "," + form.unquote()},
 	      SList: function(lis) {return lis.unquote()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.unquote()) + " . " + lastItem.unquote() + ")"},
+		  return "(" + toSpaceDelimitedList(items.unquote()) + " . " + lastItem.unquote() + ")"},
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(" + toListOfStrings(items.unquote()) + ")"},
+		  return "(" + toSpaceDelimitedList(items.unquote()) + ")"},
 	      ListItem: function(item) {return item.unquote()},
 	      Atom: function(a) {return a.unquote()},
 	      lexical_integer: function(ns) {return toPackedString(ns.unquote());},
@@ -1063,16 +1063,16 @@ function number_to_list(n) {
           pass1_semantics.addOperation(
 	  'unbackquote',
 	  {
-	      Program: function(tree) {return toListOfStrings(tree.unbackquote())},
+	      Program: function(tree) {return toSpaceDelimitedList(tree.unbackquote())},
 	      Form: function(item) {return item.unbackquote()},
 	      QuotedSexp: function(_, form) {return "(quote " + form.unbackquote() + ")"},
 	      BackQuotedSexp: function(_, form) {return form.inbackquote();},
 	      CommaSexp: function(_, form) {throw "can\'t happen - comma not inside backquote - (actually, not necessarily the case, but nested backquotes left as an exercise for the reader)"},
 	      SList: function(lis) {return lis.unbackquote()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(" + toListOfStrings(items.unbackquote()) + " . " + lastItem.unbackquote() + ")"},
+		  return "(" + toSpaceDelimitedList(items.unbackquote()) + " . " + lastItem.unbackquote() + ")"},
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(" + toListOfStrings(items.unbackquote()) + ")"},
+		  return "(" + toSpaceDelimitedList(items.unbackquote()) + ")"},
 	      ListItem: function(item) {return item.unbackquote()},
 	      Atom: function(a) {return a.unbackquote()},
 	      lexical_integer: function(ns) {return toPackedString(ns.unbackquote());},
@@ -1098,9 +1098,9 @@ function number_to_list(n) {
 	      CommaSexp: function(_, form) {return form.unity()}, // use unbackquote to get eval'ed value
 	      SList: function(lis) {return lis.inbackquote()},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(list " + toListOfStrings(items.inbackquote()) + " . " + lastItem.inbackquote() + ")"},
+		  return "(list " + toSpaceDelimitedList(items.inbackquote()) + " . " + lastItem.inbackquote() + ")"},
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(list " + toListOfStrings(items.inbackquote()) + ")"},
+		  return "(list " + toSpaceDelimitedList(items.inbackquote()) + ")"},
 	      ListItem: function(item) {return item.inbackquote()},
 	      Atom: function(a) {return a.inbackquote()},
 	      lexical_integer: function(ns) {return toPackedString(ns.inbackquote());},
@@ -1124,7 +1124,7 @@ function number_to_list(n) {
       listConstants_semantics.addOperation(
 	  'listConstants',
 	  {
-	      Program: function(tree) {return toListOfStrings(tree.listConstants())},
+	      Program: function(tree) {return toSpaceDelimitedList(tree.listConstants())},
 	      Form: function(item) {return item.listConstants()},
 	      SList: function(lis) {return lis.listConstants();},
 	      QuotedSexp: function(_lp,_q,form,_rp) {return form.listConstants()},
@@ -1132,15 +1132,15 @@ function number_to_list(n) {
 	      CommaSexp: function(_, form) {throw "can't happen";},
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "this solution does not support dotted list (except when quoted)"},
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return "(" + toListOfStrings(items.listConstants()) + ")"},
+		  return "(" + toSpaceDelimitedList(items.listConstants()) + ")"},
 	      ListItem: function(item) {return item.listConstants()},
 	      Atom: function(a) {return a.listConstants()},
 	      Syntactic_Atom: function(a) { return a.listConstants();},
 
               QuotedSList: function(slist) { return slist.listConstants(); },
-              QuotedNullTerminatedList: function(_lp,qitem,_rp) { return "(@newList@ " + toListOfStrings(qitem.listConstants()) + ")"; },
+              QuotedNullTerminatedList: function(_lp,qitem,_rp) { return "(@newList@ " + toSpaceDelimitedList(qitem.listConstants()) + ")"; },
 	      QuotedDottedList: function(_lp, items, _dot, lastItem, _rp) {
-		  return "(@newDottedList@ " + toListOfStrings(items.listConstants()) + " " + lastItem.listConstants() + ")"},
+		  return "(@newDottedList@ " + toSpaceDelimitedList(items.listConstants()) + " " + lastItem.listConstants() + ")"},
               QListItem: function(item) { return item.listConstants(); },
               QAtom: function(a) { return a.listConstants(); },
               QAtomicNonSymbol: function(a) { return a.listConstants(); },
@@ -1325,7 +1325,7 @@ listConstants_semantics.addOperation(
       emitter_semantics.addOperation(
 	  'emitjs',
 	  {
-	      Program: function(listOfForms) {return toListOfStrings(listOfForms.emitjs())},
+	      Program: function(listOfForms) {return toSpaceDelimitedList(listOfForms.emitjs())},
               Arg: function(a) {return a.emitjs();},
 
               Form: function(item) {return item.emitjs()},
@@ -1346,9 +1346,9 @@ listConstants_semantics.addOperation(
 	      //
               CondExpression: function(c){ return c.emitjs(); },
               CondExpressionWithElse : function(_begin,_cond,firstClause,moreClauses,elseClause,_end) {
-                  return "(function(){" + firstClause.emitjs() + toListOfStrings(moreClauses.emitjs()) + elseClause.emitjs() + "})()" ; },
+                  return "(function(){" + firstClause.emitjs() + toSpaceDelimitedList(moreClauses.emitjs()) + elseClause.emitjs() + "})()" ; },
               CondExpressionWithoutElse : function(_begin,_cond,firstClause,moreClauses,_end) {
-                  return "(function(){"+ firstClause.emitjs() + toListOfStrings(moreClauses.emitjs()) + " else " + "{ return null; }" + "})()" ; },
+                  return "(function(){"+ firstClause.emitjs() + toSpaceDelimitedList(moreClauses.emitjs()) + " else " + "{ return null; }" + "})()" ; },
 
               FirstCondClause: function(c) { return "if " + c.emitjs(); },
               MoreCondClause: function(c) { return " else if " + c.emitjs(); },
@@ -1361,7 +1361,7 @@ listConstants_semantics.addOperation(
 
 	      StatementBlock: function(atomOrSequential) { return atomOrSequential.emitjs(); },
               SequentialStatement: function(midStatements, lastStatement) {
-		  return toListOfStrings(midStatements.emitjs()) + lastStatement.emitjs()},
+		  return toSpaceDelimitedList(midStatements.emitjs()) + lastStatement.emitjs()},
               MidStatement: function(s,_lookahead) { if (s._node.numChildren() > 0) {return s.emitjs() + ";" ;} else {return "";}},
               LastStatement: function(s) { return "return " + s.emitjs() + ";" ;},
               Statement: function(f) { return f.emitjs() ;},
@@ -1409,10 +1409,10 @@ listConstants_semantics.addOperation(
 
 
 	      DottedList: function(_lp, items, _dot, lastItem, _rp) { throw "can't happen (in this solution)"; },
-	      //DottedList: function(_lp, items, _dot, lastItem, _rp) { return toListOfStrings(items.emitjs()) + " . " + lastItem.emitjs(); },
+	      //DottedList: function(_lp, items, _dot, lastItem, _rp) { return toSpaceDelimitedList(items.emitjs()) + " . " + lastItem.emitjs(); },
 
 	      NullTerminatedList: function(_lp, items, _rp) {
-		  return toListOfStrings(items.emitjs()) ;},
+		  return toSpaceDelimitedList(items.emitjs()) ;},
 	      ListItem: function(item) {return item.emitjs()},
 
 	      Atom: function(a) {return a.emitjs() ;},
