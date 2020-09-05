@@ -411,32 +411,13 @@ xyz
   '(p q (r . s)))
 </script>
 
-<script type="text/test-xx">
+<script type="text/test-xyz">
 (define db '(p q (u ("r" . "s"))))
 </script>
 
 <!-- test harness -->
-<script type="text/test-xx">
-(define (prove6 l g r e n c)
-  (cond
-    ((null? g)
-      (print-frame e)
-      (back6a))
-    ((eq? '! (car g))
-      (clear_r c)
-      (prove6b))
-    ((eq? 'r! (car g))
-      (prove6c))
-    ((null? r)
-      (if (null? l)
-          #t
-          (back6d)))
-    (else
-      (let* ((a  5)
-             (e* 6))
-        (if e*
-            (prove6c)
-            (back6d))))))
+<script type="text/test-harness">
+
 </script>
 
 <!-- prolog-6.scm -->
