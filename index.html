@@ -416,27 +416,31 @@ xyz
 </script>
 
 <!-- test harness -->
-<script type="text/test-xx">
-(define link list)
-(define L_l car)
-(define L_g cadr)
-(define L_r caddr)
-(define L_e cadddr)
-(define (L_n x) (car (cddddr x)))
-
-(define (back5 l g r e n)
-  (if (and (pair? g)
-           (pair? r))
-      (prove5 l g (cdr r) e n)
-      (prove5 (L_l l)
-              (L_g l)
-              (cdr (L_r l))
-              (L_e l)
-              (L_n l))))
+<script type="text/test">
+(define (prove6 l g r e n c)
+  (cond
+    ((null? g)
+      (print-frame e)
+      (back6a))
+    ((eq? '! (car g))
+      (clear_r c)
+      (prove6b))
+    ((eq? 'r! (car g))
+      (prove6c))
+    ((null? r)
+      (if (null? l)
+          #t
+          (back6d)))
+    (else
+      (let* ((a  5)
+             (e* 6))
+        (if e*
+            (prove6c)
+            (back6d))))))
 </script>
 
 <!-- prolog-6.scm -->
-<script type="text/test">
+<script type="text/test-prolog">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -819,11 +823,11 @@ Scm2JSEmitter {
 
 
   CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
-  CondExpressionWithElse = BEGIN lexical_COND FirstCondClause MoreCondClause CondElseClause END
+  CondExpressionWithElse = BEGIN lexical_COND FirstCondClause MoreCondClause* CondElseClause END
   CondExpressionWithoutElse = BEGIN lexical_COND FirstCondClause MoreCondClause END
     
   FirstCondClause = CondClause
-  MoreCondClause = CondClause*
+  MoreCondClause = CondClause
   CondClause = BEGIN ~lexical_ELSE CondTest CondStatementBlock END
 
   CondTest = Form
@@ -1342,22 +1346,12 @@ listConstants_semantics.addOperation(
 	      //
               CondExpression: function(c){ return c.emitjs(); },
               CondExpressionWithElse : function(_begin,_cond,firstClause,moreClauses,elseClause,_end) {
-                  return "(function(){" + firstClause.emitjs() + moreClauses.emitjs() + elseClause.emitjs() + "})()" ; },
+                  return "(function(){" + firstClause.emitjs() + toListOfStrings(moreClauses.emitjs()) + elseClause.emitjs() + "})()" ; },
               CondExpressionWithoutElse : function(_begin,_cond,firstClause,moreClauses,_end) {
-                  return "(function(){"+ firstClause.emitjs() + moreClauses.emitjs() + " else " + "{ return null; }" + "})()" ; },
+                  return "(function(){"+ firstClause.emitjs() + toListOfStrings(moreClauses.emitjs()) + " else " + "{ return null; }" + "})()" ; },
 
               FirstCondClause: function(c) { return "if " + c.emitjs(); },
-              MoreCondClause: function(c) { 
-		  //console.log('c ' + c.toString());
-		  //console.log('node(raw)    ' + c._node);
-		  //console.log('node(string) ' + c._node.toString());
-                  //console.log('node(nChild) ' + c._node.numChildren());
-		  if (c._node.numChildren() == 0) {
-		      return "";
-		  } else {
-		      return " else if " + c.emitjs();
-		  }
-	      },
+              MoreCondClause: function(c) { return " else if " + c.emitjs(); },
 	      CondClause: function(_begin,ctest,block,_end) {return "(" + ctest.emitjs() + ") {" +  block.emitjs() + "}"; },
 
 	      CondTest: function(f) { return f.emitjs(); },
@@ -1466,7 +1460,7 @@ listConstants_semantics.addOperation(
 	  var r = inputString
 	      .replace(/'!/g,'"!"')
 	      .replace(/[(][+]/g,"(_plus ")
-	      .replace(/'r!/g,'"r!"')
+//	      .replace(/'r!/g,'"r!"')
 	      .replace(/try/g,"_try")
 	      .replace(/null[?]/g,"null_Q_")
 	      .replace(/pair[?]/g,"pair_Q_")
@@ -1481,7 +1475,7 @@ listConstants_semantics.addOperation(
       
       function doPostReplacements(inputString) {
 	  var r = inputString
-	      .replace(/list[(]r!,l[)]/g,'list("r!",l)')
+	      .replace(/[(]r!,/g,'("r!",')
 	  ;
 	  return r;
       }
@@ -1508,7 +1502,7 @@ listConstants_semantics.addOperation(
 	      if (parsed_listConstants.failed()) {
 		  resultsString = resultsString + "<br>listConstants parse *FAILED*<br>";
 	      } else {		  
-		  var transpiled_listConstants = doPostReplacements(listConstants_semantics(parsed_listConstants).listConstants());
+		  var transpiled_listConstants = listConstants_semantics(parsed_listConstants).listConstants();
 		  resultsString = resultsString + "<br>input:<br>" + testString + " ==>";
 		  resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants;
 		  clString = listConstants_semantics(parsed_listConstants).toCL();
@@ -1543,10 +1537,46 @@ listConstants_semantics.addOperation(
 		      resultsString = resultsString + "<br>trace in console";
 		      console.log(emitter_grammar.trace(transpiled_listConstants).toString());
 		  } else {
-		      var tree = doPostReplacements(emitter_semantics(parsed_emitter).toCL());
+		      var tree = emitter_semantics(parsed_emitter).toCL();
 		      resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
 		      resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants + " ==><br><br>";
 		      resultsString = resultsString + "<br>final:<br>" + tree;
+		  }
+	      }
+	  }
+      }
+      
+      function doOrg(testElement) {
+	  var testString = doPreReplacements(testElement.innerHTML);
+
+          var parsed_pass1 = pass1_grammar.match(testString);
+	  if (parsed_pass1.failed()) {
+	      console.log(pass1_grammar.trace(testString).toString());
+	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
+	      console.log(parsed_pass1.shortMessage);
+              console.log(parsed_pass1.getRightmostFailures());
+              console.log(parsed_pass1.getRightmostFailures().toString());
+	  } else {
+              var transpiled_pass1 = pass1_semantics(parsed_pass1).unbackquote();
+	      
+	      var parsed_listConstants = listConstants_grammar.match(transpiled_pass1);
+	      if (parsed_listConstants.failed()) {
+		  resultsString = resultsString + "<br>listConstants parse *FAILED*<br>";
+	      } else {		  
+		  var transpiled_listConstants = listConstants_semantics(parsed_listConstants).listConstants();
+		  
+		  // console.log( emitter_grammar.trace(transpiled_listConstants).toString() );
+		  var parsed_emitter = emitter_grammar.match(transpiled_listConstants);
+		  if (parsed_emitter.failed()) {
+		      resultsString = resultsString + "<br>emitter parse *FAILED*";
+		      resultsString = resultsString + "<br>transpiled listConstants=<br>" + transpiled_listConstants;
+		      resultsString = resultsString + "<br>trace in console";
+		      console.log(emitter_grammar.trace(transpiled_listConstants).toString());
+		  } else {
+		      var org = emitter_semantics(parsed_emitter).toORG();
+		      resultsString = resultsString + "<br>input:<br>" + testString + " ==><br><br>";
+		      resultsString = resultsString + "<br>listConstants:<br>" + transpiled_listConstants + " ==><br><br>";
+		      resultsString = resultsString + "<br>final:<br>" + org;
 		  }
 	      }
 	  }
@@ -1610,8 +1640,13 @@ listConstants_semantics.addOperation(
       function tree() {
 	  resultsString = '';
 	  tests.forEach(doTree);
-	  var str = doPortReplacements(resultsString);
-	  displayTestResults(str,'result');
+	  displayTestResults(resultsString,'result');
+	  displayDate();
+      }
+      function org() {
+	  resultsString = '';
+	  tests.forEach(doOrg);
+	  displayTestResults(resultsString,'result');
 	  displayDate();
       }
       function pipelinetest() {
