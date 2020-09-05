@@ -416,7 +416,7 @@ xyz
 </script>
 
 <!-- test harness -->
-<script type="text/test">
+<script type="text/test-xx">
 (define (prove6 l g r e n c)
   (cond
     ((null? g)
@@ -440,7 +440,7 @@ xyz
 </script>
 
 <!-- prolog-6.scm -->
-<script type="text/test-prolog">
+<script type="text/test">
 (define (try g r e n)
   (if (null? r)
       #f
@@ -555,17 +555,21 @@ xyz
   (and (pair? x)
        (eq? "?" (car x))))
 
+;; manually rewritten named let
+(define (lookup_loop e id tm)
+    (cond ((not (pair? (caar e)))
+	   #f)
+	  ((and (eq? id (name (caar e)))
+		(eqv? tm (time (caar e))))
+	   (car e))
+	  (else
+	   (lookup-loop (cdr e)))))
+
 (define (lookup v e)
-  (let ((id (name v))
-        (t  (time v)))
-    (let loop ((e e))
-      (cond ((not (pair? (caar e)))
-              #f)
-            ((and (eq? id (name (caar e)))
-                  (eqv? t (time (caar e))))
-              (car e))
-            (else
-              (loop (cdr e)))))))
+    (let ((id (name v))
+          (tm  (time v)))
+      (lookup_loop e id tm)))
+;;; end rewrite
 
 (define (value x e)
   (if (var? x)
@@ -624,20 +628,20 @@ xyz
 ;;             (loop (cdr ee))))))
 
 ;; manually rewritten version w/o named let
-(define (print-frame-loop ee)
+(define (print_frame_loop ee)
   (if (pair? (cdr ee))
-      (let ()
+      (let ((_xx 0))
 	(if (null? (time (caar ee)))
-	    (let ()
+	    (let ((_yy 0))
 	      (display (cadaar ee))
 	      (display " = ")
 	      (display (resolve (caar ee) e))
 	      (neline)))
-	(print-frame-loop (cdr ee)))))
+	(print_frame_loop (cdr ee)))))
 
 (define (print-frame e)
   (newline)
-  (print-frame-loop e))
+  (print_frame_loop e))
 ;; end manually rewritten version w/o named let
 
 
@@ -1469,6 +1473,7 @@ listConstants_semantics.addOperation(
 	      .replace(/var[?]/g,"var_Q_")
 	      .replace(/eqv[?]/g,"eqv_Q_")
 	      .replace(/eq[?]/g,"eq_Q_")
+	      .replace(/print-frame/g,"print_frame")
 	  ;
 	  return r;
       }
