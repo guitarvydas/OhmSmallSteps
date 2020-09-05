@@ -824,7 +824,7 @@ Scm2JSEmitter {
 
   CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
   CondExpressionWithElse = BEGIN lexical_COND FirstCondClause MoreCondClause* CondElseClause END
-  CondExpressionWithoutElse = BEGIN lexical_COND FirstCondClause MoreCondClause END
+  CondExpressionWithoutElse = BEGIN lexical_COND FirstCondClause MoreCondClause* END
     
   FirstCondClause = CondClause
   MoreCondClause = CondClause
