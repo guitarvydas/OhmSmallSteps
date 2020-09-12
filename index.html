@@ -1391,7 +1391,7 @@ listConstants_semantics.addOperation(
 		  return "function " + id.emitjs() + "(" + formals.emitjs() + ")" + " {" + body.emitjs() + "};<br>"; },
 
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {
-		  return "var " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
+		  return "let " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
               TopLevelFunctionCall: function(fn) {return fn.emitjs() + ";<br>";},
 	      
 
