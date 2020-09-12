@@ -104,16 +104,14 @@ function pair_Q_(x) {
     return x.isPair;
 }
 
-function __try(g,r,e,n) {return (function(){ if (null_Q_(r)) {return false;} else {return (function(a=copy(car(r),list(n)),ne=unify(car(g),car(a),e)) {(function(){ if (ne) {return prove3(append(cdr(a),cdr(g)),ne,_plus(1,n));} else { return null;}})();return __try(g,cdr(r),e,n);})();}})();};
-function prove3(g,e,n) {return (function(){if (null_Q_(g)) {return print_frame(e);}else {return __try(g,db,e,n);}})();};
+function first(x) {return car(x);};
+function rest(x) {return cdr(x);};
 let link = list;
 let L_l = car;
 let L_g = cadr;
 let L_r = caddr;
 let L_e = cadddr;
 function L_n(x) {return car(cddddr(x));};
-function back5(l,g,r,e,n) {return (function(){ if (pair_Q_(g) && pair_Q_(r)) {return prove5(l,g,cdr(r),e,n);} else {return prove5(L_l(l),L_g(l),cdr(L_r(l)),L_e(l),L_n(l));}})();};
-function prove5(l,g,r,e,n) {return (function(){if (null_Q_(g)) {print_frame(e);return back5(l,g,r,e,n);} else if (null_Q_(r)) {return (function(){ if (null_Q_(l)) {return true;} else {return back5(l,g,r,e,n);}})();}else {return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {return (function(){ if (e_A_) {return prove5(link(l,g,r,e,n),append(cdr(a),cdr(g)),db,e_A_,_plus(1,n));} else {return back5(l,g,r,e,n);}})();})();}})();};
 function L_c(x) {return cadr(cddddr(x));};
 function clear_r(x) {return set-car_B_(cddr(x),new Cons(new Cons()));};
 function back6(l,g,r,e,n,c) {return (function(){if (pair_Q_(g) && pair_Q_(r)) {return prove6(l,g,cdr(r),e,n,c);} else if (pair_Q_(l)) {return prove6(L_l(l),L_g(l),cdr(L_r(l)),L_e(l),L_n(l),L_c(l));} else { return null; }})();};
@@ -131,10 +129,6 @@ function unify(x1,y1,e) {return (function(x=value(x1,e),y=value(y1,e)) {return (
 function resolve(x,e) {return (function(){if ((!pair_Q_(x))) {x} else if (var_Q_(x)) {return (function(v=value(x,e)) {return (function(){ if (var_Q_(v)) {return v;} else {return resolve(v,e);}})();})();}else {return cons(resolve(car(x),e),resolve(cdr(x),e));}})();};
 function print_frame_loop(ee) {return (function(){ if (pair_Q_(cdr(ee))) {return (function(_xx=0) {(function(){ if (null_Q_(time(caar(ee)))) {return (function(_yy=0) {display(cadaar(ee)); display(" = "); display(resolve(caar(ee),e));return neline();})();} else { return null;}})();return print_frame_loop(cdr(ee));})();} else { return null;}})();};
 function print_frame(e) {newline();return print_frame_loop(e);};
-let db = new Cons(new Cons(new Cons("edge","a","b")),new Cons(new Cons("edge","a","f")),new Cons(new Cons("edge","a","g")),new Cons(new Cons("edge","b","c")),new Cons(new Cons("edge","b","d")),new Cons(new Cons("edge","c","d")),new Cons(new Cons("edge","c","e")),new Cons(new Cons("edge","g","h")),new Cons(new Cons("edge","d","h")),new Cons(new Cons("edge","h","e")),new Cons(new Cons("edge","h","f")),new Cons(new Cons("path",new Cons("?","A"),new Cons("?","B"),new Cons(new Cons("?","A"),new Cons("?","B"))),new Cons("edge",new Cons("?","A"),new Cons("?","B"))),new Cons(new Cons("path",new Cons("?","A"),new Cons("?","B"),new Cons(new Cons("?","A"),new Cons("?","CB"))),new Cons("edge",new Cons("?","A"),new Cons("?","C")),new Cons("path",new Cons("?","C"),new Cons("?","B"),new Cons("?","CB"))));
-let goals = new Cons(new Cons("path","a","f",new Cons("?","P")));
-prove3(goals,empty,1);
-prove5(new Cons(),goals,db,empty,1);
 let db = new Cons(new Cons(new Cons("some","foo")),new Cons(new Cons("some","bar")),new Cons(new Cons("some","baz")),new Cons(new Cons("eq",new Cons("?","X"),new Cons("?","X"))),new Cons(new Cons("neq",new Cons("?","X"),new Cons("?","Y")),new Cons("eq",new Cons("?","X"),new Cons("?","Y")),"!","fail"),new Cons(new Cons("neq",new Cons("?","X"),new Cons("?","Y"))));
 let goals = new Cons(new Cons("some",new Cons("?","X")),new Cons("some",new Cons("?","Y")),new Cons("neq",new Cons("?","X"),new Cons("?","Y")));
 prove6(new Cons(),goals,db,empty,1,new Cons());

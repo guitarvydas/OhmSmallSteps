@@ -421,6 +421,11 @@ xyz
 
 <!-- prolog-6.scm -->
 <script type="text/test">
+;; utility functions
+(define (first x) (car x))
+(define (rest x) (cdr x))
+;;;;
+
 (define link list)
 (define L_l car)
 (define L_g cadr)
@@ -600,7 +605,6 @@ xyz
 
 ; 9-slide PROVE
 (prove6 '() goals db empty 1 '())
-
 
     </script>
 

@@ -11,7 +11,6 @@
 (define (L_n x) (car (cddddr x)))
 
 
-
 (define (L_c x) (cadr (cddddr x)))
 
 
@@ -19,70 +18,72 @@
   (set-car! (cddr x) '(())))
 
 
-(define (back6 l g r e n c whole-db)
+(define (back6 l g r e n c)
   (cond
     ((and (pair? g)
           (pair? r))
-      (prove6 l g (cdr r) e n c whole-db))
+      (prove6 l g (cdr r) e n c))
     ((pair? l)
       (prove6 (L_l l)
               (L_g l)
               (cdr (L_r l))
               (L_e l)
               (L_n l)
-              (L_c l)
-	      whole-db))))
+              (L_c l)))))
 
 
-(define (prove6 l g r e n c whole-db)
+(define (prove6 l g r e n c)
   (cond
     ((null? g)
       (print-frame e)
-      (back6 l g r e n c whole-db))
+      (back6 l g r e n c))
     ((eq? '! (car g))
       (clear_r c)
-      (prove6 c (cdr g) r e n c whole-db))
+      (prove6 c (cdr g) r e n c))
     ((eq? 'r! (car g))
-      (prove6 l (cddr g) r e n (cadr g) whole-db))
+      (prove6 l (cddr g) r e n (cadr g)))
     ((null? r)
       (if (null? l)
           #t
-          (back6 l g r e n c whole-db)))
+          (back6 l g r e n c)))
     (else
       (let* ((a  (copy (car r) n))
              (e* (unify (car a) (car g) e)))
         (if e*
             (prove6 (link l g r e n c)
                     (append (cdr a) `(r! ,l) (cdr g))
-                    whole-db
+                    db
                     e*
                     (+ 1 n)
-                    l 
-		    whole-db)
-            (back6 l g r e n c whole-db))))))
+                    l)
+            (back6 l g r e n c))))))
 
 
 (define empty '((bottom)))
 
-(define var '?)
+;(define var '?) ; removed for transpilation
 (define name cadr)
 (define time cddr)
 
 (define (var? x)
   (and (pair? x)
-       (eq? var (car x))))
+       (eq? "?" (car x))))
+
+;; manually rewritten named let
+(define (lookup_loop e id tm)
+    (cond ((not (pair? (caar e)))
+	   #f)
+	  ((and (eq? id (name (caar e)))
+		(eqv? tm (time (caar e))))
+	   (car e))
+	  (else
+	   (lookup-loop (cdr e)))))
 
 (define (lookup v e)
-  (let ((id (name v))
-        (t  (time v)))
-    (let loop ((e e))
-      (cond ((not (pair? (caar e)))
-              #f)
-            ((and (eq? id (name (caar e)))
-                  (eqv? t (time (caar e))))
-              (car e))
-            (else
-              (loop (cdr e)))))))
+    (let ((id (name v))
+          (tm  (time v)))
+      (lookup_loop e id tm)))
+;;; end rewrite
 
 (define (value x e)
   (if (var? x)
@@ -91,9 +92,6 @@
             (value (cadr v) e)
             x))
       x))
-
-(define (make-unique x n)
-  (copy x n))
 
 (define (copy x n)
   (cond
@@ -106,9 +104,12 @@
 (define (bind x y e)
   (cons (list x y) e))
 
-(define (unify x y e)
-  (let ((x (value x e))
-        (y (value y e)))
+; (define (unify x y e)
+;   (let ((x (value x e))
+;         (y (value y e)))
+(define (unify x1 y1 e)
+  (let ((x (value x1 e))
+        (y (value y1 e)))
     (cond
       ((eq? x y) e)
       ((var? x) (bind x y e))
@@ -132,16 +133,33 @@
             (resolve (car x) e)
             (resolve (cdr x) e)))))
 
+;; (define (print-frame e)
+;;   (newline)
+;;   (let loop ((ee e))
+;;     (cond ((pair? (cdr ee))
+;;             (cond ((null? (time (caar ee)))
+;;                     (display (cadaar ee))
+;;                     (display " = ")
+;;                     (display (resolve (caar ee) e))
+;;                     (newline)))
+;;             (loop (cdr ee))))))
+
+;; manually rewritten version w/o named let
+(define (print_frame_loop ee)
+  (if (pair? (cdr ee))
+      (let ((_xx 0))
+	(if (null? (time (caar ee)))
+	    (let ((_yy 0))
+	      (display (cadaar ee))
+	      (display " = ")
+	      (display (resolve (caar ee) e))
+	      (neline)))
+	(print_frame_loop (cdr ee)))))
+
 (define (print-frame e)
   (newline)
-  (let loop ((ee e))
-    (cond ((pair? (cdr ee))
-            (cond ((null? (time (caar ee)))
-                    (display (cadaar ee))
-                    (display " = ")
-                    (display (resolve (caar ee) e))
-                    (newline)))
-            (loop (cdr ee))))))
+  (print_frame_loop e))
+;; end manually rewritten version w/o named let
 
 
 ;; Negation as failure
@@ -163,5 +181,4 @@
                 (neq (? X) (? Y))))
 
 ; 9-slide PROVE
-(prove6 '() goals db empty 1 '() db)
-
+(prove6 '() goals db empty 1 '())
