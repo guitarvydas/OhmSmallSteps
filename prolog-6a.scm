@@ -2,7 +2,7 @@
 (define (try goals rules environment n)
   (if (null? rules)
       #f
-      (let* ((unique-rule  (copy-and-rename (car rules) (list n)))
+      (let* ((unique-rule  (copy-and-rename (car rules) n))
              (new-environment (unify (car goals) (car unique-rule) environment)))
         (if new-environment
             (prove3 (append (cdr unique-rule) (cdr goals)) new-environment (+ 1 n)))
