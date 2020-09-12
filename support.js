@@ -39,7 +39,7 @@ function caddddr (cell) {
     return car(cddddr(cell));
 }
 
-var x = new Cons(1,new Cons(2,new Cons(3,new Cons(4,new Cons(5,new Cons(6,null))))));
+let x = new Cons(1,new Cons(2,new Cons(3,new Cons(4,new Cons(5,new Cons(6,null))))));
 console.log(x);
 console.log(car(x));
 console.log(cadr(x));
@@ -55,8 +55,7 @@ function list() {
     }
     return result;
 }
-
-var y = list(1,2,3,4,5,6);
+let y = list(1,2,3,4,5,6);
 console.log(y);
 console.log(car(y));
 console.log(cadr(y));
@@ -84,7 +83,7 @@ console.log(eq_Q_(x,y));  // should be false
 console.log(eq_Q_(x,x));  // should be true
 
 console.log();
-console.log(typeof x);
+console.log(typeof(x));
 
 function null_Q_(x) {
     return !x;
@@ -98,10 +97,9 @@ function null_Q_() {};
 function pair_Q_() {};
 */
 
-function pair_Q_(x) {
-    return x.isPair;
-}
-
 function cons(x,y) {
     return new Cons(x,y);
+}
+function pair_Q_(x) {
+    return x.isPair;
 }
