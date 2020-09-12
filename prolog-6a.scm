@@ -3,22 +3,6 @@
 (define (rest x) (cdr x))
 ;;;;
 
-(define (try goals rules environment n)
-  (if (null? rules)
-      #f
-      (let* ((unique-rule  (make-unique (first rules) n))
-             (new-environment (unify (first goals) (first unique-rule) environment)))
-        (if new-environment
-            (prove3 (append (rest unique-rule) (rest goals)) new-environment (+ 1 n)))
-        (try goals (rest rules) environment n))))
-
-(define (prove3 goals environment n)
-  (cond ((null? goals)
-          (print-frame environment))
-        (else
-          (try goals db environment n))))
-
-
 (define link list)
 (define L_l car)
 (define L_g cadr)
@@ -26,37 +10,6 @@
 (define L_e cadddr)
 (define (L_n x) (car (cddddr x)))
 
-
-(define (back5 l g r e n)
-  (if (and (pair? g)
-           (pair? r))
-      (prove5 l g (cdr r) e n)
-      (prove5 (L_l l)
-              (L_g l)
-              (cdr (L_r l))
-              (L_e l)
-              (L_n l))))
-
-
-(define (prove5 l g r e n)
-  (cond
-    ((null? g)
-      (print-frame e)
-      (back5 l g r e n))
-    ((null? r)
-      (if (null? l)
-          #t
-          (back5 l g r e n)))
-    (else
-      (let* ((a  (copy (car r) n))
-             (e* (unify (car a) (car g) e)))
-        (if e*
-            (prove5 (link l g r e n)
-                    (append (cdr a) (cdr g))
-                    db
-                    e*
-                    (+ 1 n))
-            (back5 l g r e n))))))
 
 
 (define (L_c x) (cadr (cddddr x)))
@@ -66,45 +19,47 @@
   (set-car! (cddr x) '(())))
 
 
-(define (back6 l g r e n c)
+(define (back6 l g r e n c whole-db)
   (cond
     ((and (pair? g)
           (pair? r))
-      (prove6 l g (cdr r) e n c))
+      (prove6 l g (cdr r) e n c whole-db))
     ((pair? l)
       (prove6 (L_l l)
               (L_g l)
               (cdr (L_r l))
               (L_e l)
               (L_n l)
-              (L_c l)))))
+              (L_c l)
+	      whole-db))))
 
 
-(define (prove6 l g r e n c)
+(define (prove6 l g r e n c whole-db)
   (cond
     ((null? g)
       (print-frame e)
-      (back6 l g r e n c))
+      (back6 l g r e n c whole-db))
     ((eq? '! (car g))
       (clear_r c)
-      (prove6 c (cdr g) r e n c))
+      (prove6 c (cdr g) r e n c whole-db))
     ((eq? 'r! (car g))
-      (prove6 l (cddr g) r e n (cadr g)))
+      (prove6 l (cddr g) r e n (cadr g) whole-db))
     ((null? r)
       (if (null? l)
           #t
-          (back6 l g r e n c)))
+          (back6 l g r e n c whole-db)))
     (else
       (let* ((a  (copy (car r) n))
              (e* (unify (car a) (car g) e)))
         (if e*
             (prove6 (link l g r e n c)
                     (append (cdr a) `(r! ,l) (cdr g))
-                    db
+                    whole-db
                     e*
                     (+ 1 n)
-                    l)
-            (back6 l g r e n c))))))
+                    l 
+		    whole-db)
+            (back6 l g r e n c whole-db))))))
 
 
 (define empty '((bottom)))
@@ -189,36 +144,6 @@
             (loop (cdr ee))))))
 
 
-;; Graph example from section 1
-
-(define db
-  '(((edge a b))
-    ((edge a f))
-    ((edge a g))
-    ((edge b c))
-    ((edge b d))
-    ((edge c d))
-    ((edge c e))
-    ((edge g h))
-    ((edge d h))
-    ((edge h e))
-    ((edge h f))
-
-    ((path (? A) (? B) ((? A) (? B)))
-     (edge (? A) (? B)))
-
-    ((path (? A) (? B) ((? A) . (? CB)))
-     (edge (? A) (? C))
-     (path (? C) (? B) (? CB)))))
-
-(define goals '((path a f (? P))))
-
-; recursive PROVE
-(prove3 goals empty 1)
-
-; 6-slide PROVE
-(prove5 '() goals db empty 1)
-
 ;; Negation as failure
 
 (define db
@@ -238,5 +163,5 @@
                 (neq (? X) (? Y))))
 
 ; 9-slide PROVE
-(prove6 '() goals db empty 1 '())
+(prove6 '() goals db empty 1 '() db)
 
