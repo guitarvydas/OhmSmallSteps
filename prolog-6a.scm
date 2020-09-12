@@ -1,12 +1,16 @@
+;; utility functions
+;; (define (first x) (car x))
+(define (rest x) (cdr x))
+;;;;
 
 (define (try goals rules environment n)
   (if (null? rules)
       #f
-      (let* ((unique-rule  (copy-and-rename (car rules) n))
-             (new-environment (unify (car goals) (car unique-rule) environment)))
+      (let* ((unique-rule  (copy-and-rename (first rules) n))
+             (new-environment (unify (first goals) (first unique-rule) environment)))
         (if new-environment
-            (prove3 (append (cdr unique-rule) (cdr goals)) new-environment (+ 1 n)))
-        (try goals (cdr rules) environment n))))
+            (prove3 (append (rest unique-rule) (rest goals)) new-environment (+ 1 n)))
+        (try goals (rest rules) environment n))))
 
 (define (prove3 g e n)
   (cond ((null? g)
