@@ -1,0 +1,29 @@
+(define (try goals rules environment n)
+  (if (null? rules)
+      #f
+      (let* ((unique-rule  (make-unique (first rules) n))
+             (new-environment (unify (first goals) (first unique-rule) environment)))
+        (if new-environment
+            (prove3 (append (rest unique-rule) (rest goals)) new-environment (+ 1 n)))
+        (try goals (rest rules) environment n))))
+
+(define (prove3 goals environment n)
+  (cond ((null? goals)
+          (print-frame environment))
+        (else
+          (try goals db environment n))))
+
+
+;; algorithm  ...
+
+define simple-prove-all (goal-clauses rules bindings n)
+  ∀ goals
+    ∀ rules
+      make-unique(rule n) → rule-clauses
+      ∀ rule-clauses
+	∀ goal-clauses
+	  @ unify(goal-clause rule-clause)
+	    append-to-bindings
+  display-all-bindings
+
+
