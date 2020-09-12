@@ -1,14 +1,14 @@
 
-(define (try g r e n)
-  (if (null? r)
+(define (try goals rules environment n)
+  (if (null? rules)
       #f
-      (let* ((a  (copy (car r) (list n)))
-             (ne (unify (car g) (car a) e)))
-        (if ne
-            (prove3 (append (cdr a) (cdr g)) ne (+ 1 n)))
-        (try g (cdr r) e n))))
+      (let* ((unique-rule  (copy-and-rename (car rules) (list n)))
+             (new-environment (unify (car goals) (car unique-rule) environment)))
+        (if new-environment
+            (prove3 (append (cdr unique-rule) (cdr goals)) new-environment (+ 1 n)))
+        (try goals (cdr rules) environment n))))
 
-(define (prove3 db g e n)
+(define (prove3 g e n)
   (cond ((null? g)
           (print-frame e))
         (else
@@ -132,6 +132,9 @@
             (value (cadr v) e)
             x))
       x))
+
+(define (copy-and-rename x n)
+  (copy x n))
 
 (define (copy x n)
   (cond
