@@ -1,6 +1,7 @@
 function Cons(car,cdr) { 
     this.car = car;
     this.cdr = cdr;
+    this.isPair = true;
 };
 
 function car(cell) {
@@ -82,6 +83,9 @@ console.log(eq_Q_(s,s2));  // should be false in Schem, but isn't in JS
 console.log(eq_Q_(x,y));  // should be false
 console.log(eq_Q_(x,x));  // should be true
 
+console.log();
+console.log(typeof x);
+
 function null_Q_(x) {
     return !x;
 }
@@ -92,8 +96,16 @@ function list() {};
 function eq_Q_() {};
 function null_Q_() {};
 function pair_Q_() {};
-function string_eq() {};
 */
+
+function pair_Q_(x) {
+    return x.isPair;
+}
+
+function cons(x,y) {
+    return new Cons(x,y);
+}
+
 
 function __try(g,r,e,n) {return (function(){ if (null_Q_(r)) {return false;} else {return (function(a=copy(car(r),list(n)),ne=unify(car(g),car(a),e)) {(function(){ if (ne) {return prove3(append(cdr(a),cdr(g)),ne,_plus(1,n));} else { return null;}})();return __try(g,cdr(r),e,n);})();}})();};
 function prove3(g,e,n) {return (function(){if (null_Q_(g)) {return print_frame(e);}else {return __try(g,db,e,n);}})();};
