@@ -6,7 +6,7 @@
 (define (try goals rules environment n)
   (if (null? rules)
       #f
-      (let* ((unique-rule  (copy-and-rename (first rules) n))
+      (let* ((unique-rule  (make-unique (first rules) n))
              (new-environment (unify (first goals) (first unique-rule) environment)))
         (if new-environment
             (prove3 (append (rest unique-rule) (rest goals)) new-environment (+ 1 n)))
@@ -137,7 +137,7 @@
             x))
       x))
 
-(define (copy-and-rename x n)
+(define (make-unique x n)
   (copy x n))
 
 (define (copy x n)
