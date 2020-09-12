@@ -1,5 +1,5 @@
 ;; utility functions
-;; (define (first x) (car x))
+(define (first x) (car x))
 (define (rest x) (cdr x))
 ;;;;
 
@@ -12,11 +12,11 @@
             (prove3 (append (rest unique-rule) (rest goals)) new-environment (+ 1 n)))
         (try goals (rest rules) environment n))))
 
-(define (prove3 g e n)
-  (cond ((null? g)
-          (print-frame e))
+(define (prove3 goals environment n)
+  (cond ((null? goals)
+          (print-frame environment))
         (else
-          (try g db e n))))
+          (try goals db environment n))))
 
 
 (define link list)
