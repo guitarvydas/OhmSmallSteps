@@ -946,7 +946,7 @@ function number_to_list(n) {
     var loop = function (n acc) {
 	return (n < 10) ? cons(n acc) : loop(remainder(n acc), acc)
     };
-    loop(n, new List());
+    loop(n, new Cons());
 }
 */
     </script>
@@ -1318,8 +1318,8 @@ listConstants_semantics.addOperation(
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "new List(" + items.emitjs() + ")"; },
-              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Pair(" + toDotted(items.emitjs()) + ")"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "new Cons(" + items.emitjs() + ")"; },
+              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Cons(" + toDotted(items.emitjs()) + ")"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
 
