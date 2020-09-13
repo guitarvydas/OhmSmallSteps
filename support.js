@@ -35,6 +35,10 @@ function cdddddr(cell) {
     return cdr(cdr(cdr(cdr(cdr(cell)))))
 }
 
+function caar (cell) {
+    return car(car(cell));
+}
+
 function cadr (cell) {
     return car(cdr(cell));
 }
