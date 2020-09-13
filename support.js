@@ -166,3 +166,5 @@ let lis2 = null;
 console.log(toDebug(lis));
 console.log(toDebug(lis2));
 
+console.log();
+console.log();

@@ -2,6 +2,18 @@ function Cons(car,cdr) {
     this.car = car;
     this.cdr = cdr;
     this.isPair = true;
+    this.toString = function() {
+	let str = "(";
+	let cell = this;
+	while (cell != null) {
+	    str = str + cell.car.toString();
+	    cell = cell.cdr;
+	    if (cell != null) {
+		str = str + " ";
+	    }
+	}
+	return str + ")";
+    }   
 };
 
 function car(cell) {
@@ -42,6 +54,8 @@ function caddddr (cell) {
 function cons(x,y) {
     if (x == undefined && y == undefined) {
 	return null;
+    } else if (y == undefined) {
+	return new Cons(x,null);
     } else {
 	return new Cons(x,y);
     }
@@ -139,15 +153,21 @@ console.log(pair_Q_(d));
 console.log(pair_Q_("abc"));
 console.log(pair_Q_(42));
 
-function toDebug(x) {
+function toDebug (x) {
     if (x == null) {
-	return "null ";
-    } else if (x == undefined) {
-	return "undefined ";
+	return "()";
     } else {
-	return x.toString() + " ";
+	return x.toString();
     }
 }
+
+let lis = list(1,2,3,list(4,5));
+let lis2 = null;
+console.log(toDebug(lis));
+console.log(toDebug(lis2));
+
+console.log();
+console.log();
 
 function first(x) {return car(x);};
 function rest(x) {return cdr(x);};
@@ -160,7 +180,40 @@ function L_n(x) {return car(cddddr(x));};
 function L_c(x) {return cadr(cddddr(x));};
 function clear_r(x) {return set_car_B_(cddr(x),list(list()));};
 function back6(l,g,r,e,n,c,whole_db) {return (function(){if (pair_Q_(g) && pair_Q_(r)) {return prove6(l,g,cdr(r),e,n,c,whole_db);} else if (pair_Q_(l)) {return prove6(L_l(l),L_g(l),cdr(L_r(l)),L_e(l),L_n(l),L_c(l),whole_db);} else { return null; }})();};
-function prove6(l,g,r,e,n,c,whole_db) {return (function(){if (null_Q_(g)) {print_frame(e);return back6(l,g,r,e,n,c,whole_db);} else if (eq_Q_("!",car(g))) {clear_r(c);return prove6(c,cdr(g),r,e,n,c,whole_db);} else if (eq_Q_("r!",car(g))) {return prove6(l,cddr(g),r,e,n,cadr(g),whole_db);} else if (null_Q_(r)) {return (function(){ if (null_Q_(l)) {return true;} else {return back6(l,g,r,e,n,c,whole_db);}})();}else {return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {return (function(){ if (e_A_) {return prove6(link(l,g,r,e,n,c),append(cdr(a),list("r!",l),cdr(g)),whole_db,e_A_,_plus(1,n),l,whole_db);} else {return back6(l,g,r,e,n,c,whole_db);}})();})();}})();};
+function prove6(l,g,r,e,n,c,whole_db) {
+    console.log(">> prove6 (\n l = " + toDebug(l) + '\n g ='  + toDebug(g) + '\n r = ' + toDebug(r) + '\n e = ' + toDebug(e) + '\n n = ' + toDebug(n) + '\n c = ' + toDebug(c) + '\n w =' + toDebug(whole_db) + "\n)");
+    return (
+	function(){
+	    if (null_Q_(g)) {
+		print_frame(e);
+		return back6(l,g,r,e,n,c,whole_db);
+	    } else if (eq_Q_("!",car(g))) {
+		clear_r(c);
+		return prove6(c,cdr(g),r,e,n,c,whole_db);
+	    } else if (eq_Q_("r!",car(g))) {
+		return prove6(l,cddr(g),r,e,n,cadr(g),whole_db);
+	    } else if (null_Q_(r)) {
+		return (function(){ 
+		    if (null_Q_(l)) {
+			return true;
+		    } else {
+			return back6(l,g,r,e,n,c,whole_db);
+		    }
+		})();
+	    }else {
+		return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {
+		    return (function(){ 
+			if (e_A_) {
+			    return prove6(link(l,g,r,e,n,c),append(cdr(a),list("r!",l),cdr(g)),whole_db,e_A_,_plus(1,n),l,whole_db);
+			} else {
+			    return back6(l,g,r,e,n,c,whole_db);
+			}
+		    })();
+		})();
+	    }
+	})();
+};
+
 let empty = list(list("bottom"));
 let name = cadr;
 let time = cddr;
@@ -175,5 +228,14 @@ function resolve(x,e) {return (function(){if ((!pair_Q_(x))) {x} else if (var_Q_
 function print_frame_loop(ee) {return (function(){ if (pair_Q_(cdr(ee))) {return (function(_xx=0) {(function(){ if (null_Q_(time(caar(ee)))) {return (function(_yy=0) {display(cadaar(ee)); display(" = "); display(resolve(caar(ee),e));return neline();})();} else { return null;}})();return print_frame_loop(cdr(ee));})();} else { return null;}})();};
 function print_frame(e) {newline();return print_frame_loop(e);};
 let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
-let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));
+let goals = 
+    list(
+	list(
+	    "some",
+	    list("?","X")),
+	list("some",
+	     list("?","Y")),
+	list("neq",
+	     list("?","X"),
+	     list("?","Y")));
 prove6(list(),goals,db,empty,1,list(),db);
