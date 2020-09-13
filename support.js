@@ -2,6 +2,18 @@ function Cons(car,cdr) {
     this.car = car;
     this.cdr = cdr;
     this.isPair = true;
+    this.toString = function() {
+	let str = "(";
+	let cell = this;
+	while (cell != null) {
+	    str = str + cell.car.toString();
+	    cell = cell.cdr;
+	    if (cell != null) {
+		str = str + " ";
+	    }
+	}
+	return str + ")";
+    }   
 };
 
 function car(cell) {
@@ -141,12 +153,5 @@ console.log(pair_Q_(d));
 console.log(pair_Q_("abc"));
 console.log(pair_Q_(42));
 
-function toDebug(x) {
-    if (x == null) {
-	return "null ";
-    } else if (x == undefined) {
-	return "undefined ";
-    } else {
-	return x.toString() + " ";
-    }
-}
+let lis = list(1,2,3,list(4,5));
+console.log(lis.toString());
