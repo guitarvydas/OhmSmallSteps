@@ -153,5 +153,16 @@ console.log(pair_Q_(d));
 console.log(pair_Q_("abc"));
 console.log(pair_Q_(42));
 
+function toDebug (x) {
+    if (x == null) {
+	return "()";
+    } else {
+	return x.toString();
+    }
+}
+
 let lis = list(1,2,3,list(4,5));
-console.log(lis.toString());
+let lis2 = null;
+console.log(toDebug(lis));
+console.log(toDebug(lis2));
+
