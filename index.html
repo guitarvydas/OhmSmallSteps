@@ -415,7 +415,7 @@ xyz
 (define db '(p q (u ("r" . "s"))))
 </script>
 
-<!-- test harness -->try<script type="text/test-harness">
+<!-- test harness --><script type="text/test-harness">
 
 </script>
 
@@ -1373,8 +1373,6 @@ listConstants_semantics.addOperation(
 	  var r = inputString
 	      .replace(/'!/g,'"!"')
 	      .replace(/[(][+]/g,"(_plus ")
-//	      .replace(/'r!/g,'"r!"')
-	      .replace(/try/g,"_try")
 	      .replace(/null[?]/g,"null_Q_")
 	      .replace(/pair[?]/g,"pair_Q_")
 	      .replace(/e[*]/g,"e_A_")
@@ -1383,6 +1381,9 @@ listConstants_semantics.addOperation(
 	      .replace(/eqv[?]/g,"eqv_Q_")
 	      .replace(/eq[?]/g,"eq_Q_")
 	      .replace(/print-frame/g,"print_frame")
+	      .replace(/set-car/g,"set_car")
+	      .replace(/lookup-loop/g,"lookup_loop")
+	      .replace(/try/g,"_try")
 	  ;
 	  return r;
       }

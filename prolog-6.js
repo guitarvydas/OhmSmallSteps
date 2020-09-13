@@ -100,8 +100,8 @@ function pair_Q_() {};
 function cons(x,y) {
     return new Cons(x,y);
 }
-function pair_Q_(x) {
-    return x.isPair;
+function pair_Q_(xyz) {
+    return (xyz.isPair);
 }
 
 function first(x) {return car(x);};
@@ -113,14 +113,14 @@ let L_r = caddr;
 let L_e = cadddr;
 function L_n(x) {return car(cddddr(x));};
 function L_c(x) {return cadr(cddddr(x));};
-function clear_r(x) {return set-car_B_(cddr(x),new Cons(new Cons()));};
+function clear_r(x) {return set_car_B_(cddr(x),new Cons(new Cons()));};
 function back6(l,g,r,e,n,c) {return (function(){if (pair_Q_(g) && pair_Q_(r)) {return prove6(l,g,cdr(r),e,n,c);} else if (pair_Q_(l)) {return prove6(L_l(l),L_g(l),cdr(L_r(l)),L_e(l),L_n(l),L_c(l));} else { return null; }})();};
 function prove6(l,g,r,e,n,c) {return (function(){if (null_Q_(g)) {print_frame(e);return back6(l,g,r,e,n,c);} else if (eq_Q_("!",car(g))) {clear_r(c);return prove6(c,cdr(g),r,e,n,c);} else if (eq_Q_("r!",car(g))) {return prove6(l,cddr(g),r,e,n,cadr(g));} else if (null_Q_(r)) {return (function(){ if (null_Q_(l)) {return true;} else {return back6(l,g,r,e,n,c);}})();}else {return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {return (function(){ if (e_A_) {return prove6(link(l,g,r,e,n,c),append(cdr(a),list("r!",l),cdr(g)),db,e_A_,_plus(1,n),l);} else {return back6(l,g,r,e,n,c);}})();})();}})();};
 let empty = new Cons(new Cons("bottom"));
 let name = cadr;
 let time = cddr;
 function var_Q_(x) {return pair_Q_(x) && eq_Q_("?",car(x));};
-function lookup_loop(e,id,tm) {return (function(){if ((!pair_Q_(caar(e)))) {false} else if (eq_Q_(id,name(caar(e))) && eqv_Q_(tm,time(caar(e)))) {return car(e);}else {return lookup-loop(cdr(e));}})();};
+function lookup_loop(e,id,tm) {return (function(){if ((!pair_Q_(caar(e)))) {false} else if (eq_Q_(id,name(caar(e))) && eqv_Q_(tm,time(caar(e)))) {return car(e);}else {return lookup_loop(cdr(e));}})();};
 function lookup(v,e) {return (function(id=name(v),tm=time(v)) {return lookup_loop(e,id,tm);})();};
 function value(x,e) {return (function(){ if (var_Q_(x)) {return (function(v=lookup(x,e)) {return (function(){ if (v) {return value(cadr(v),e);} else {return x;}})();})();} else {return x;}})();};
 function copy(x,n) {return (function(){if ((!pair_Q_(x))) {x} else if (var_Q_(x)) {return append(x,n);}else {return cons(copy(car(x),n),copy(cdr(x),n));}})();};
