@@ -158,12 +158,10 @@ let L_r = caddr;
 let L_e = cadddr;
 function L_n(x) {return car(cddddr(x));};
 function L_c(x) {return cadr(cddddr(x));};
-function clear_r(x) {return set_car_B_(cddr(x),cons(cons()));};
+function clear_r(x) {return set_car_B_(cddr(x),list(list()));};
 function back6(l,g,r,e,n,c,whole_db) {return (function(){if (pair_Q_(g) && pair_Q_(r)) {return prove6(l,g,cdr(r),e,n,c,whole_db);} else if (pair_Q_(l)) {return prove6(L_l(l),L_g(l),cdr(L_r(l)),L_e(l),L_n(l),L_c(l),whole_db);} else { return null; }})();};
-function prove6(l,g,r,e,n,c,whole_db) {
-    console.log(">> prove6 (" + toDebug(l) + toDebug(g) + toDebug(r) + toDebug(e) + toDebug(n) + toDebug(c) + toDebug(whole_db) + ")");
-return (function(){if (null_Q_(g)) {print_frame(e);return back6(l,g,r,e,n,c,whole_db);} else if (eq_Q_("!",car(g))) {clear_r(c);return prove6(c,cdr(g),r,e,n,c,whole_db);} else if (eq_Q_("r!",car(g))) {return prove6(l,cddr(g),r,e,n,cadr(g),whole_db);} else if (null_Q_(r)) {return (function(){ if (null_Q_(l)) {return true;} else {return back6(l,g,r,e,n,c);}})();}else {return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {return (function(){ if (e_A_) {return prove6(link(l,g,r,e,n,c),append(cdr(a),list("r!",l),cdr(g)),whole_db,e_A_,_plus(1,n),l,whole_db);} else {return back6(l,g,r,e,n,c,whole_db);}})();})();}})();};
-let empty = cons(cons("bottom"));
+function prove6(l,g,r,e,n,c,whole_db) {return (function(){if (null_Q_(g)) {print_frame(e);return back6(l,g,r,e,n,c,whole_db);} else if (eq_Q_("!",car(g))) {clear_r(c);return prove6(c,cdr(g),r,e,n,c,whole_db);} else if (eq_Q_("r!",car(g))) {return prove6(l,cddr(g),r,e,n,cadr(g),whole_db);} else if (null_Q_(r)) {return (function(){ if (null_Q_(l)) {return true;} else {return back6(l,g,r,e,n,c,whole_db);}})();}else {return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {return (function(){ if (e_A_) {return prove6(link(l,g,r,e,n,c),append(cdr(a),list("r!",l),cdr(g)),whole_db,e_A_,_plus(1,n),l,whole_db);} else {return back6(l,g,r,e,n,c,whole_db);}})();})();}})();};
+let empty = list(list("bottom"));
 let name = cadr;
 let time = cddr;
 function var_Q_(x) {return pair_Q_(x) && eq_Q_("?",car(x));};
@@ -176,6 +174,6 @@ function unify(x1,y1,e) {return (function(x=value(x1,e),y=value(y1,e)) {return (
 function resolve(x,e) {return (function(){if ((!pair_Q_(x))) {x} else if (var_Q_(x)) {return (function(v=value(x,e)) {return (function(){ if (var_Q_(v)) {return v;} else {return resolve(v,e);}})();})();}else {return cons(resolve(car(x),e),resolve(cdr(x),e));}})();};
 function print_frame_loop(ee) {return (function(){ if (pair_Q_(cdr(ee))) {return (function(_xx=0) {(function(){ if (null_Q_(time(caar(ee)))) {return (function(_yy=0) {display(cadaar(ee)); display(" = "); display(resolve(caar(ee),e));return neline();})();} else { return null;}})();return print_frame_loop(cdr(ee));})();} else { return null;}})();};
 function print_frame(e) {newline();return print_frame_loop(e);};
-let db = cons(cons(cons("some","foo")),cons(cons("some","bar")),cons(cons("some","baz")),cons(cons("eq",cons("?","X"),cons("?","X"))),cons(cons("neq",cons("?","X"),cons("?","Y")),cons("eq",cons("?","X"),cons("?","Y")),"!","fail"),cons(cons("neq",cons("?","X"),cons("?","Y"))));
-let goals = cons(cons("some",cons("?","X")),cons("some",cons("?","Y")),cons("neq",cons("?","X"),cons("?","Y")));
-prove6(cons(),goals,db,empty,1,cons(),db);
+let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
+let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));
+prove6(list(),goals,db,empty,1,list(),db);

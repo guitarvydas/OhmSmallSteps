@@ -42,6 +42,8 @@ function caddddr (cell) {
 function cons(x,y) {
     if (x == undefined && y == undefined) {
 	return null;
+    } else if (y == undefined) {
+	return new Cons(x,null);
     } else {
 	return new Cons(x,y);
     }

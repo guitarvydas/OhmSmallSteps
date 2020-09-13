@@ -424,7 +424,6 @@ xyz
 
 <!-- prolog-6.scm -->
 <script type="text/test">
-
 ;; utility functions
 (define (first x) (car x))
 (define (rest x) (cdr x))
@@ -473,7 +472,7 @@ xyz
     ((null? r)
       (if (null? l)
           #t
-          (back6 l g r e n c)))
+          (back6 l g r e n c whole-db)))
     (else
       (let* ((a  (copy (car r) n))
              (e* (unify (car a) (car g) e)))
@@ -1247,7 +1246,7 @@ listConstants_semantics.addOperation(
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "cons(" + items.emitjs() + ")"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "list(" + items.emitjs() + ")"; },
               SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "cons(" + toDotted(items.emitjs()) + ")"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
