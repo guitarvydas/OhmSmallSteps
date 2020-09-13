@@ -18,45 +18,47 @@
   (set-car! (cddr x) '(())))
 
 
-(define (back6 l g r e n c)
+(define (back6 l g r e n c whole-db)
   (cond
     ((and (pair? g)
           (pair? r))
-      (prove6 l g (cdr r) e n c))
+      (prove6 l g (cdr r) e n c whole-db))
     ((pair? l)
       (prove6 (L_l l)
               (L_g l)
               (cdr (L_r l))
               (L_e l)
               (L_n l)
-              (L_c l)))))
+              (L_c l)
+	      whole-db))))
 
 
-(define (prove6 l g r e n c)
+(define (prove6 l g r e n c whole-db)
   (cond
     ((null? g)
       (print-frame e)
-      (back6 l g r e n c))
+      (back6 l g r e n c whole-db))
     ((eq? '! (car g))
       (clear_r c)
-      (prove6 c (cdr g) r e n c))
+      (prove6 c (cdr g) r e n c whole-db))
     ((eq? 'r! (car g))
-      (prove6 l (cddr g) r e n (cadr g)))
+      (prove6 l (cddr g) r e n (cadr g) whole-db))
     ((null? r)
       (if (null? l)
           #t
-          (back6 l g r e n c)))
+          (back6 l g r e n c whole-db)))
     (else
       (let* ((a  (copy (car r) n))
              (e* (unify (car a) (car g) e)))
         (if e*
             (prove6 (link l g r e n c)
                     (append (cdr a) `(r! ,l) (cdr g))
-                    db
+                    whole-db
                     e*
                     (+ 1 n)
-                    l)
-            (back6 l g r e n c))))))
+                    l
+		    whole-db)
+            (back6 l g r e n c whole-db))))))
 
 
 (define empty '((bottom)))
@@ -181,4 +183,4 @@
                 (neq (? X) (? Y))))
 
 ; 9-slide PROVE
-(prove6 '() goals db empty 1 '())
+(prove6 '() goals db empty 1 '() db)

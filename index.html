@@ -419,8 +419,12 @@ xyz
 
 </script>
 
+</script>
+
+
 <!-- prolog-6.scm -->
 <script type="text/test">
+
 ;; utility functions
 (define (first x) (car x))
 (define (rest x) (cdr x))
@@ -441,30 +445,31 @@ xyz
   (set-car! (cddr x) '(())))
 
 
-(define (back6 l g r e n c)
+(define (back6 l g r e n c whole-db)
   (cond
     ((and (pair? g)
           (pair? r))
-      (prove6 l g (cdr r) e n c))
+      (prove6 l g (cdr r) e n c whole-db))
     ((pair? l)
       (prove6 (L_l l)
               (L_g l)
               (cdr (L_r l))
               (L_e l)
               (L_n l)
-              (L_c l)))))
+              (L_c l)
+	      whole-db))))
 
 
-(define (prove6 l g r e n c)
+(define (prove6 l g r e n c whole-db)
   (cond
     ((null? g)
       (print-frame e)
-      (back6 l g r e n c))
+      (back6 l g r e n c whole-db))
     ((eq? '! (car g))
       (clear_r c)
-      (prove6 c (cdr g) r e n c))
+      (prove6 c (cdr g) r e n c whole-db))
     ((eq? 'r! (car g))
-      (prove6 l (cddr g) r e n (cadr g)))
+      (prove6 l (cddr g) r e n (cadr g) whole-db))
     ((null? r)
       (if (null? l)
           #t
@@ -475,11 +480,12 @@ xyz
         (if e*
             (prove6 (link l g r e n c)
                     (append (cdr a) `(r! ,l) (cdr g))
-                    db
+                    whole-db
                     e*
                     (+ 1 n)
-                    l)
-            (back6 l g r e n c))))))
+                    l
+		    whole-db)
+            (back6 l g r e n c whole-db))))))
 
 
 (define empty '((bottom)))
@@ -604,11 +610,9 @@ xyz
                 (neq (? X) (? Y))))
 
 ; 9-slide PROVE
-(prove6 '() goals db empty 1 '())
+(prove6 '() goals db empty 1 '() db)
 
-    </script>
-
-
+</script>
 
 
     <script type="text/ohm-js">
@@ -1383,6 +1387,7 @@ listConstants_semantics.addOperation(
 	      .replace(/print-frame/g,"print_frame")
 	      .replace(/set-car/g,"set_car")
 	      .replace(/lookup-loop/g,"lookup_loop")
+	      .replace(/whole-db/g,"whole_db")
 	      .replace(/try/g,"_try")
 	  ;
 	  return r;

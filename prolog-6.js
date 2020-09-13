@@ -149,7 +149,6 @@ function toDebug(x) {
     }
 }
 
-
 function first(x) {return car(x);};
 function rest(x) {return cdr(x);};
 let link = list;
@@ -160,10 +159,10 @@ let L_e = cadddr;
 function L_n(x) {return car(cddddr(x));};
 function L_c(x) {return cadr(cddddr(x));};
 function clear_r(x) {return set_car_B_(cddr(x),cons(cons()));};
-function back6(l,g,r,e,n,c) {return (function(){if (pair_Q_(g) && pair_Q_(r)) {return prove6(l,g,cdr(r),e,n,c);} else if (pair_Q_(l)) {return prove6(L_l(l),L_g(l),cdr(L_r(l)),L_e(l),L_n(l),L_c(l));} else { return null; }})();};
-function prove6(l,g,r,e,n,c) {
-    console.log("prove6 (" + toDebug(l) + toDebug(g) + toDebug(r) + toDebug(e) + toDebug(n) + toDebug(c) + ")");
-    return (function(){if (null_Q_(g)) {print_frame(e);return back6(l,g,r,e,n,c);} else if (eq_Q_("!",car(g))) {clear_r(c);return prove6(c,cdr(g),r,e,n,c);} else if (eq_Q_("r!",car(g))) {return prove6(l,cddr(g),r,e,n,cadr(g));} else if (null_Q_(r)) {return (function(){ if (null_Q_(l)) {return true;} else {return back6(l,g,r,e,n,c);}})();}else {return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {return (function(){ if (e_A_) {return prove6(link(l,g,r,e,n,c),append(cdr(a),list("r!",l),cdr(g)),db,e_A_,_plus(1,n),l);} else {return back6(l,g,r,e,n,c);}})();})();}})();};
+function back6(l,g,r,e,n,c,whole_db) {return (function(){if (pair_Q_(g) && pair_Q_(r)) {return prove6(l,g,cdr(r),e,n,c,whole_db);} else if (pair_Q_(l)) {return prove6(L_l(l),L_g(l),cdr(L_r(l)),L_e(l),L_n(l),L_c(l),whole_db);} else { return null; }})();};
+function prove6(l,g,r,e,n,c,whole_db) {
+    console.log(">> prove6 (" + toDebug(l) + toDebug(g) + toDebug(r) + toDebug(e) + toDebug(n) + toDebug(c) + toDebug(whole_db) + ")");
+return (function(){if (null_Q_(g)) {print_frame(e);return back6(l,g,r,e,n,c,whole_db);} else if (eq_Q_("!",car(g))) {clear_r(c);return prove6(c,cdr(g),r,e,n,c,whole_db);} else if (eq_Q_("r!",car(g))) {return prove6(l,cddr(g),r,e,n,cadr(g),whole_db);} else if (null_Q_(r)) {return (function(){ if (null_Q_(l)) {return true;} else {return back6(l,g,r,e,n,c);}})();}else {return (function(a=copy(car(r),n),e_A_=unify(car(a),car(g),e)) {return (function(){ if (e_A_) {return prove6(link(l,g,r,e,n,c),append(cdr(a),list("r!",l),cdr(g)),whole_db,e_A_,_plus(1,n),l,whole_db);} else {return back6(l,g,r,e,n,c,whole_db);}})();})();}})();};
 let empty = cons(cons("bottom"));
 let name = cadr;
 let time = cddr;
@@ -179,4 +178,4 @@ function print_frame_loop(ee) {return (function(){ if (pair_Q_(cdr(ee))) {return
 function print_frame(e) {newline();return print_frame_loop(e);};
 let db = cons(cons(cons("some","foo")),cons(cons("some","bar")),cons(cons("some","baz")),cons(cons("eq",cons("?","X"),cons("?","X"))),cons(cons("neq",cons("?","X"),cons("?","Y")),cons("eq",cons("?","X"),cons("?","Y")),"!","fail"),cons(cons("neq",cons("?","X"),cons("?","Y"))));
 let goals = cons(cons("some",cons("?","X")),cons("some",cons("?","Y")),cons("neq",cons("?","X"),cons("?","Y")));
-prove6(cons(),goals,db,empty,1,cons());
+prove6(cons(),goals,db,empty,1,cons(),db);
