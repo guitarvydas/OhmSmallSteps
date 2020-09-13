@@ -39,7 +39,15 @@ function caddddr (cell) {
     return car(cddddr(cell));
 }
 
-let x = new Cons(1,new Cons(2,new Cons(3,new Cons(4,new Cons(5,new Cons(6,null))))));
+function cons(x,y) {
+    if (x == undefined && y == undefined) {
+	return null;
+    } else {
+	return new Cons(x,y);
+    }
+}
+
+let x = cons(1,cons(2,cons(3,cons(4,cons(5,cons(6,null))))));
 console.log(x);
 console.log(car(x));
 console.log(cadr(x));
@@ -51,7 +59,7 @@ console.log(cdr(cdddddr(x)));
 function list() {
     var result = null;
     for(var i = (arguments.length-1); i >= 0 ; i--) {
-	result = new Cons (arguments[i], result);
+	result = cons (arguments[i], result);
     }
     return result;
 }
@@ -97,9 +105,29 @@ function null_Q_() {};
 function pair_Q_() {};
 */
 
-function cons(x,y) {
-    return new Cons(x,y);
-}
 function pair_Q_(x) {
-    return x.isPair;
+    // Scheme doesn't like truthiness or falsiness, it wants true or false
+    if (!x) {
+	return false;
+    } else if (x.isPair) {
+	return true;
+    } else {
+	return false;
+    }
 }
+console.log();
+var a = null;
+var b = cons("b",a);
+var c = cons("b",null);
+var d = cons();
+
+console.log(a);
+console.log(b);
+console.log(c);
+console.log(d);
+console.log(pair_Q_(a));
+console.log(pair_Q_(b));
+console.log(pair_Q_(c));
+console.log(pair_Q_(d));
+console.log(pair_Q_("abc"));
+console.log(pair_Q_(42));

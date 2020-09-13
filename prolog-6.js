@@ -100,9 +100,13 @@ function pair_Q_() {};
 function cons(x,y) {
     return new Cons(x,y);
 }
-function pair_Q_(xyz) {
-    return (xyz.isPair);
+function pair_Q_(x) {
+    return x && x.isPair;
 }
+
+var zzz = new Cons();
+console.log(zzz);
+
 
 function first(x) {return car(x);};
 function rest(x) {return cdr(x);};
