@@ -1,3 +1,4 @@
+
 function Cons(car,cdr) { 
     this.car = car;
     this.cdr = cdr;
@@ -172,5 +173,4 @@ console.log(toDebug(lis2));
 
 console.log();
 console.log();
-
 

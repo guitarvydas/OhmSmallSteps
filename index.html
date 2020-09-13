@@ -417,9 +417,7 @@ xyz
 
 <!-- test harness -->
 <script type="text/test-harness">
-(define (copy x n)
-  (cond
-    ((not (pair? x)) x)))
+
 </script>
 
 
@@ -428,6 +426,13 @@ xyz
 ;; utility functions
 (define (first x) (car x))
 (define (rest x) (cdr x))
+
+(define (AppendInefficient list1 list2)
+  (append list1 list2))
+
+(define (AppendInefficient3 list1 list2 list3)
+  (AppendInefficient list1 (AppendInefficient list2 list3)))
+
 ;;;;
 
 (define link list)
@@ -479,14 +484,13 @@ xyz
         (let ((e* (unify (car a) (car g) e)))
           (if e*
               (prove6 (link l g r e n c)
-                      (append (cdr a) `(r! ,l) (cdr g))
+                      (AppendInefficient3 (cdr a) `(r! ,l) (cdr g))
                       whole-db
                       e*
                       (+ 1 n)
                       l
 		      whole-db)
-              (back6 l g r e n c whole-db))))
-)))
+              (back6 l g r e n c whole-db)))))))
 
 
 (define empty '((bottom)))
@@ -497,7 +501,8 @@ xyz
 
 (define (var? x)
   (and (pair? x)
-       (eq? "?" (car x))))
+       (string? (car x))
+       (string=? "?" (car x))))
 
 ;; manually rewritten named let
 (define (lookup_loop e id tm)
@@ -507,7 +512,7 @@ xyz
 		(eqv? tm (time (caar e))))
 	   (car e))
 	  (else
-	   (lookup-loop (cdr e)))))
+	   (lookup_loop (cdr e) id tm))))
 
 (define (lookup v e)
     (let ((id (name v))
@@ -526,7 +531,7 @@ xyz
 (define (copy x n)
   (cond
     ((not (pair? x)) x)
-    ((var? x) (append x n))
+    ((var? x) (AppendInefficient x n))
     (else
       (cons (copy (car x) n)
             (copy (cdr x) n)))))
@@ -575,7 +580,7 @@ xyz
 ;;             (loop (cdr ee))))))
 
 ;; manually rewritten version w/o named let
-(define (print_frame_loop ee)
+(define (print_frame_loop e ee)
   (if (pair? (cdr ee))
       (let ((_xx 0))
 	(if (null? (time (caar ee)))
@@ -583,12 +588,12 @@ xyz
 	      (display (cadaar ee))
 	      (display " = ")
 	      (display (resolve (caar ee) e))
-	      (neline)))
-	(print_frame_loop (cdr ee)))))
+	      (newline)))
+	(print_frame_loop e (cdr ee)))))
 
 (define (print-frame e)
   (newline)
-  (print_frame_loop e))
+  (print_frame_loop e e))
 ;; end manually rewritten version w/o named let
 
 
@@ -599,16 +604,16 @@ xyz
     ((some bar))
     ((some baz))
 
-    ((eq (? X) (? X)))
+    ((eq ("?" X) ("?" X)))
 
-    ((neq (? X) (? Y))
-     (eq (? X) (? Y)) ! fail)
+    ((neq ("?" X) ("?" Y))
+     (eq ("?" X) ("?" Y)) ! fail)
 
-    ((neq (? X) (? Y)))))
+    ((neq ("?" X) ("?" Y)))))
 
-(define goals '((some (? X))
-                (some (? Y))
-                (neq (? X) (? Y))))
+(define goals '((some ("?" X))
+                (some ("?" Y))
+                (neq ("?" X) ("?" Y))))
 
 ; 9-slide PROVE
 (prove6 '() goals db empty 1 '() db)
@@ -662,7 +667,7 @@ Scm2JSBasic {
   lexical_numchar = "0".."9"
   lexical_string = "\"" (~"\"" any)+ "\""
   lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "="
   lexical_lc = "a".."z"
   lexical_uc = "A".."Z"
   lexical_DOT = space* "." space*
@@ -706,7 +711,7 @@ Scm2JSListConstants {
   lexical_numchar = "0".."9"
   lexical_string = "\"" (~"\"" any)+ "\""
   lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "="
   lexical_lc = "a".."z"
   lexical_uc = "A".."Z"
   semiColonComment = ";" (~"\n" any)* "\n"
@@ -835,7 +840,7 @@ Scm2JSEmitter {
   lexical_numchar = "0".."9"
   lexical_string = "\"" (~"\"" any)+ "\""
   lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-"
+  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "="
   lexical_lc = "a".."z"
   lexical_uc = "A".."Z"
   semiColonComment = ";" (~"\n" any)* "\n"
@@ -1377,6 +1382,8 @@ listConstants_semantics.addOperation(
       
       function doPreReplacements(inputString) {
 	  var r = inputString
+	      .replace(/string[?]/g,"string_Q_")
+	      .replace(/string=[?]/g,"string_EQ_Q_")
 	      .replace(/'!/g,'"!"')
 	      .replace(/[(][+]/g,"(_plus ")
 	      .replace(/null[?]/g,"null_Q_")
@@ -1510,12 +1517,12 @@ listConstants_semantics.addOperation(
 
           var parsed_pass1 = pass1_grammar.match(str);
 	  if (parsed_pass1.failed()) {
-	      console.log(pass1_grammar.trace(str).toString());
+	      // console.log(pass1_grammar.trace(str).toString());
 	      resultsString = resultsString + "<br>pass1 parse *FAILED*<br>input:<br>" + testString;
 	      resultsString = resultsString + "<br>pre Replacements<br>input:<br>" + str;
-	      console.log(parsed_pass1.shortMessage);
-              console.log(parsed_pass1.getRightmostFailures());
-              console.log(parsed_pass1.getRightmostFailures().toString());
+	      // console.log(parsed_pass1.shortMessage);
+              // console.log(parsed_pass1.getRightmostFailures());
+              // console.log(parsed_pass1.getRightmostFailures().toString());
 	  } else {
               var transpiled_pass1 = pass1_semantics(parsed_pass1).unbackquote();
 	      
