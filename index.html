@@ -754,8 +754,7 @@ Scm2JSEmitter {
 
   CondStatementBlock = StatementBlock
 
-  StatementBlock = AtomStatement | SequentialStatement
-  AtomStatement = Atom
+  StatementBlock = SequentialStatement
   SequentialStatement = MidStatement* LastStatement
   MidStatement = Statement &Statement
   LastStatement = Statement ~Statement
@@ -1164,7 +1163,6 @@ listConstants_semantics.addOperation(
 		  return "(:CondStatementBlock " + statementBlock.toCL() + ")";},
 
 	      StatementBlock: function(s) { return "(:StatementBlock " + s.toCL() + ")";},
-	      AtomStatement: function(a) {return "(:AtomStatement " + a.toCL() + ")";},
 	      SequentialStatement: function(mids,last) { 
 		  return "(:SequentialStatement " + mids.toCL() + " " + last.toCL() + ")";},
 	      MidStatement: function(statement,_lookahead) { return "(:MidStatement " + statement.toCL() + ")";},
