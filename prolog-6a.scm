@@ -6,7 +6,7 @@
   (append list1 list2))
 
 (define (AppendInefficient3 list1 list2 list3)
-  (append list1 (append list2 list3)))
+  (AppendInefficient list1 (AppendInefficient list2 list3)))
 
 ;;;;
 
