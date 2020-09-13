@@ -64,13 +64,14 @@
 
 (define empty '((bottom)))
 
-(define var '?) ; removed for transpilation
+;(define var '?) ; removed for transpilation
 (define name cadr)
 (define time cddr)
 
 (define (var? x)
   (and (pair? x)
-       (eq? var (car x))))
+       (string? (car x))
+       (string=? "?" (car x))))
 
 ;; manually rewritten named let
 (define (lookup_loop e id tm)
@@ -172,16 +173,16 @@
     ((some bar))
     ((some baz))
 
-    ((eq (? X) (? X)))
+    ((eq ("?" X) ("?" X)))
 
-    ((neq (? X) (? Y))
-     (eq (? X) (? Y)) ! fail)
+    ((neq ("?" X) ("?" Y))
+     (eq ("?" X) ("?" Y)) ! fail)
 
-    ((neq (? X) (? Y)))))
+    ((neq ("?" X) ("?" Y)))))
 
-(define goals '((some (? X))
-                (some (? Y))
-                (neq (? X) (? Y))))
+(define goals '((some ("?" X))
+                (some ("?" Y))
+                (neq ("?" X) ("?" Y))))
 
 ; 9-slide PROVE
 (prove6 '() goals db empty 1 '() db)
