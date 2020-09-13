@@ -64,13 +64,13 @@
 
 (define empty '((bottom)))
 
-;(define var '?) ; removed for transpilation
+(define var '?) ; removed for transpilation
 (define name cadr)
 (define time cddr)
 
 (define (var? x)
   (and (pair? x)
-       (eq? "?" (car x))))
+       (eq? var (car x))))
 
 ;; manually rewritten named let
 (define (lookup_loop e id tm)
@@ -80,7 +80,7 @@
 		(eqv? tm (time (caar e))))
 	   (car e))
 	  (else
-	   (lookup-loop (cdr e)))))
+	   (lookup_loop (cdr e) id tm))))
 
 (define (lookup v e)
     (let ((id (name v))
@@ -148,7 +148,7 @@
 ;;             (loop (cdr ee))))))
 
 ;; manually rewritten version w/o named let
-(define (print_frame_loop ee)
+(define (print_frame_loop e ee)
   (if (pair? (cdr ee))
       (let ((_xx 0))
 	(if (null? (time (caar ee)))
@@ -156,12 +156,12 @@
 	      (display (cadaar ee))
 	      (display " = ")
 	      (display (resolve (caar ee) e))
-	      (neline)))
-	(print_frame_loop (cdr ee)))))
+	      (newline)))
+	(print_frame_loop e (cdr ee)))))
 
 (define (print-frame e)
   (newline)
-  (print_frame_loop e))
+  (print_frame_loop e e))
 ;; end manually rewritten version w/o named let
 
 
