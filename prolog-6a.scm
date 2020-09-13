@@ -48,17 +48,18 @@
           #t
           (back6 l g r e n c whole-db)))
     (else
-      (let* ((a  (copy (car r) n))
-             (e* (unify (car a) (car g) e)))
-        (if e*
-            (prove6 (link l g r e n c)
-                    (append (cdr a) `(r! ,l) (cdr g))
-                    whole-db
-                    e*
-                    (+ 1 n)
-                    l
-		    whole-db)
-            (back6 l g r e n c whole-db))))))
+      (let ((a  (copy (car r) n)))
+        (let ((e* (unify (car a) (car g) e)))
+          (if e*
+              (prove6 (link l g r e n c)
+                      (append (cdr a) `(r! ,l) (cdr g))
+                      whole-db
+                      e*
+                      (+ 1 n)
+                      l
+		      whole-db)
+              (back6 l g r e n c whole-db))))
+)))
 
 
 (define empty '((bottom)))
