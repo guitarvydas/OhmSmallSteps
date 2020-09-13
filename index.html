@@ -1243,8 +1243,8 @@ listConstants_semantics.addOperation(
 
               Form: function(item) {return item.emitjs()},
 	      SList: function(lis) {return lis.emitjs()},
-              SList_atnewlistat: function(_begin,_at,items,_end) { return "new Cons(" + items.emitjs() + ")"; },
-              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "new Cons(" + toDotted(items.emitjs()) + ")"; },
+              SList_atnewlistat: function(_begin,_at,items,_end) { return "cons(" + items.emitjs() + ")"; },
+              SList_atnewdottedlistat: function(_begin,_at,items,_end) { return "cons(" + toDotted(items.emitjs()) + ")"; },
 
               SpecialForm: function(e) { return e.emitjs(); },
 

@@ -94,7 +94,14 @@ console.log();
 console.log(typeof(x));
 
 function null_Q_(x) {
-    return !x;
+    if (x == null) {
+	return true;
+    } else if (x.isPair) {
+	return false;
+    } else {
+	throw "internal error x is not a Cons or null: " + x;
+	return false;
+    }
 }
 /*
 
@@ -131,3 +138,13 @@ console.log(pair_Q_(c));
 console.log(pair_Q_(d));
 console.log(pair_Q_("abc"));
 console.log(pair_Q_(42));
+
+function toDebug(x) {
+    if (x == null) {
+	return "null ";
+    } else if (x == undefined) {
+	return "undefined ";
+    } else {
+	return x.toString() + " ";
+    }
+}
