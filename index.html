@@ -415,15 +415,16 @@ xyz
 (define db '(p q (u ("r" . "s"))))
 </script>
 
-<!-- test harness --><script type="text/test-harness">
-
-</script>
-
+<!-- test harness -->
+<script type="text/test">
+(define (copy x n)
+  (cond
+    ((not (pair? x)) x)))
 </script>
 
 
 <!-- prolog-6.scm -->
-<script type="text/test">
+<script type="text/test-prolog-6.scm">
 ;; utility functions
 (define (first x) (car x))
 (define (rest x) (cdr x))
@@ -1147,7 +1148,7 @@ listConstants_semantics.addOperation(
 	      CondExpressionWithElse: function(_begin,_cond,firstCondClause,moreCondClauses,condElseClause,_end) { 
 		  return "(:CondExpressionWithElse " + firstCondClause.toCL() + " " + moreCondClauses.toCL() + ")";},
 	      CondExpressionWithoutElse: function(_begin,_cond,firstCondClause,moreCondClauses,_end) { 
-		  return "(:CondExpressionWithoutElse " + firstCondClause.toCL + " " + moreCondClauses.toCL() + ")";},
+		  return "(:CondExpressionWithoutElse " + firstCondClause.toCL() + " " + moreCondClauses.toCL() + ")";},
     
 	      FirstCondClause: function(clause) { return "(:FirstCondClause " + clause.toCL() + ")";},
 	      MoreCondClause: function(clause) { return "(:MoreCondClause " + clause.toCL() + ")";},
