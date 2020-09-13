@@ -1,6 +1,13 @@
 ;; utility functions
 (define (first x) (car x))
 (define (rest x) (cdr x))
+
+(define (AppendInefficient list1 list2)
+  (append list1 list2))
+
+(define (AppendInefficient3 list1 list2 list3)
+  (append list1 (append list2 list3)))
+
 ;;;;
 
 (define link list)
@@ -52,7 +59,7 @@
         (let ((e* (unify (car a) (car g) e)))
           (if e*
               (prove6 (link l g r e n c)
-                      (append (cdr a) `(r! ,l) (cdr g))
+                      (AppendInefficient3 (cdr a) `(r! ,l) (cdr g))
                       whole-db
                       e*
                       (+ 1 n)
@@ -100,7 +107,7 @@
 (define (copy x n)
   (cond
     ((not (pair? x)) x)
-    ((var? x) (append x n))
+    ((var? x) (AppendInefficient x n))
     (else
       (cons (copy (car x) n)
             (copy (cdr x) n)))))
