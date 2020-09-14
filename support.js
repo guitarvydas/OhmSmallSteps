@@ -75,6 +75,10 @@ function caddddr (cell) {
     return car(cddddr(cell));
 }
 
+function cadaar (cell) {
+    car(cdr(car(car(cell))));
+}
+
 function cons(x,y) {
     if (x == undefined && y == undefined) {
 	return "nil";
@@ -105,14 +109,6 @@ function null_Q_(x) {
 	return false;
     }
 }
-/*
-
-  function list() {};
-
-  function eq_Q_() {};
-  function null_Q_() {};
-  function pair_Q_() {};
-*/
 
 
 function pair_Q_(x) {
