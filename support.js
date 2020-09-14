@@ -7,14 +7,17 @@ function Cons(car,cdr) {
 	let str = "(";
 	let cell = this;
 	while (cell != null) {
-	    str = str + cell.car.toString();
+	    if (null == cell.car) {
+		ztr = str + "null";
+	    } else {
+		str = str + cell.car.toString();
+	    }
 	    cell = cell.cdr;
 	    if (cell != null) {
 		str = str + " ";
 	    }
 	}
 	return str + ")";
-    }   
 };
 
 function car(cell) {
@@ -170,6 +173,25 @@ let lis = list(1,2,3,list(4,5));
 let lis2 = null;
 console.log(toDebug(lis));
 console.log(toDebug(lis2));
+
+console.log();
+console.log();
+
+function string_Q_(s) {
+    return s && ("string" == typeof(s));
+}
+
+function string_EQ_Q_(s1,s2) {
+    return s1 == s2;
+}
+
+function _plus(a,b){
+    return a + b;
+}
+
+function set_car_B_(l,v) { l.car = v; }
+function newline () { process.write.stdout ('\n'); }
+function display(x) { process.write.stdout (x.toString()); }
 
 console.log();
 console.log();

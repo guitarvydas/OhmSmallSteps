@@ -3,7 +3,9 @@
 (define (rest x) (cdr x))
 
 (define (AppendInefficient list1 list2)
-  (append list1 list2))
+  (if (null? list1)
+      list2
+      (cons (car list1) (AppendInefficient (cdr list1) list2))))
 
 (define (AppendInefficient3 list1 list2 list3)
   (AppendInefficient list1 (AppendInefficient list2 list3)))
@@ -41,6 +43,13 @@
 
 
 (define (prove6 l g r e n c whole-db)
+  (display "l = ") (display l) (newline)
+  (display "g = ") (display g) (newline)
+  (display "r = ") (display r) (newline)
+  (display "e = ") (display e) (newline)
+  (display "n = ") (display n) (newline)
+  (display "c = ") (display c) (newline)
+  (display "w = ") (display whole-db) (newline)
   (cond
     ((null? g)
       (print-frame e)
@@ -192,4 +201,9 @@
                 (neq ("?" X) ("?" Y))))
 
 ; 9-slide PROVE
-(prove6 '() goals db empty 1 '() db)
+;(prove6 '() goals db empty 1 '() db)
+
+(define smalldb '(((x paul))))
+(define smallg  '((x ("?" paul))))
+(prove6 '() smallg smalldb empty 1 '() smalldb)
+

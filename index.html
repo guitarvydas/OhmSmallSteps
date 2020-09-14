@@ -428,7 +428,9 @@ xyz
 (define (rest x) (cdr x))
 
 (define (AppendInefficient list1 list2)
-  (append list1 list2))
+  (if (null? list1)
+      list2
+      (cons (car list1) (AppendInefficient (cdr list1) list2))))
 
 (define (AppendInefficient3 list1 list2 list3)
   (AppendInefficient list1 (AppendInefficient list2 list3)))
@@ -466,6 +468,13 @@ xyz
 
 
 (define (prove6 l g r e n c whole-db)
+  (display "l = ") (display l) (newline)
+  (display "g = ") (display g) (newline)
+  (display "r = ") (display r) (newline)
+  (display "e = ") (display e) (newline)
+  (display "n = ") (display n) (newline)
+  (display "c = ") (display c) (newline)
+  (display "w = ") (display whole-db) (newline)
   (cond
     ((null? g)
       (print-frame e)
@@ -490,7 +499,8 @@ xyz
                       (+ 1 n)
                       l
 		      whole-db)
-              (back6 l g r e n c whole-db)))))))
+              (back6 l g r e n c whole-db))))
+)))
 
 
 (define empty '((bottom)))
@@ -616,7 +626,12 @@ xyz
                 (neq ("?" X) ("?" Y))))
 
 ; 9-slide PROVE
-(prove6 '() goals db empty 1 '() db)
+;(prove6 '() goals db empty 1 '() db)
+
+(define smalldb '(((x paul))))
+(define smallg  '((x ("?" paul))))
+(prove6 '() smallg smalldb empty 1 '() smalldb)
+
 
 </script>
 
@@ -1269,32 +1284,32 @@ listConstants_semantics.addOperation(
 	      //
               CondExpression: function(c){ return c.emitjs(); },
               CondExpressionWithElse : function(_begin,_cond,firstClause,moreClauses,elseClause,_end) {
-                  return "(function(){" + firstClause.emitjs() + toSpaceDelimitedList(moreClauses.emitjs()) + elseClause.emitjs() + "})()" ; },
+                  return "(function(){<br>" + firstClause.emitjs() + toSpaceDelimitedList(moreClauses.emitjs()) + elseClause.emitjs() + "<br>})()" ; },
               CondExpressionWithoutElse : function(_begin,_cond,firstClause,moreClauses,_end) {
-                  return "(function(){"+ firstClause.emitjs() + toSpaceDelimitedList(moreClauses.emitjs()) + " else " + "{ return null; }" + "})()" ; },
+                  return "(function(){<br>"+ firstClause.emitjs() + toSpaceDelimitedList(moreClauses.emitjs()) + " else " + "{<br>return null;<br>}" + "<br>})()" ; },
 
               FirstCondClause: function(c) { return "if " + c.emitjs(); },
               MoreCondClause: function(c) { return " else if " + c.emitjs(); },
-	      CondClause: function(_begin,ctest,block,_end) {return "(" + ctest.emitjs() + ") {" +  block.emitjs() + "}"; },
+	      CondClause: function(_begin,ctest,block,_end) {return "(" + ctest.emitjs() + ") {<br>" +  block.emitjs() + "<br>}"; },
 
 	      CondTest: function(f) { return f.emitjs(); },
-	      CondElseClause: function(_begin,_else,block,_end){ return "else {" + block.emitjs() + "}"; },
+	      CondElseClause: function(_begin,_else,block,_end){ return "else {<br>" + block.emitjs() + "}<br>"; },
 
               CondStatementBlock: function(sb) { return sb.emitjs(); },
 
 	      StatementBlock: function(atomOrSequential) { return atomOrSequential.emitjs(); },
               SequentialStatement: function(midStatements, lastStatement) {
 		  return toSpaceDelimitedList(midStatements.emitjs()) + lastStatement.emitjs()},
-              MidStatement: function(s,_lookahead) { if (s._node.numChildren() > 0) {return s.emitjs() + ";" ;} else {return "";}},
-              LastStatement: function(s) { return "return " + s.emitjs() + ";" ;},
+              MidStatement: function(s,_lookahead) { if (s._node.numChildren() > 0) {return s.emitjs() + ";<br>" ;} else {return "";}},
+              LastStatement: function(s) { return "return " + s.emitjs() + ";<br>" ;},
               Statement: function(f) { return f.emitjs() ;},
 
 	      LetExpression: function(e) { return e.emitjs(); },
               LetSequential: function(_begin,_letstar,bindings,body,_end) {
 		  throw "NIY: let*";
-		  return "(function(" + bindings.emitjs() + ") {"+ body.emitjs() + "})()"},
+		  return "(function(" + bindings.emitjs() + ") {<br>"+ body.emitjs() + "<br>})()"},
               LetParallel: function(_begin,_let,bindings,body,_end) {
-		  return "(function(" + bindings.emitjs() + ") {"+ body.emitjs() + "})()"},
+		  return "(function(" + bindings.emitjs() + ") {<br>"+ body.emitjs() + "<br>})()"},
 
               LetBindings: function(_begin,bindings,_end) { return bindings.emitjs(); },
               Binding: function(_begin,v,e,_end) { return v.emitjs() + "=" + e.emitjs(); },
@@ -1303,11 +1318,11 @@ listConstants_semantics.addOperation(
 
 	      
               IfThenElseExpression: function(_begin,_if,e,thenPart,elsePart,_end) {
-                  return "(function(){ if (" + e.emitjs() + ") {return " + thenPart.emitjs() + ";} else {return " + elsePart.emitjs() + ";}})()";
+                  return "(function(){<br>if (" + e.emitjs() + ") {<br>return " + thenPart.emitjs() + ";<br>} else {<br>return " + elsePart.emitjs() + ";<br>}<br>})()";
               },
 
               IfThenExpression: function(_begin,_if,e,thenPart,_end) {
-                  return "(function(){ if (" + e.emitjs() + ") {return " + thenPart.emitjs() + ";} else {" + "  return null;" + "}})()";
+                  return "(function(){<br>if (" + e.emitjs() + ") {<br>return " + thenPart.emitjs() + ";<br>} else {<br>" + "  return null;" + "<br>}<br>})()";
               },
 
               ThenPart: function(b) { return b.emitjs(); },
@@ -1324,7 +1339,7 @@ listConstants_semantics.addOperation(
               FunctionCall: function(_lp,id,actuals,_end) {return id.emitjs() + "(" + actuals.emitjs() + ")";},
 
               GlobalFunctionDefinition: function(_begin,_define,_begin2,id,formals,_end2,body,_end) {
-		  return "function " + id.emitjs() + "(" + formals.emitjs() + ")" + " {" + body.emitjs() + "};<br>"; },
+		  return "function " + id.emitjs() + "(" + formals.emitjs() + ")" + " {<br>" + body.emitjs() + "};<br>"; },
 
               GlobalVariableDefinition: function(_begin,_define,id,form,_end) {
 		  return "let " + id.emitjs() + " = " + form.emitjs() + ";<br>";},
