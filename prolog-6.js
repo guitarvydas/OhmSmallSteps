@@ -8,7 +8,7 @@ function Cons(car,cdr) {
 	let cell = this;
 	while (cell != null) {
 	    if (null == cell.car) {
-		ztr = str + "null";
+		str = str + "null";
 	    } else {
 		str = str + cell.car.toString();
 	    }
@@ -191,12 +191,20 @@ function _plus(a,b){
 }
 
 function set_car_B_(l,v) { l.car = v; }
-function newline () { process.write.stdout ('\n'); }
-function display(x) { process.write.stdout (x.toString()); }
+//function newline () { process.write.stdout ('\n'); }
+function newline () { console.log (); }
+function display(x) { 
+    if (x == null) {
+	console.log("null");
+    } else if (x == undefined) {
+	console.log("undefined");
+    } else {
+	console.log(x.toString()); 
+    }
+}
 
 console.log();
 console.log();
-
 
 
 
