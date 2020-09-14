@@ -191,20 +191,20 @@ function _plus(a,b){
 }
 
 function set_car_B_(l,v) { l.car = v; }
-//function newline () { process.write.stdout ('\n'); }
-function newline () { console.log (); }
+function newline () { process.stdout.write("\n"); }
 function display(x) { 
     if (x == null) {
-	console.log("null");
+	process.stdout.write("null");
     } else if (x == undefined) {
-	console.log("undefined");
+	process.stdout.write("undefined");
     } else {
-	console.log(x.toString()); 
+	process.stdout.write(x.toString()); 
     }
 }
 
 console.log();
 console.log();
+
 
 
 
