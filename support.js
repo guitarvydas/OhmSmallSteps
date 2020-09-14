@@ -8,7 +8,7 @@ function Cons(car,cdr) {
 	let cell = this;
 	while (cell != null) {
 	    if (null == cell.car) {
-		ztr = str + "null";
+		str = str + "null";
 	    } else {
 		str = str + cell.car.toString();
 	    }
