@@ -18,6 +18,7 @@ function Cons(car,cdr) {
 	    }
 	}
 	return str + ")";
+    }
 };
 
 function car(cell) {
@@ -127,11 +128,11 @@ function null_Q_(x) {
 }
 /*
 
-function list() {};
+  function list() {};
 
-function eq_Q_() {};
-function null_Q_() {};
-function pair_Q_() {};
+  function eq_Q_() {};
+  function null_Q_() {};
+  function pair_Q_() {};
 */
 
 function pair_Q_(x) {
