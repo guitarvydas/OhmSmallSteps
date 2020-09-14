@@ -202,6 +202,10 @@ function display(x) {
     }
 }
 
+let lll = list("r!",null);  // should return ("r!" null)
+console.log (lll.toString());
+console.log (car(lll));
+console.log (cadr(lll));  // crashes if lll is not ("r1" null)
 console.log();
 console.log();
 

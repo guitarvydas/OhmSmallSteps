@@ -43,6 +43,7 @@
 
 
 (define (prove6 l g r e n c whole-db)
+  (newline) (display "prove6") (newline)
   (display "l = ") (display l) (newline)
   (display "g = ") (display g) (newline)
   (display "r = ") (display r) (newline)
