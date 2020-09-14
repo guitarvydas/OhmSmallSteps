@@ -1,16 +1,30 @@
-function isNil(x) {
-    if ("string" == typeof(x)) {
-	if ("nil" == x) {
-	    return true;
-	} else {
-	    return false;
-	}
-    } else {
-	return false;
-    }
-}
+<!doctype html>
+<html>
+  <head>
+    <title>ohm/js in small steps</title>
+    <meta charset=utf-8>
+    <script src="/Users/tarvydas/projects/ohm/examples/lib.js"></script>
+    <script src="/Users/tarvydas/projects/ohm/dist/ohm.js"></script>
+    <script type="text/test-form">
+      (#t #f)
+    </script>
 
-function Cons(car,cdr) { 
+
+    <script>
+
+      function isNil(x) {
+	  if ("string" == typeof(x)) {
+	      if ("nil" == x) {
+		  return true;
+	      } else {
+		  return false;
+	      }
+	  } else {
+	      return false;
+	  }
+      }
+
+      function Cons(car,cdr) { 
     this.car = car;
     this.cdr = cdr;
     this.isPair = true;
@@ -232,7 +246,8 @@ function testToDebug() {
     console.log("c");
     console.log(toDebug(null));
     console.log("cc");
-    console.log(cons(1,"nil").toString());
+    let cc = cons(1,"nil");
+    console.log(cc.toString());
     console.log("ccc");
     console.log(list(1).toString());
     console.log("cccc");
@@ -254,8 +269,14 @@ function testStrings () {
     console.log (cadr(lll));  // crashes if lll is not ("r1" null)
 }
 
-testToDebug();
-testStrings()
+// testToDebug();
+// testToStrings()
     console.log();
     console.log();
-
+    </script>
+  </head>
+  <body>
+    <button onclick="testToDebug()">test toDebug</button>
+    <button onclick="testStrings()">test strings</button>
+  </body>
+</html>
