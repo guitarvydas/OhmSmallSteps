@@ -223,7 +223,6 @@ function null_Q_(x) {
     } else if (x.isPair) {
 	return false;
     } else {
-	throw "internal error x is not a Cons or 'nil': " + x;
 	return false;
     }
 }
@@ -620,6 +619,4 @@ return print_frame_loop(e,e);
 };
 let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
 let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));
-let smalldb = list(list(list("x","paul")));
-let smallg = list(list("x",list("?","yyy")));
-prove6(list(),smallg,smalldb,empty,1,list(),smalldb);
+prove6(list(),goals,db,empty,1,list(),db);

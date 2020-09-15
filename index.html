@@ -1,4 +1,3 @@
-<!doctype html>
 <html>
   <head>
     <title>ohm/js in small steps</title>
@@ -627,36 +626,14 @@ xyz
                 (neq ("?" X) ("?" Y))))
 
 ; 9-slide PROVE
-;(prove6 '() goals db empty 1 '() db)
+(prove6 '() goals db empty 1 '() db)
 
-(define smalldb '(((x paul))))
-(define smallg  '((x ("?" yyy))))
-(prove6 '() smallg smalldb empty 1 '() smalldb)
-
-
-</script>
+; simple test
+;(define smalldb '(((x paul))))
+;(define smallg  '((x ("?" yyy))))
+;(prove6 '() smallg smalldb empty 1 '() smalldb)
 
 
-    <script type="text/ohm-js">
-WSGrammar0 {
-  SyntacticRule = "xy" "z"
-  SyntacticRule2 = "xy" ~alnum "z"
-  lexicalRule = "xy" "z"
-}
-    </script>
-    <script type="text/ohm-js">
-WSGrammar1 {
-  SyntacticRule = "(" "xy" "z"
-  SyntacticRule2 = "(" "xy" ~alnum "z"
-  lexicalRule = "(" "xy" "z"
-}
-    </script>
-    <script type="text/ohm-js">
-WSGrammar {
-  SyntacticRule = "xy" "z"
-  lexicalRule = "xy" "z"
-  SyntacticRule2 = "xy" ~alnum "z"
-}
     </script>
 
     <script type="text/ohm-js">

@@ -223,7 +223,6 @@ function null_Q_(x) {
     } else if (x.isPair) {
 	return false;
     } else {
-	throw "internal error x is not a Cons or 'nil': " + x;
 	return false;
     }
 }
