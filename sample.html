@@ -2,33 +2,43 @@
   <head>
     <title>sample mixed PROLOG and JS - ohm/js in small steps</title>
     <meta charset=utf-8>
-    <script src="/Users/tarvydas/projects/ohm/examples/lib.js"></script>
-    <script src="/Users/tarvydas/projects/ohm/dist/ohm.js"></script>
-    <script type="text/test-form">
-      (#t #f)
-    </script>
 
     <script type="text/js-and-prolog">
-
+      this is a test
+    </script>
+    
+    <script>
+      
       function displayDate () {
 	  document.getElementById('timestamp').innerHTML = Date();
       }
-
-      function displayResults(str,el) {
-	  document.getElementById(el).innerHTML = str;
+      
+      function displayResults(str) {
+	  document.getElementById('result').innerHTML = str;
       }
       
-      function run() {
-	  let jsAandPrologString = document.querySelector('script[type="text/js-and-prolog"]');
+      function transpileMixedPrologAndJS(s) {
+	  // stubbed out
+	  return s;
+      }
+      
+      function createPageForRunningJS(s) {
+	  // stubbed out
+	  return s;
+      }
+      
+      function runSample() {
+	  let jsAndPrologString = document.querySelector('script[type="text/js-and-prolog"]').innerHTML;
 	  let transpiledToJS = transpileMixedPrologAndJS(jsAndPrologString);
 	  let newPage = createPageForRunningJS(transpiledToJS);
-	  displayResults(newPage,'result');
+	  displayResults(newPage);
 	  displayDate();
+      }
     </script>
 
   </head>
   <body>
-    <button onclick="run()">run</button>
+    <button onclick="runSample()">run sample</button>
     <p id="timestamp"></p>
     <p id="result"></p>
   </body>
