@@ -205,6 +205,6 @@
 ;(prove6 '() goals db empty 1 '() db)
 
 (define smalldb '(((x paul))))
-(define smallg  '((x ("?" paul))))
+(define smallg  '((x ("?" yyy))))
 (prove6 '() smallg smalldb empty 1 '() smalldb)
 

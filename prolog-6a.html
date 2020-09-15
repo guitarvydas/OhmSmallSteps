@@ -1,3 +1,16 @@
+<!doctype html>
+<html>
+  <head>
+    <title>ohm/js in small steps</title>
+    <meta charset=utf-8>
+    <script src="/Users/tarvydas/projects/ohm/examples/lib.js"></script>
+    <script src="/Users/tarvydas/projects/ohm/dist/ohm.js"></script>
+    <script type="text/test-form">
+      (#t #f)
+    </script>
+
+
+    <script>
 function isNil(x) {
     if ("string" == typeof(x)) {
 	if ("nil" == x) {
@@ -163,62 +176,62 @@ function display(x) {
 
 /////// tests /////
 /*
-  console.log("\ntesting cons...");
-  let x = cons(1,cons(2,cons(3,cons(4,cons(5,cons(6,"nil"))))));
-  console.log(x);
-  console.log(car(x));
-  console.log(cadr(x));
-  console.log(caddr(x));
-  console.log(cadddr(x));
-  console.log(caddddr(x));
-  console.log(cdr(cdddddr(x)));
+console.log("\ntesting cons...");
+let x = cons(1,cons(2,cons(3,cons(4,cons(5,cons(6,"nil"))))));
+console.log(x);
+console.log(car(x));
+console.log(cadr(x));
+console.log(caddr(x));
+console.log(cadddr(x));
+console.log(caddddr(x));
+console.log(cdr(cdddddr(x)));
 
-  console.log("\ntesting list...");
-  let y = list(1,2,3,4,5,6);
-  console.log(y);
-  console.log(car(y));
-  console.log(cadr(y));
-  console.log(caddr(y));
-  console.log(cadddr(y));
-  console.log(caddddr(y));
-  console.log(cdr(cdddddr(y)));
+console.log("\ntesting list...");
+let y = list(1,2,3,4,5,6);
+console.log(y);
+console.log(car(y));
+console.log(cadr(y));
+console.log(caddr(y));
+console.log(cadddr(y));
+console.log(caddddr(y));
+console.log(cdr(cdddddr(y)));
 
-  console.log();
+console.log();
 
-  console.log("\ntesting eq_Q_...");
-  console.log(eq_Q_("nil","nil")); // should be true
-  console.log(eq_Q_(1,1));       // should be true
-  console.log(eq_Q_(true,true)); // should be true
-  console.log(eq_Q_(false,false)); // should be true
-  console.log(eq_Q_("abc","abc")); // should be false in Scheme, but isn't in JS
-  var s = "abc";
-  console.log(eq_Q_(s,s));  // should be true
-  var s2 = "abc";
-  console.log(eq_Q_(s,s2));  // should be false in Schem, but isn't in JS
+console.log("\ntesting eq_Q_...");
+console.log(eq_Q_("nil","nil")); // should be true
+console.log(eq_Q_(1,1));       // should be true
+console.log(eq_Q_(true,true)); // should be true
+console.log(eq_Q_(false,false)); // should be true
+console.log(eq_Q_("abc","abc")); // should be false in Scheme, but isn't in JS
+var s = "abc";
+console.log(eq_Q_(s,s));  // should be true
+var s2 = "abc";
+console.log(eq_Q_(s,s2));  // should be false in Schem, but isn't in JS
 
-  console.log(eq_Q_(x,y));  // should be false
-  console.log(eq_Q_(x,x));  // should be true
+console.log(eq_Q_(x,y));  // should be false
+console.log(eq_Q_(x,x));  // should be true
 
-  console.log();
-  console.log(typeof(x));
+console.log();
+console.log(typeof(x));
 
-  console.log("\ntesting pair_Q_...");
-  console.log();
-  var a = "nil";
-  var b = cons("b",a);
-  var c = cons("b","nil");
-  var d = cons();
+console.log("\ntesting pair_Q_...");
+console.log();
+var a = "nil";
+var b = cons("b",a);
+var c = cons("b","nil");
+var d = cons();
 
-  console.log(a);
-  console.log(b);
-  console.log(c);
-  console.log(d);
-  console.log(pair_Q_(a));
-  console.log(pair_Q_(b));
-  console.log(pair_Q_(c));
-  console.log(pair_Q_(d));
-  console.log(pair_Q_("abc"));
-  console.log(pair_Q_(42));
+console.log(a);
+console.log(b);
+console.log(c);
+console.log(d);
+console.log(pair_Q_(a));
+console.log(pair_Q_(b));
+console.log(pair_Q_(c));
+console.log(pair_Q_(d));
+console.log(pair_Q_("abc"));
+console.log(pair_Q_(42));
 */
 
 function testToDebug() {
@@ -255,8 +268,8 @@ function testStrings () {
 
 testToDebug();
 testStrings()
-console.log();
-console.log();
+    console.log();
+    console.log();
 
 
 
@@ -511,5 +524,15 @@ function print_frame(e) {
 let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
 let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));
 let smalldb = list(list(list("x","paul")));
-let smallg = list(list("x",list("?","yyy")));
-prove6(list(),smallg,smalldb,empty,1,list(),smalldb);
+let smallg = list(list("x",list("?","paul")));
+
+      function run() {
+	  prove6(list(),smallg,smalldb,empty,1,list(),smalldb);
+      }
+
+    </script>
+  </head>
+  <body>
+    <button onclick="run()">run</button>
+  </body>
+</html>

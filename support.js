@@ -1,3 +1,4 @@
+// utility functions for Cons.toString()
 function isNil(x) {
     if ("string" == typeof(x)) {
 	if ("nil" == x) {
@@ -9,31 +10,107 @@ function isNil(x) {
 	return false;
     }
 }
+function itemToString(x) {
+    if (x == undefined) {
+	return "error(undefined)";
+    } else if (x == null) {
+	return "error(null)";
+    } else if (isNil(x)) {
+	return "nil";
+    } else if ("object" == typeof(x) && x.isPair) {
+	return "";
+    } else if ("object" == typeof(x)) {
+	return "error(object)";
+    } else {
+	return x.toString();
+    }
+}
+
+function toSpacer(x) { // return " . " if cell contains a non-nil/non-next-cell item, return " " if end-of-list, else return ""
+    if (x == undefined) {
+	return "";
+    } else if (x == null) {
+	return "";
+    } else if (isNil(x)) {
+	return "";
+    } else if ("object" == typeof(x) && x.isPair) {
+	return " ";
+    } else if ("object" == typeof(x)) {
+	return "";
+    } else {
+	return " . ";
+    }
+}
+
+function toTrailingSpace(x) { // return " " if end of list, else ""
+    if (x == undefined) {
+	return "";
+    } else if (x == null) {
+	return "";
+    } else if (isNil(x)) {
+	return "";
+    } else if ("object" == typeof(x) && x.isPair) {
+	return " ";
+    } else if ("object" == typeof(x)) {
+	return "";
+    } else {
+	return "";
+    }
+}
+
+function continueCDRing(x) {
+    if (x == undefined) {
+	return false;
+    } else if (x == null) {
+	return false;
+    } else if (isNil(x)) {
+	return false;
+    } else if ("object" == typeof(x) && x.isPair) {
+	return true;
+    } else if ("object" == typeof(x)) {
+	return false;
+    } else {
+	return false;
+    }
+}
+function nextCell(x) { // return cdr of cell if we are to continue (determined by continueCDRing function, above), else return undefined
+    if (x == undefined) {
+	return undefined;
+    } else if (x == null) {
+	return undefined;
+    } else if (isNil(x)) {
+	return undefined;
+    } else if ("object" == typeof(x) && x.isPair) {
+	return cdr(x);
+    } else if ("object" == typeof(x)) {
+	return undefined;
+    } else {
+	return undefined;
+    }
+}
+function cellToStr(cell) {
+    let str = "(";
+    let keepGoing = true;
+    while (keepGoing) {
+	let a = itemToString(car(cell));
+	let d = itemToString(cdr(cell));
+	let spacer = toSpacer(cell);
+	let trailer = toTrailingSpace(cell);
+	str = str + a + spacer + d + trailer;
+	keepGoing = continueCDRing(cell);
+	cell = nextCell(cell);
+    }
+    return str + ")";
+}
+/////
 
 function Cons(car,cdr) { 
     this.car = car;
     this.cdr = cdr;
     this.isPair = true;
-    this.toString = function() {
-	let str = "(";
-	let cell = this;
-	while (!(isNil(cell))) {
-	    if (isNil(cell.car)) {
-		str = str + "nil";
-	    } else if (null == cell.car) { // internal error
-		str = str + "NULL";
-	    } else if (undefined == cell.car) { // internal error
-		str = str + "UNDEFINED";
-	    } else {
-		str = str + cell.car.toString();
-	    }
-	    cell = cell.cdr;
-	    if (!(isNil(cell))) {
-		str = str + " ";
-	    }
-	}
-	return str + ")";
-    }
+    this.toString = function() {  // returns string (a b) or (a . b) with appropriate trailing space in the possible presence of javascript errors (null and undefined)
+	cellToStr(this);
+   }
 };
 
 function car(cell) {
@@ -97,6 +174,9 @@ function list() {
     return result;
 }
 function eq_Q_(x,y) {
+    return x === y;
+}
+function eqv_Q_(x,y) {
     return x === y;
 }
 function null_Q_(x) {
@@ -249,9 +329,15 @@ function testStrings () {
     console.log (car(lll));
     console.log (cadr(lll));  // crashes if lll is not ("r1" null)
 }
+function testDotted() {
+    let ddd = cons(1,2);
+    console.log("\ntesting dotted pair");
+    console.log(ddd.toString());
+}
 
-testToDebug();
-testStrings()
+//testToDebug();
+//testStrings();
+testDotted();
     console.log();
     console.log();
 
