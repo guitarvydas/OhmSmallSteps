@@ -191,7 +191,7 @@ function caddddr (cell) {
 }
 
 function cadaar (cell) {
-    car(cdr(car(car(cell))));
+    return car(cdr(car(car(cell))));
 }
 
 function cons(x,y) {
@@ -389,6 +389,6 @@ function testDotted() {
 
 //testToDebug();
 //testStrings();
-testDotted();
-    console.log();
-    console.log();
+//testDotted();
+//    console.log();
+//    console.log();
