@@ -1,3 +1,4 @@
+// utility functions for Cons.toString()
 function isNil(x) {
     if ("string" == typeof(x)) {
 	if ("nil" == x) {
@@ -9,30 +10,144 @@ function isNil(x) {
 	return false;
     }
 }
+function isCons (maybeCell) {
+    if ("object" == typeof(maybeCell)) {
+	if (maybeCell.isPair) {
+	    return true;
+	} else {
+	    return false;
+	}
+    } else {
+	return false;
+    }
+}
+function carItemToString(x) {
+    if (x == undefined) {
+	return "error(undefined)";
+    } else if (x == null) {
+	return "error(null)";
+    } else if (isNil(x)) {
+	return "nil";
+    } else if (isCons(x)) {
+	return x.toString();
+    } else {
+	return x.toString();
+    }
+}
+function cdrItemToString(x) {
+    if (x == undefined) {
+	return "error(undefined)";
+    } else if (x == null) {
+	return "error(null)";
+    } else if (isNil(x)) {
+	return "";
+    } else if (isCons(x)) {
+	return "";
+    } else {
+	return x.toString();
+    }
+}
+
+function toSpacer(x) { // return " . " if cell contains a non-nil/non-next-cell item, return " " if end-of-list, else return ""
+    // more edge cases than Lisp or Scheme because of undefined and null, and I've decided to make nil be "nil"
+    if (x == undefined) {
+	return " ";
+    } else if (x == null) {
+	return " ";
+    } else if ( ("object" == typeof(x) && x.isPair) ) {
+	if ( ("object" == typeof(x.cdr)) ) {
+	    return " ";
+	} else if (isNil(x.cdr)) {
+	    return "";
+	} else {
+	    return " . ";
+	}
+    } else {
+	throw "can't happen";
+    }
+}
+
+function toTrailingSpace(x) { // return " " if end of list, else ""
+    // more edge cases than Lisp or Scheme because of undefined and null, and I've decided to make nil be "nil"
+    if (x == undefined) {
+	return " ";
+    } else if (x == null) {
+	return " ";
+    } else if ( ("object" == typeof(x) && x.isPair) ) {
+	if ( ("object" == typeof(x.cdr)) ) {
+	    return " ";
+	} else if (isNil(x.cdr)) {
+	    return "";
+	} else {
+	    return "";
+	}
+    } else {
+	throw "can't happen";
+    }
+}
+
+
+function continueCDRing(maybeCell) {  // if x.cdr is another Cons, return true, if it's "nil" return false, if it's a primitive return false, else return false
+    // more edge cases than Lisp or Scheme because of undefined and null, and I've decided to make nil be "nil"
+    // x should be a Cons cell or "nil" or a primitive, but it might be null or undefined (an internal error that I want to see)
+    if (maybeCell == undefined) {
+	return false;
+    } else if (maybeCell == null) {
+	return false;
+    } else if (isNil(maybeCell)) {
+	return false;
+    } else if (isCons(maybeCell)) {  // a Cons cell
+	let next = cdr(maybeCell);
+	if (isCons(next)) {
+	    return true;
+	} else {
+	    return false;
+	}
+    } else if ("object" == typeof(maybeCell)) {
+	return false;
+    } else {
+	return false;
+    }
+}
+function nextCell(maybeCell) { // return cdr of cell if we are to continue (determined by continueCDRing function, above), else return undefined
+    // more edge cases than Lisp or Scheme because of undefined and null, and I've decided to make nil be "nil"
+    // x should be a Cons cell or "nil" or a primitive, but it might be null or undefined (an internal error that I want to see)
+    if (maybeCell == undefined) {
+	return undefined;
+    } else if (maybeCell == null) {
+	return undefined;
+    } else if (isNil(maybeCell)) {
+	return undefined;
+    } else if (isCons(maybeCell)) {
+	return cdr(maybeCell);  // this will return a Cons or might return "nil" if at end of list
+    } else if ("object" == typeof(maybeCell)) {
+	return undefined;
+    } else {
+	return undefined;
+    }
+}
+function cellToStr(cell) {
+    let str = "(";
+    let keepGoing = true;
+    while (keepGoing) {
+	let a = carItemToString(car(cell));
+	let d = cdrItemToString(cdr(cell));
+	let spacer = toSpacer(cell);
+	let trailer = toTrailingSpace(cell);
+	str = str + a + spacer + d + trailer;
+	keepGoing = continueCDRing(cell);
+	cell = nextCell(cell);
+    }
+    return str + ")";
+}
+/////
 
 function Cons(car,cdr) { 
     this.car = car;
     this.cdr = cdr;
     this.isPair = true;
-    this.toString = function() {
-	let str = "(";
-	let cell = this;
-	while (!(isNil(cell))) {
-	    if (isNil(cell.car)) {
-		str = str + "nil";
-	    } else if (null == cell.car) { // internal error
-		str = str + "NULL";
-	    } else if (undefined == cell.car) { // internal error
-		str = str + "UNDEFINED";
-	    } else {
-		str = str + cell.car.toString();
-	    }
-	    cell = cell.cdr;
-	    if (!(isNil(cell))) {
-		str = str + " ";
-	    }
-	}
-	return str + ")";
+    this.toString = function() {  // returns string (a b) or (a . b) with appropriate trailing space in the possible presence of javascript errors (null and undefined)
+	return cellToStr(this);
     }
 };
 
@@ -252,12 +367,31 @@ function testStrings () {
     console.log (car(lll));
     console.log (cadr(lll));  // crashes if lll is not ("r1" null)
 }
+function testDotted() {
+    let ddd = cons(1,2);
+    console.log("\ntesting dotted pair");
+    console.log(ddd.toString());
+    let lll = cons(8,9);
+    console.log(lll.toString());
+    let cc = list(10);
+    console.log(cc.toString());
+    let ccc = list(12,13);
+    console.log(ccc.toString());
+    let lccc = list(14,15,ddd);
+    console.log(lccc.toString());
+    let cccl = list(list(16,17));
+    console.log(cccl.toString());
+    let lld = list(cons(18,19));
+    console.log(lld.toString());
+    let ld = cons(20,cons(21,22));
+    console.log(ld.toString());
+}
 
-testToDebug();
-testStrings()
+//testToDebug();
+//testStrings();
+testDotted();
 console.log();
 console.log();
-
 
 
 function first(x) {

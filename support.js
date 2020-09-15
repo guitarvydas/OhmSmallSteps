@@ -10,17 +10,39 @@ function isNil(x) {
 	return false;
     }
 }
-function itemToString(x) {
+function isCons (maybeCell) {
+    if ("object" == typeof(maybeCell)) {
+	if (maybeCell.isPair) {
+	    return true;
+	} else {
+	    return false;
+	}
+    } else {
+	return false;
+    }
+}
+function carItemToString(x) {
     if (x == undefined) {
 	return "error(undefined)";
     } else if (x == null) {
 	return "error(null)";
     } else if (isNil(x)) {
 	return "nil";
-    } else if ("object" == typeof(x) && x.isPair) {
+    } else if (isCons(x)) {
+	return x.toString();
+    } else {
+	return x.toString();
+    }
+}
+function cdrItemToString(x) {
+    if (x == undefined) {
+	return "error(undefined)";
+    } else if (x == null) {
+	return "error(null)";
+    } else if (isNil(x)) {
 	return "";
-    } else if ("object" == typeof(x)) {
-	return "error(object)";
+    } else if (isCons(x)) {
+	return "";
     } else {
 	return x.toString();
     }
@@ -35,6 +57,8 @@ function toSpacer(x) { // return " . " if cell contains a non-nil/non-next-cell 
     } else if ( ("object" == typeof(x) && x.isPair) ) {
 	if ( ("object" == typeof(x.cdr)) ) {
 	    return " ";
+	} else if (isNil(x.cdr)) {
+	    return "";
 	} else {
 	    return " . ";
 	}
@@ -52,6 +76,8 @@ function toTrailingSpace(x) { // return " " if end of list, else ""
     } else if ( ("object" == typeof(x) && x.isPair) ) {
 	if ( ("object" == typeof(x.cdr)) ) {
 	    return " ";
+	} else if (isNil(x.cdr)) {
+	    return "";
 	} else {
 	    return "";
 	}
@@ -60,17 +86,6 @@ function toTrailingSpace(x) { // return " " if end of list, else ""
     }
 }
 
-function isCons (maybeCell) {
-    if ("object" == typeof(maybeCell)) {
-	if (maybeCell.isPair) {
-	    return true;
-	} else {
-	    return false;
-	}
-    } else {
-	return false;
-    }
-}
 
 function continueCDRing(maybeCell) {  // if x.cdr is another Cons, return true, if it's "nil" return false, if it's a primitive return false, else return false
     // more edge cases than Lisp or Scheme because of undefined and null, and I've decided to make nil be "nil"
@@ -115,8 +130,8 @@ function cellToStr(cell) {
     let str = "(";
     let keepGoing = true;
     while (keepGoing) {
-	let a = itemToString(car(cell));
-	let d = itemToString(cdr(cell));
+	let a = carItemToString(car(cell));
+	let d = cdrItemToString(cdr(cell));
 	let spacer = toSpacer(cell);
 	let trailer = toTrailingSpace(cell);
 	str = str + a + spacer + d + trailer;
@@ -356,6 +371,20 @@ function testDotted() {
     let ddd = cons(1,2);
     console.log("\ntesting dotted pair");
     console.log(ddd.toString());
+    let lll = cons(8,9);
+    console.log(lll.toString());
+    let cc = list(10);
+    console.log(cc.toString());
+    let ccc = list(12,13);
+    console.log(ccc.toString());
+    let lccc = list(14,15,ddd);
+    console.log(lccc.toString());
+    let cccl = list(list(16,17));
+    console.log(cccl.toString());
+    let lld = list(cons(18,19));
+    console.log(lld.toString());
+    let ld = cons(20,cons(21,22));
+    console.log(ld.toString());
 }
 
 //testToDebug();
@@ -363,4 +392,3 @@ function testDotted() {
 testDotted();
     console.log();
     console.log();
-
