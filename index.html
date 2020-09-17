@@ -115,6 +115,7 @@ xyz
     </script>
 
     <script type="text/test-cond">
+
 (define (unify2 x y e)
   (let ((x (value x e))
         (y (value y e)))
@@ -595,9 +596,8 @@ xyz
       (let ((_xx 0))
 	(if (null? (time (caar ee)))
 	    (let ((_yy 0))
-	      (display (cadaar ee))
-	      (display " = ")
-	      (display (resolve (caar ee) e))
+	      (let ((answer (list (cadaar ee) (resolve (caar ee) e))))
+		(display answer))
 	      (newline)))
 	(print_frame_loop e (cdr ee)))))
 
@@ -633,40 +633,6 @@ xyz
 ;(define smallg  '((x ("?" yyy))))
 ;(prove6 '() smallg smalldb empty 1 '() smalldb)
 
-
-    </script>
-
-    <script type="text/ohm-js">
-
-// pass 1 grammar
-
-      // An Ohm grammar for Scheme, step 1.
-Scm2JSBasic {
-  Program = Form+
-  Form = SList | Atom
-  QuotedSexp = "'" Form
-  BackQuotedSexp = "`" Form
-  CommaSexp = "," Form
-  SList = DottedList | NullTerminatedList
-  DottedList = "(" ListItem+ lexical_DOT ListItem ")"
-  NullTerminatedList =   "(" ListItem* ")"
-  ListItem = (Atom | SList)
-  Atom = lexical_atom | Syntactic_Atom
-  Syntactic_Atom = QuotedSexp | BackQuotedSexp | CommaSexp
-
-  lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
-  lexical_boolean = "#f" | "#t"
-  lexical_integer = lexical_numchar+
-  lexical_numchar = "0".."9"
-  lexical_string = "\"" (~"\"" any)+ "\""
-  lexical_symbol = lexical_letchar (lexical_letchar | lexical_numchar)*
-  lexical_letchar = lexical_lc | lexical_uc | "+" | "*" | "!" | "?"  | "_" | "-" | "="
-  lexical_lc = "a".."z"
-  lexical_uc = "A".."Z"
-  lexical_DOT = space* "." space*
-  semiColonComment = ";" (~"\n" any)* "\n"
-  space += semiColonComment
-}
 </script>
 
 
