@@ -1578,6 +1578,17 @@ listConstants_semantics.addOperation(
 	  displayDate();
       }
 
+
+      function displayInput(testElement) {
+	  let testString = testElement.innerHTML;
+	  displayTestResults(testString,'result');
+	  displayDate();
+      }
+
+      function displayAllInputs() {
+	  tests.forEach(displayInput);
+      }
+
 </script>
 
 
@@ -1587,6 +1598,7 @@ listConstants_semantics.addOperation(
 
   </head>
   <body>
+    <button onclick="displayAllInputs()">Display Input</button>
     <button onclick="listConstantsPipelinetest()">pass1 & listConstants</button>
     <button onclick="tree()">pass1 & listConstants & emitter tree</button>
     <button onclick="pipelinetest()">pass1 & listConstants & emitter test</button>
