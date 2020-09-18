@@ -166,19 +166,21 @@
 ;;             (loop (cdr ee))))))
 
 ;; manually rewritten version w/o named let
-(define (print_frame_loop e ee)
-  (if (pair? (cdr ee))
-      (let ((_xx 0))
-	(if (null? (time (caar ee)))
-	    (let ((_yy 0))
-	      (let ((result (list (cadaar ee) (resolve (caar ee) e))))
-		(display result))
-	      (newline)))
-	(print_frame_loop e (cdr ee)))))
+(define (print_frame_loop e ee accumulator)
+    (if (pair? (cdr ee))
+	(let ((_xx 0))
+	  (if (null? (time (caar ee)))
+	      (let ((_yy 0))
+		(let ((result (list (cadaar ee) (resolve (caar ee) e))))
+		  (cons result accumulator)))
+	      (print_frame_loop e (cdr ee) accumulator)))
+	accumulator))
 
 (define (print-frame e)
   (newline)
-  (print_frame_loop e e))
+  (let ((final_result (print_frame_loop e e '())))
+    (display final_result)
+    final_result))
 ;; end manually rewritten version w/o named let
 
 

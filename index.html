@@ -176,14 +176,15 @@
 
 ;; manually rewritten version w/o named let
 (define (print_frame_loop e ee)
-  (if (pair? (cdr ee))
-      (let ((_xx 0))
-	(if (null? (time (caar ee)))
-	    (let ((_yy 0))
-	      (let ((result (list (cadaar ee) (resolve (caar ee) e))))
-		(display result))
-	      (newline)))
-	(print_frame_loop e (cdr ee)))))
+  (let ((full_result '()))
+    (if (pair? (cdr ee))
+	(let ((_xx 0))
+	  (if (null? (time (caar ee)))
+	      (let ((_yy 0))
+		(let ((result (list (cadaar ee) (resolve (caar ee) e))))
+		  (set! full_result (cons result full_result))))
+	      (print_frame_loop e (cdr ee)))))
+    (display full_result)))
 
 (define (print-frame e)
   (newline)
@@ -218,7 +219,6 @@
 ;(prove6 '() smallg smalldb empty 1 '() smalldb)
 
 ;; pt was here
-
     </script>
 
     <script type="text/ohm-js">
@@ -962,6 +962,7 @@ listConstants_semantics.addOperation(
 	  var r = inputString
 	      .replace(/string[?]/g,"string_Q_")
 	      .replace(/string=[?]/g,"string_EQ_Q_")
+              .replace(/set!/g,"set_B_")
 	      .replace(/'!/g,'"!"')
 	      .replace(/[(][+]/g,"(_plus ")
 	      .replace(/null[?]/g,"null_Q_")
