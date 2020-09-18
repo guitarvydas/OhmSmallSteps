@@ -588,35 +588,37 @@ return cons(resolve(car(x),e),resolve(cdr(x),e));
 
 })();
 };
-function print_frame_loop(e,ee) {
+function print_frame_loop(e,ee,accumulator) {
 return (function(){
 if (pair_Q_(cdr(ee))) {
 return (function(_xx=0) {
-(function(){
+return (function(){
 if (null_Q_(time(caar(ee)))) {
 return (function(_yy=0) {
-(function(result=list(cadaar(ee),resolve(caar(ee),e))) {
-return display(result);
+return (function(result=list(cadaar(ee),resolve(caar(ee),e))) {
+return cons(result,accumulator);
 
 })();
-return newline();
 
 })();
 } else {
-return null;
+return print_frame_loop(e,cdr(ee),accumulator);
 }
 })();
-return print_frame_loop(e,cdr(ee));
 
 })();
 } else {
-return null;
+return accumulator;
 }
 })();
 };
 function print_frame(e) {
 newline();
-return print_frame_loop(e,e);
+return (function(final_result=print_frame_loop(e,e,list())) {
+display(final_result);
+return final_result;
+
+})();
 };
 let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
 let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));
