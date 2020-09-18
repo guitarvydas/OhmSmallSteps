@@ -595,9 +595,10 @@ return (function(_xx=0) {
 (function(){
 if (null_Q_(time(caar(ee)))) {
 return (function(_yy=0) {
-display(cadaar(ee));
-display(" = ");
-display(resolve(caar(ee),e));
+(function(result=list(cadaar(ee),resolve(caar(ee),e))) {
+return display(result);
+
+})();
 return newline();
 
 })();

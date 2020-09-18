@@ -180,9 +180,8 @@
       (let ((_xx 0))
 	(if (null? (time (caar ee)))
 	    (let ((_yy 0))
-	      (display (cadaar ee))
-	      (display " = ")
-	      (display (resolve (caar ee) e))
+	      (let ((result (list (cadaar ee) (resolve (caar ee) e))))
+		(display result))
 	      (newline)))
 	(print_frame_loop e (cdr ee)))))
 
