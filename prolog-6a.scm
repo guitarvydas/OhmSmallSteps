@@ -209,3 +209,4 @@
 ;(define smallg  '((x ("?" yyy))))
 ;(prove6 '() smallg smalldb empty 1 '() smalldb)
 
+;; pt was here
