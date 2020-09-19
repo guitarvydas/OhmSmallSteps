@@ -1,3 +1,5 @@
+;; begin prolog-6a.scm
+
 ;; utility functions
 (define (first x) (car x))
 (define (rest x) (cdr x))
@@ -210,4 +212,4 @@
 ;(define smallg  '((x ("?" yyy))))
 ;(prove6 '() smallg smalldb empty 1 '() smalldb)
 
-;; pt was here
+;; end prolog-6a.scm
