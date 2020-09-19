@@ -451,8 +451,10 @@ return null;
 function prove6(l,g,r,e,n,c,whole_db) {
 return (function(){
 if (null_Q_(g)) {
-append_to_result(e);
-print_frame(e);
+(function(next_result=print_frame(e)) {
+return append_to_result(next_result);
+
+})();
 return back6(l,g,r,e,n,c,whole_db);
 
 } else if (eq_Q_("!",car(g))) {

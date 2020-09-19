@@ -69,8 +69,8 @@
 ;  (display "w = ") (display whole-db) (newline)
   (cond
     ((null? g)
-      (append_to_result e)
-      (print-frame e)
+      (let ((next_result (print-frame e)))
+	(append_to_result next_result))
       (back6 l g r e n c whole-db))
     ((eq? '! (car g))
       (clear_r c)
