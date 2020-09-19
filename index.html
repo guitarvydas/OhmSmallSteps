@@ -328,7 +328,7 @@ Scm2JSEmitter {
           | NullTerminatedList
           | DottedList 
 
-  SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression
+    SpecialForm = QuotedExpression | CondExpression | LetExpression | IfThenElseExpression | IfThenExpression | AndExpression | OrExpression | NotExpression | SetExpression
 
 
   CondExpression = CondExpressionWithElse | CondExpressionWithoutElse
@@ -376,6 +376,9 @@ Scm2JSEmitter {
   NotExpression = BEGIN lexical_NOT Bool END
   Bool = Form
 
+  SetExpression = BEGIN lexical_SET SetVar SetExpr END
+  SetVar = Identifier
+  SetExpr = Form
 
   FunctionCall = BEGIN Identifier Arg* END
   Identifier = ~Keyword lexical_symbol
@@ -406,6 +409,7 @@ Scm2JSEmitter {
             | lexical_AND | lexical_OR | lexical_NOT
             | lexical_ELSE
             | lexical_QUOTE
+            | lexical_SET
 
   lexical_AND = "and" ~alnum space*
   lexical_OR = "or" ~alnum space*
@@ -419,6 +423,7 @@ Scm2JSEmitter {
   lexical_LETSTAR = "let*" ~alnum space*
   lexical_LET = "let" ~alnum space*
   lexical_QUOTE = "quote" ~alnum space*
+  lexical_SET = "set!" ~alnum space*
 
   lexical_atom = lexical_integer | lexical_symbol | lexical_string | lexical_boolean
   lexical_boolean = "#f" | "#t"
@@ -786,6 +791,9 @@ listConstants_semantics.addOperation(
 	      NotExpression: function(_begin,_not,expr,_end) { return "(:NotExpression " + expr.toCL() + ")";},
 	      Bool: function(form) { return "(:Bool " + form.toCL() + ")";},
 
+              SetExpression: function(_begin,_set,v,e,_end) { return "(:SetExpression " + v.toCL + " " + e.ToCL() + ")"; },
+              SetVar: function(id) { return id.toCL(); },
+	      SetExpr: function(e) { return e.toCL(); },
 	      FunctionCall: function(_begin,id,args,_end) { return "(:FunctionCall " + id.toCL() + args.toCL() + ")";},
 	      Identifier: function(sym) { return "(:Identifier " + sym.toCL() + ")";},
 	      Arg: function(listItem) { return "(:Arg " + listItem.toCL() + ")";},
@@ -906,6 +914,9 @@ listConstants_semantics.addOperation(
               NotExpression: function(_begin,_not,bool,_end) { return "(!" + bool.emitjs() + ")"; },
               Bool: function(form){return form.emitjs(); },
 
+              SetExpression: function (_begin,_set,v,e,_end) { return "(" + v.toCL() + " = " + e.toCL() + ")"; },
+              SetVar: function (id) { return id.emitjs(); },
+              SetExpr: function (e) { return e.emitjs(); },
 
               FunctionCall: function(_lp,id,actuals,_end) {return id.emitjs() + "(" + actuals.emitjs() + ")";},
 
