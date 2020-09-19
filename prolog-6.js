@@ -626,9 +626,7 @@ return accumulator;
 })();
 };
 function print_frame(e) {
-newline();
 return (function(final_result=print_frame_loop(e,e,list())) {
-display(final_result);
 return final_result;
 
 })();

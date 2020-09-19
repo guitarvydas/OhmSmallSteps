@@ -194,9 +194,7 @@
 	accumulator))
 
 (define (print-frame e)
-  (newline)
   (let ((final_result (print_frame_loop e e '())))
-    (display final_result)
     final_result))
 ;; end manually rewritten version w/o named let
 
