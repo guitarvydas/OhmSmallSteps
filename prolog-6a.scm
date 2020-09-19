@@ -60,6 +60,7 @@
 ;  (display "w = ") (display whole-db) (newline)
   (cond
     ((null? g)
+      (append_to_result e)
       (print-frame e)
       (back6 l g r e n c whole-db))
     ((eq? '! (car g))
@@ -210,7 +211,9 @@
                 (neq ("?" X) ("?" Y))))
 
 ; 9-slide PROVE
+(clear_result)
 (prove6 '() goals db empty 1 '() db)
+(display_result)
 
 ; simple test
 ;(define smalldb '(((x paul))))

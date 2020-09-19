@@ -413,10 +413,10 @@ return AppendInefficient(list1,AppendInefficient(list2,list3));
 };
 let result_ = list();
 function clear_result() {
-return set_B_(result_,list());
+return (result_ = list());
 };
 function append_to_result(lis) {
-return set_B_(result_,cons(lis,result_));
+return (result_ = cons(lis,result_));
 };
 function display_result() {
 return display(result_);
@@ -451,6 +451,7 @@ return null;
 function prove6(l,g,r,e,n,c,whole_db) {
 return (function(){
 if (null_Q_(g)) {
+append_to_result(e);
 print_frame(e);
 return back6(l,g,r,e,n,c,whole_db);
 
@@ -632,4 +633,6 @@ return final_result;
 };
 let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
 let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));
+clear_result();
 prove6(list(),goals,db,empty,1,list(),db);
+display_result();
