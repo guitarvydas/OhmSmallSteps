@@ -12,6 +12,11 @@
 (define (AppendInefficient3 list1 list2 list3)
   (AppendInefficient list1 (AppendInefficient list2 list3)))
 
+(define result_ '())
+(define (clear_result) (set! result_ '()))
+(define (append_to_result lis) (set! result_ (cons lis result_)))
+(define (display_result) (display result_))
+
 ;;;;
 
 (define link list)

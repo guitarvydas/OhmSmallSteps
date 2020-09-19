@@ -411,6 +411,16 @@ return cons(car(list1),AppendInefficient(cdr(list1),list2));
 function AppendInefficient3(list1,list2,list3) {
 return AppendInefficient(list1,AppendInefficient(list2,list3));
 };
+let result_ = list();
+function clear_result() {
+return set_B_(result_,list());
+};
+function append_to_result(lis) {
+return set_B_(result_,cons(lis,result_));
+};
+function display_result() {
+return display(result_);
+};
 let link = list;
 let L_l = car;
 let L_g = cadr;
