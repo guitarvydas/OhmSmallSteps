@@ -778,7 +778,7 @@ listConstants_semantics.addOperation(
 	      Binding: function(_begin,v,rhs,_end) { return "(:Binding " + v.toCL() + " " + rhs.toCL() + ")";},
 	      LetVar: function(v) { return "(:LetVar " + v.toCL() + ")";},
 	      LetBindingClause: function(form) { return "(:LetBindingClause " + form.toCL() + ")";},
-	      LetBody: function(statementBlock) { return "(:LetBodyClause " + statementsBlock.toCL() + ")";},    
+	      LetBody: function(statementBlock) { return "(:LetBodyClause " + statementBlock.toCL() + ")";},    
 
 	      IfThenElseExpression: function(_begin,_if,testExpr,thenPart,elsePart,_end) { 
 		  return "(:IfThenElseExpressio " + testExpr.toCL() + " " + thenPart.toCL() + " " + elsePart.toCL() + ")";},
