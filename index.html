@@ -183,19 +183,43 @@
 ;;             (loop (cdr ee))))))
 
 ;; manually rewritten version w/o named let
-(define (print_frame_loop e ee accumulator)
-    (if (pair? (cdr ee))
-	(let ((_xx 0))
-	  (if (null? (time (caar ee)))
-	      (let ((_yy 0))
-		(let ((result (list (cadaar ee) (resolve (caar ee) e))))
-		  (cons result accumulator)))
-	      (print_frame_loop e (cdr ee) accumulator)))
-	accumulator))
+
+(define (has_bindings_Q_ ee)
+  (pair? (cdr ee)))
+
+(define (get_var_name_from_binding ee)
+  (cadaar ee))
+
+(define (get_binding_value_from_binding ee e)
+  (resolve (caar ee) e))
+
+(define (no_timestamp_binding_Q_ ee)
+  (null_Q_ (time (caar ee))))
+
+(define (get_rest_of_bindings ee)
+  (cdr ee))
+
+(define (print_frame_helper ee all_bindings accumulator)
+  (cond ((has_bindings_Q_ ee)
+	 (let ((var_name (get_var_name_from_binding ee))
+	       (binding_value (get_binding_value_from_binding ee all_bindings))
+	       (remaining_bindings (get_rest_of_bindings ee)))
+           (cond ((no_timestamp_binding_Q_ ee)
+		  (print_frame_helper remaining_bindings 
+				      all_bindings 
+				      (cons 
+				       (cons var_name binding_value)
+				       accumulator)))
+		 (else 
+		  (print_frame_helper remaining_bindings 
+				      all_bindings 
+				      accumulator)))))
+        (else accumulator)))
 
 (define (print-frame e)
-  (let ((final_result (print_frame_loop e e '())))
+  (let ((final_result (print_frame_helper e e '())))
     final_result))
+
 ;; end manually rewritten version w/o named let
 
 
@@ -221,6 +245,7 @@
 (clear_result)
 (prove6 '() goals db empty 1 '() db)
 (display_result)
+(newline)  
 
 ; simple test
 ;(define smalldb '(((x paul))))
@@ -777,7 +802,7 @@ listConstants_semantics.addOperation(
 	      Binding: function(_begin,v,rhs,_end) { return "(:Binding " + v.toCL() + " " + rhs.toCL() + ")";},
 	      LetVar: function(v) { return "(:LetVar " + v.toCL() + ")";},
 	      LetBindingClause: function(form) { return "(:LetBindingClause " + form.toCL() + ")";},
-	      LetBody: function(statementBlock) { return "(:LetBodyClause " + statementsBlock.toCL() + ")";},    
+	      LetBody: function(statementBlock) { return "(:LetBodyClause " + statementBlock.toCL() + ")";},    
 
 	      IfThenElseExpression: function(_begin,_if,testExpr,thenPart,elsePart,_end) { 
 		  return "(:IfThenElseExpressio " + testExpr.toCL() + " " + thenPart.toCL() + " " + elsePart.toCL() + ")";},
@@ -991,11 +1016,13 @@ listConstants_semantics.addOperation(
 	      .replace(/var[?]/g,"var_Q_")
 	      .replace(/eqv[?]/g,"eqv_Q_")
 	      .replace(/eq[?]/g,"eq_Q_")
-	      .replace(/print-frame/g,"print_frame")
 	      .replace(/set-car/g,"set_car")
 	      .replace(/lookup-loop/g,"lookup_loop")
 	      .replace(/whole-db/g,"whole_db")
 	      .replace(/try/g,"_try")
+
+	      .replace(/print-frame/g,"print_frame")
+
 	  ;
 	  return r;
       }
@@ -1207,7 +1234,7 @@ listConstants_semantics.addOperation(
     <button onclick="displayAllInputs()">Display Input</button>
     <button onclick="listConstantsPipelinetest()">pass1 & listConstants</button>
     <button onclick="tree()">pass1 & listConstants & emitter tree</button>
-    <button onclick="pipelinetest()">pass1 & listConstants & emitter test</button>
+    <button onclick="pipelinetest()">emit JavaScript</button>
     <p id="timestamp"></p>
     <p id="result"></p>
     <p id="cl"></p>
