@@ -189,19 +189,21 @@
 (define (get-rest-of-bindings ee)
   (cdr ee))
 
+(define (print-frame-helper ee all-bindings)
+  (cond ((has-bindings? ee)
+	 (let ((var-name (get-var-name-from-binding ee))
+	       (binding-value (get-binding-value-from-binding ee all-bindings))
+	       (remaining-bindings (get-rest-of-bindings ee)))
+           (cond ((no-timestamp-binding? ee)
+                  (display var-name)
+                  (display " = ")
+                  (display binding-value)
+		  (newline)))
+           (print-frame-helper remaining-bindings all-bindings)))))
+
 (define (print-frame e)
   (newline)
-  (let loop ((ee e))
-    (cond ((has-bindings? ee)
-	   (let ((var-name (get-var-name-from-binding ee))
-		 (binding-value (get-binding-value-from-binding ee e))
-		 (remaining-bindings (get-rest-of-bindings ee)))
-            (cond ((no-timestamp-binding? ee)
-                    (display var-name)
-                    (display " = ")
-                    (display binding-value)
-                    (newline)))
-            (loop remaining-bindings))))))
+  (print-frame-helper e e))
 
 
 ;; Graph example from section 1
