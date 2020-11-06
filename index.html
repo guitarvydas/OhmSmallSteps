@@ -184,12 +184,8 @@
 
 ;; manually rewritten version w/o named let
 
-(define (nt_at_bottom_Q_ ee)
-  (and (pair? (car ee))
-       (not (eq? 'bottom (caar ee)))))
-
-(define (has_bindings_Q_ ee)
-  (nt_at_bottom_Q_ ee))
+(define (has-bindings? ee)
+  (pair? (cdr ee)))
 
 (define (get_var_name_from_binding ee)
   (cadaar ee))

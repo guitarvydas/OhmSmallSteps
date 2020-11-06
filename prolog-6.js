@@ -206,35 +206,48 @@ return cons(resolve(car(x),e),resolve(cdr(x),e));
 
 })();
 };
-function print_frame_loop(e,ee,accumulator) {
+function has_bindings_Q_(ee) {
+return pair_Q_(cdr(ee));
+};
+function get_var_name_from_binding(ee) {
+return cadaar(ee);
+};
+function get_binding_value_from_binding(ee,e) {
+return resolve(caar(ee),e);
+};
+function no_timestamp_binding_Q_(ee) {
+return null_Q_(time(caar(ee)));
+};
+function get_rest_of_bindings(ee) {
+return cdr(ee);
+};
+function print_frame_helper(ee,all_bindings) {
 return (function(){
-if (pair_Q_(cdr(ee))) {
-return (function(_xx=0) {
-return (function(){
-if (null_Q_(time(caar(ee)))) {
-return (function(_yy=0) {
-return (function(result=list(cadaar(ee),resolve(caar(ee),e))) {
-return cons(result,accumulator);
+if (has_bindings_Q_(ee)) {
+return (function(var_name=get_var_name_from_binding(ee),binding_value=get_binding_value_from_binding(ee,all_bindings),remaining_bindings=get_rest_of_bindings(ee)) {
+(function(){
+if (no_timestamp_binding_Q_(ee)) {
+display(var_name);
+display(" = ");
+display(binding_value);
+return newline();
 
-})();
-
-})();
 } else {
-return print_frame_loop(e,cdr(ee),accumulator);
+return null;
 }
 })();
+return print_frame_helper(remaining_bindings,all_bindings);
 
 })();
+
 } else {
-return accumulator;
+return null;
 }
 })();
 };
 function print_frame(e) {
-return (function(final_result=print_frame_loop(e,e,list())) {
-return final_result;
-
-})();
+newline();
+return print_frame_helper(e,e);
 };
 let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
 let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));

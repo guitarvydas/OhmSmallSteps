@@ -170,12 +170,8 @@
             (resolve (car x) e)
             (resolve (cdr x) e)))))
 
-(define (not-at-bottom? ee)
-  (and (pair? (car ee))
-       (not (eq? 'bottom (caar ee)))))
-
 (define (has-bindings? ee)
-  (not-at-bottom? ee))
+  (pair? (cdr ee)))
 
 (define (get-var-name-from-binding ee)
   (cadaar ee))
