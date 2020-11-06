@@ -184,7 +184,7 @@
 
 ;; manually rewritten version w/o named let
 
-(define (has-bindings? ee)
+(define (has_bindings_Q_ ee)
   (pair? (cdr ee)))
 
 (define (get_var_name_from_binding ee)
@@ -199,21 +199,26 @@
 (define (get_rest_of_bindings ee)
   (cdr ee))
 
-(define (print_frame_helper ee all_bindings)
+(define (print_frame_helper ee all_bindings accumulator)
   (cond ((has_bindings_Q_ ee)
 	 (let ((var_name (get_var_name_from_binding ee))
 	       (binding_value (get_binding_value_from_binding ee all_bindings))
 	       (remaining_bindings (get_rest_of_bindings ee)))
-           (cond ((no_timestamp_binding_Q_a ee)
-                  (display var_name)
-                  (display " = ")
-                  (display binding_value)
-		  (newline)))
-           (print_frame_helper remaining_bindings all_bindings)))))
+           (cond ((no_timestamp_binding_Q_ ee)
+		  (print_frame_helper remaining_bindings 
+				      all_bindings 
+				      (cons 
+				       (cons var_name binding_value)
+				       accumulator)))
+		 (else 
+		  (print_frame_helper remaining_bindings 
+				      all_bindings 
+				      accumulator)))))
+        (else accumulator)))
 
 (define (print-frame e)
-  (newline)
-  (print_frame_helper e e))
+  (let ((final_result (print_frame_helper e e '())))
+    final_result))
 
 ;; end manually rewritten version w/o named let
 
@@ -1229,7 +1234,7 @@ listConstants_semantics.addOperation(
     <button onclick="displayAllInputs()">Display Input</button>
     <button onclick="listConstantsPipelinetest()">pass1 & listConstants</button>
     <button onclick="tree()">pass1 & listConstants & emitter tree</button>
-    <button onclick="pipelinetest()">pass1 & listConstants & emitter test</button>
+    <button onclick="pipelinetest()">emit JavaScript</button>
     <p id="timestamp"></p>
     <p id="result"></p>
     <p id="cl"></p>

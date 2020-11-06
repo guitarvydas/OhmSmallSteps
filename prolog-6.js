@@ -221,33 +221,33 @@ return null_Q_(time(caar(ee)));
 function get_rest_of_bindings(ee) {
 return cdr(ee);
 };
-function print_frame_helper(ee,all_bindings) {
+function print_frame_helper(ee,all_bindings,accumulator) {
 return (function(){
 if (has_bindings_Q_(ee)) {
 return (function(var_name=get_var_name_from_binding(ee),binding_value=get_binding_value_from_binding(ee,all_bindings),remaining_bindings=get_rest_of_bindings(ee)) {
-(function(){
+return (function(){
 if (no_timestamp_binding_Q_(ee)) {
-display(var_name);
-display(" = ");
-display(binding_value);
-return newline();
+return print_frame_helper(remaining_bindings,all_bindings,cons(cons(var_name,binding_value),accumulator));
 
-} else {
-return null;
+}else {
+return print_frame_helper(remaining_bindings,all_bindings,accumulator);
 }
-})();
-return print_frame_helper(remaining_bindings,all_bindings);
 
 })();
 
-} else {
-return null;
+})();
+
+}else {
+return accumulator;
 }
+
 })();
 };
 function print_frame(e) {
-newline();
-return print_frame_helper(e,e);
+return (function(final_result=print_frame_helper(e,e,list())) {
+return final_result;
+
+})();
 };
 let db = list(list(list("some","foo")),list(list("some","bar")),list(list("some","baz")),list(list("eq",list("?","X"),list("?","X"))),list(list("neq",list("?","X"),list("?","Y")),list("eq",list("?","X"),list("?","Y")),"!","fail"),list(list("neq",list("?","X"),list("?","Y"))));
 let goals = list(list("some",list("?","X")),list("some",list("?","Y")),list("neq",list("?","X"),list("?","Y")));
