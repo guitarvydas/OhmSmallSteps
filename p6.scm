@@ -177,16 +177,28 @@
 (define (has-bindings? ee)
   (not-at-bottom? ee))
 
+(define (get-var-name-from-binding ee)
+  (cadaar ee))
+
+(define (get-binding-value-from-binding ee e)
+  (resolve (caar ee) e))
+
+(define (no-timestamp-binding? ee)
+  (null? (time (caar ee))))
+
 (define (print-frame e)
   (newline)
   (let loop ((ee e))
     (cond ((has-bindings? ee)
-            (cond ((null? (time (caar ee)))
-                    (display (cadaar ee))
+	   (let ((var-name (get-var-name-from-binding ee))
+		 (binding-value (get-binding-value-from-binding ee e))
+		 (remaining-bindings (cdr ee)))
+            (cond ((no-timestamp-binding? ee)
+                    (display var-name)
                     (display " = ")
-                    (display (resolve (caar ee) e))
+                    (display binding-value)
                     (newline)))
-            (loop (cdr ee))))))
+            (loop remaining-bindings))))))
 
 
 ;; Graph example from section 1
