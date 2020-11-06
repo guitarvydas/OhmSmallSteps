@@ -186,13 +186,16 @@
 (define (no-timestamp-binding? ee)
   (null? (time (caar ee))))
 
+(define (get-rest-of-bindings ee)
+  (cdr ee))
+
 (define (print-frame e)
   (newline)
   (let loop ((ee e))
     (cond ((has-bindings? ee)
 	   (let ((var-name (get-var-name-from-binding ee))
 		 (binding-value (get-binding-value-from-binding ee e))
-		 (remaining-bindings (cdr ee)))
+		 (remaining-bindings (get-rest-of-bindings ee)))
             (cond ((no-timestamp-binding? ee)
                     (display var-name)
                     (display " = ")
