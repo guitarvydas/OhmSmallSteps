@@ -183,19 +183,42 @@
 ;;             (loop (cdr ee))))))
 
 ;; manually rewritten version w/o named let
-(define (print_frame_loop e ee accumulator)
-    (if (pair? (cdr ee))
-	(let ((_xx 0))
-	  (if (null? (time (caar ee)))
-	      (let ((_yy 0))
-		(let ((result (list (cadaar ee) (resolve (caar ee) e))))
-		  (cons result accumulator)))
-	      (print_frame_loop e (cdr ee) accumulator)))
-	accumulator))
+
+(define (nt_at_bottom_Q_ ee)
+  (and (pair? (car ee))
+       (not (eq? 'bottom (caar ee)))))
+
+(define (has_bindings_Q_ ee)
+  (nt_at_bottom_Q_ ee))
+
+(define (get_var_name_from_binding ee)
+  (cadaar ee))
+
+(define (get_binding_value_from_binding ee e)
+  (resolve (caar ee) e))
+
+(define (no_timestamp_binding_Q_ ee)
+  (null_Q_ (time (caar ee))))
+
+(define (get_rest_of_bindings ee)
+  (cdr ee))
+
+(define (print_frame_helper ee all_bindings)
+  (cond ((has_bindings_Q_ ee)
+	 (let ((var_name (get_var_name_from_binding ee))
+	       (binding_value (get_binding_value_from_binding ee all_bindings))
+	       (remaining_bindings (get_rest_of_bindings ee)))
+           (cond ((no_timestamp_binding_Q_a ee)
+                  (display var_name)
+                  (display " = ")
+                  (display binding_value)
+		  (newline)))
+           (print_frame_helper remaining_bindings all_bindings)))))
 
 (define (print-frame e)
-  (let ((final_result (print_frame_loop e e '())))
-    final_result))
+  (newline)
+  (print_frame_helper e e))
+
 ;; end manually rewritten version w/o named let
 
 
@@ -992,11 +1015,13 @@ listConstants_semantics.addOperation(
 	      .replace(/var[?]/g,"var_Q_")
 	      .replace(/eqv[?]/g,"eqv_Q_")
 	      .replace(/eq[?]/g,"eq_Q_")
-	      .replace(/print-frame/g,"print_frame")
 	      .replace(/set-car/g,"set_car")
 	      .replace(/lookup-loop/g,"lookup_loop")
 	      .replace(/whole-db/g,"whole_db")
 	      .replace(/try/g,"_try")
+
+	      .replace(/print-frame/g,"print_frame")
+
 	  ;
 	  return r;
       }
