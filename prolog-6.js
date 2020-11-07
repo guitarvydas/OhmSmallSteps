@@ -23,8 +23,11 @@ return (result_ = list());
 function append_to_result(lis) {
 return (result_ = cons(lis,result_));
 };
+function get_result() {
+return result_;
+};
 function display_result() {
-return display(result_);
+return display(get_result());
 };
 let link = list;
 let L_l = car;
