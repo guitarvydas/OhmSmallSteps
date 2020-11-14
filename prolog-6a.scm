@@ -15,7 +15,8 @@
 (define result_ '())
 (define (clear_result) (set! result_ '()))
 (define (append_to_result lis) (set! result_ (cons lis result_)))
-(define (display_result) (display result_))
+(define (get_result) result_)
+(define (display_result) (display (get_result)))
 
 ;;;;
 
@@ -174,19 +175,43 @@
 ;;             (loop (cdr ee))))))
 
 ;; manually rewritten version w/o named let
-(define (print_frame_loop e ee accumulator)
-    (if (pair? (cdr ee))
-	(let ((_xx 0))
-	  (if (null? (time (caar ee)))
-	      (let ((_yy 0))
-		(let ((result (list (cadaar ee) (resolve (caar ee) e))))
-		  (cons result accumulator)))
-	      (print_frame_loop e (cdr ee) accumulator)))
-	accumulator))
+
+(define (has_bindings_Q_ ee)
+  (pair? (cdr ee)))
+
+(define (get_var_name_from_binding ee)
+  (cadaar ee))
+
+(define (get_binding_value_from_binding ee e)
+  (resolve (caar ee) e))
+
+(define (no_timestamp_binding_Q_ ee)
+  (null? (time (caar ee))))
+
+(define (get_rest_of_bindings ee)
+  (cdr ee))
+
+(define (print_frame_helper ee all_bindings accumulator)
+  (cond ((has_bindings_Q_ ee)
+	 (let ((var_name (get_var_name_from_binding ee))
+	       (binding_value (get_binding_value_from_binding ee all_bindings))
+	       (remaining_bindings (get_rest_of_bindings ee)))
+           (cond ((no_timestamp_binding_Q_ ee)
+		  (print_frame_helper remaining_bindings 
+				      all_bindings 
+				      (cons 
+				       (cons var_name binding_value)
+				       accumulator)))
+		 (else 
+		  (print_frame_helper remaining_bindings 
+				      all_bindings 
+				      accumulator)))))
+        (else accumulator)))
 
 (define (print-frame e)
-  (let ((final_result (print_frame_loop e e '())))
+  (let ((final_result (print_frame_helper e e '())))
     final_result))
+
 ;; end manually rewritten version w/o named let
 
 
@@ -212,6 +237,7 @@
 (clear_result)
 (prove6 '() goals db empty 1 '() db)
 (display_result)
+(newline)  
 
 ; simple test
 ;(define smalldb '(((x paul))))

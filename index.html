@@ -5,7 +5,7 @@
 <!--    <script src="/Users/tarvydas/projects/ohm/examples/lib.js"></script> -->
     <script src="./ohm.js"></script>
 
-<!-- prolog-6.scm -->
+<!-- prolog-6a.scm -->
 <script type="text/test">
 ;; begin prolog-6a.scm
 
@@ -195,7 +195,7 @@
   (resolve (caar ee) e))
 
 (define (no_timestamp_binding_Q_ ee)
-  (null_Q_ (time (caar ee))))
+  (null? (time (caar ee))))
 
 (define (get_rest_of_bindings ee)
   (cdr ee))
