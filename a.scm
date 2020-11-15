@@ -224,12 +224,27 @@
 (define goals1 '((eq ("?" X) 20)))
 (define goals2 '((eq 20 ("?" X))))
 (define goals3 '((eq ("?" X) 20) (eq ("?" X) ("@" "unity" 20))))
-(define goals goals3)
+(define goals4 '((eq ("?" X) 20) (eq ("@" "unity" 20) ("?" X))))
+(define goals goals4)
+
+(define (foreign? expr)
+  (and (pair? expr)
+       (string? (car expr))
+       (string=? "@" (car expr))))
+
+(define (call-foreign expr)
+  (let ((func (cadr expr))
+	(args (cddr expr)))
+    (cond ((string=? "unity" func)
+	   (car args)))))
 
 (define (rewrite expr)
   (cond ((pair? expr)
-	 (cons (rewrite (car expr))
-	       (rewrite (cdr expr))))
+	 (cond ((foreign? expr)
+		(call-foreign expr))
+	       (else 
+		(cons (rewrite (car expr))
+		      (rewrite (cdr expr))))))
 	(else expr)))
 
 ; 9-slide PROVE
@@ -237,6 +252,7 @@
 (newline)  
 (newline)  
 (let ((g (rewrite goals)))
+  (display g) (newline)
   (prove6 '() g db empty 1 '() db)
   (display_result)
   (newline)  
