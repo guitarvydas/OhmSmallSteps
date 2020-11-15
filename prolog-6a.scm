@@ -53,7 +53,7 @@
 (define (prove6 l g r e n c whole-db)
 ;  (newline) (display "prove6") (newline)
 ;  (display "l = ") (display l) (newline)
-;  (display "g = ") (display g) (newline)
+  (display "g = ") (display g) (newline)
 ;  (display "r = ") (display r) (newline)
 ;  (display "e = ") (display e) (newline)
 ;  (display "n = ") (display n) (newline)
@@ -121,6 +121,7 @@
 ;;; end rewrite
 
 (define (value x e)
+  (display "value: ") (display x) (display " fc=") (display (foreign-call? x)) (newline)
   (if (foreign-call? x)
       (let ((fname (cadr x))
 	    (args (map (lambda (a) (resolve a e)) (cddr x))))
@@ -147,6 +148,7 @@
 ;   (let ((x (value x e))
 ;         (y (value y e)))
 (define (unify x1 y1 e)
+  (display "unify: ") (display x1) (display " ") (display y1) (newline)
   (let ((x (value x1 e))
         (y (value y1 e)))
     (cond
@@ -224,12 +226,13 @@
 ;; end manually rewritten version w/o named let
 
 (define (foreign-apply name args)
+  (display "foreign-apply ") (display name) (display " ") (display args) (newline)
   (cond ((string=? name "unity")
 	 (car args))))
 
 ;; Negation as failure
 
-(define db
+(define db-old
   '(((some 10))
     ((some 20))
     ((some 30))
@@ -250,13 +253,15 @@
 		(neq ("?" X) ("?" Y))
                 (eq ("?" Y) 20)))
 
-(define goals '((some ("?" X))
-                (some ("?" Y))
-		(neq ("?" X) ("?" Y))
-                (eq ("?" Y) ("@" "unity" 20))))
+(define db
+  '(((some 20))))
+
+(define goals '((some ("?" X)) 
+		(eq ("?" X) 20)))
 
 ; 9-slide PROVE
 (clear_result)
+(newline)
 (prove6 '() goals db empty 1 '() db)
 (display_result)
 (newline)  
