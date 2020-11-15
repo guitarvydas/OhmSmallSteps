@@ -51,14 +51,6 @@
 
 
 (define (prove6 l g r e n c whole-db)
-;  (newline) (display "prove6") (newline)
-;  (display "l = ") (display l) (newline)
-;  (display "g = ") (display g) (newline)
-;  (display "r = ") (display r) (newline)
-;  (display "e = ") (display e) (newline)
-;  (display "n = ") (display n) (newline)
-;  (display "c = ") (display c) (newline)
-;  (display "w = ") (display whole-db) (newline)
   (cond
     ((null? g)
       (let ((next_result (print-frame e)))
@@ -77,7 +69,7 @@
       (let ((a  (copy (car r) n)))
         (let ((e* (unify (car a) (car g) e)))
           (if e*
-              (prove6 (link l g r e n c)
+              (top-level-prove6 (link l g r e n c)
                       (AppendInefficient3 (cdr a) `(r! ,l) (cdr g))
                       whole-db
                       e*
@@ -85,7 +77,18 @@
                       l
 		      whole-db)
               (back6 l g r e n c whole-db))))
-)))
+      )))
+
+(define (top-level-prove6 l g r e n c whole-db)
+;  (newline) (display "prove6") (newline)
+;  (display "l = ") (display l) (newline)
+;  (display "g = ") (display g) (newline)
+;  (display "r = ") (display r) (newline)
+;  (display "e = ") (display e) (newline)
+;  (display "n = ") (display n) (newline)
+;  (display "c = ") (display c) (newline)
+;  (display "w = ") (display whole-db) (newline)
+  (prove6 l (rewrite g) r e n c whole-db))
 
 
 (define empty '((bottom)))
@@ -259,9 +262,9 @@
 (clear_result)
 (newline)  
 (newline)  
-(let ((g (rewrite goals)))
+(let ((g goals))
   (display g) (newline)
-  (prove6 '() g db empty 1 '() db)
+  (top-level-prove6 '() g db empty 1 '() db)
   (display_result)
   (newline)  
   (newline))
