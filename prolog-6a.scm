@@ -218,9 +218,9 @@
 ;; Negation as failure
 
 (define db
-  '(((some foo))
-    ((some bar))
-    ((some baz))
+  '(((some 10))
+    ((some 20))
+    ((some 30))
 
     ((eq ("?" X) ("?" X)))
 
@@ -229,9 +229,19 @@
 
     ((neq ("?" X) ("?" Y)))))
 
-(define goals '((some ("?" X))
+(define old-goals '((some ("?" X))
                 (some ("?" Y))
                 (neq ("?" X) ("?" Y))))
+
+(define goals-20 '((some ("?" X))
+                (some ("?" Y))
+		(neq ("?" X) ("?" Y))
+                (eq ("?" Y) 20)))
+
+(define goals '((some ("?" X))
+                (some ("?" Y))
+		(neq ("?" X) ("?" Y))
+                (eq ("?" Y) ("#" "unity" 20))))
 
 ; 9-slide PROVE
 (clear_result)
