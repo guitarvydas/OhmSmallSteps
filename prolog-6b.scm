@@ -51,21 +51,22 @@
 
 
 (define (prove6 l g r e n c whole-db)
-;  (newline) (display "prove6") (newline)
+  (newline)  
+  (display "prove6") (newline)
 ;  (display "l = ") (display l) (newline)
-;  (display "g = ") (display g) (newline)
-;  (display "r = ") (display r) (newline)
-;  (display "e = ") (display e) (newline)
-;  (display "n = ") (display n) (newline)
-;  (display "c = ") (display c) (newline)
-;  (display "w = ") (display whole-db) (newline)
+  (display " g = ") (display g) (newline)
+;  (display " r = ") (display r) (newline)
+  (display " e = ") (display e) (newline)
+;  (display " n = ") (display n) (newline)
+;  (display " c = ") (display c) (newline)
+;  (display " w = ") (display whole-db) (newline)
   (cond
     ((null? g)
       (let ((next_result (print-frame e)))
 	(append_to_result next_result))
       (back6 l g r e n c whole-db))
     ((eq? '! (car g))
-      (clear_r c)
+     (clear_r c)
       (prove6 c (cdr g) r e n c whole-db))
     ((eq? 'r! (car g))
       (prove6 l (cddr g) r e n (cadr g) whole-db))
@@ -99,6 +100,11 @@
        (string? (car x))
        (string=? "?" (car x))))
 
+(define (foreign-call? x)
+  (and (pair? x)
+       (string? (car x))
+       (string=? "@" (car x))))
+
 ;; manually rewritten named let
 (define (lookup_loop e id tm)
     (cond ((not (pair? (caar e)))
@@ -116,12 +122,17 @@
 ;;; end rewrite
 
 (define (value x e)
-  (if (var? x)
-      (let ((v (lookup x e)))
-        (if v
-            (value (cadr v) e)
-            x))
-      x))
+  (display "value: ") (display x) (display " fc=") (display (foreign-call? x)) (newline)
+  (if (foreign-call? x)
+      (let ((fname (cadr x))
+	    (args (map (lambda (a) (resolve a e)) (cddr x))))
+	  (value (foreign-apply fname args) e))
+      (if (var? x)
+	  (let ((v (lookup x e)))
+            (if v
+		(value (cadr v) e)
+		x))
+	  x)))
 
 (define (copy x n)
   (cond
@@ -138,6 +149,7 @@
 ;   (let ((x (value x e))
 ;         (y (value y e)))
 (define (unify x1 y1 e)
+  (display "unify: ") (display x1) (display " ") (display y1) (newline)
   (let ((x (value x1 e))
         (y (value y1 e)))
     (cond
@@ -214,31 +226,30 @@
 
 ;; end manually rewritten version w/o named let
 
-
-;; Negation as failure
+(define (foreign-apply name args)
+  (display "foreign-apply ") (display name) (display " ") (display args) (newline)
+  (cond ((string=? name "unity")
+	 (car args))))
 
 (define db
-  '(((some foo))
-    ((some bar))
-    ((some baz))
+  '(
+    ((eq (? X) (? X)))
+    ))
 
-    ((eq ("?" X) ("?" X)))
-
-    ((neq ("?" X) ("?" Y))
-     (eq ("?" X) ("?" Y)) ! fail)
-
-    ((neq ("?" X) ("?" Y)))))
-
-(define goals '((eq ("?" X) 20)
-		(eq ("?" X) 20)))
+(define goals '(
+		(eq (? X) 20)
+		(eq (? X) 20)))
 
 ; 9-slide PROVE
 (clear_result)
+(newline)
 (prove6 '() goals db empty 1 '() db)
-(newline)  
-(newline)  
 (display_result)
 (newline)  
-(newline)  
+
+; simple test
+;(define smalldb '(((x paul))))
+;(define smallg  '((x ("?" yyy))))
+;(prove6 '() smallg smalldb empty 1 '() smalldb)
 
 ;; end prolog-6a.scm
