@@ -88,7 +88,7 @@
 ;  (display "n = ") (display n) (newline)
 ;  (display "c = ") (display c) (newline)
 ;  (display "w = ") (display whole-db) (newline)
-  (prove6 l (rewrite g) r e n c whole-db))
+  (prove6 l (rewrite g e) r e n c whole-db))
 
 
 (define empty '((bottom)))
@@ -243,19 +243,19 @@
        (string? (car expr))
        (string=? "@" (car expr))))
 
-(define (call-foreign expr)
+(define (call-foreign expr bindings)
   (let ((func (cadr expr))
 	(args (cddr expr)))
     (cond ((string=? "unity" func)
 	   (car args)))))
 
-(define (rewrite expr)
+(define (rewrite expr bindings)
   (cond ((pair? expr)
 	 (cond ((foreign? expr)
-		(call-foreign expr))
+		(call-foreign expr bindings))
 	       (else 
-		(cons (rewrite (car expr))
-		      (rewrite (cdr expr))))))
+		(cons (rewrite (car expr) bindings)
+		      (rewrite (cdr expr) bindings)))))
 	(else expr)))
 
 ; 9-slide PROVE
