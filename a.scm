@@ -218,14 +218,22 @@
 ;; Negation as failure
 
 (define db
-  '(    ((eq ("?" X) ("?" X)))
+  '(
+    ((some 10))
+    ((some 20))
+    ((eq ("?" X) ("?" X)))
    ))
 
 (define goals1 '((eq ("?" X) 20)))
 (define goals2 '((eq 20 ("?" X))))
 (define goals3 '((eq ("?" X) 20) (eq ("?" X) ("@" "unity" 20))))
 (define goals4 '((eq ("?" X) 20) (eq ("@" "unity" 20) ("?" X))))
-(define goals goals4)
+(define goals6 '((some ("?" X)) (eq ("@" "unity" 10) ("?" X))))
+(define goals5 '((some ("?" X)) 
+		 (eq ("?" X) ("@" "unity" 10))))
+(define goals7 '( (some ("?" X)) (eq ("?" X) 20) ))
+(define goals8 '( (some ("?" X)) ))
+(define goals goals5)
 
 (define (foreign? expr)
   (and (pair? expr)
