@@ -51,6 +51,14 @@
 
 
 (define (prove6 l g r e n c whole-db)
+  (newline) (display "prove6") (newline)
+  (display "l = ") (display l) (newline)
+  (display "g = ") (display g) (newline)
+  (display "r = ") (display r) (newline)
+  (display "e = ") (display e) (newline)
+  (display "n = ") (display n) (newline)
+  (display "c = ") (display c) (newline)
+  (display "w = ") (display whole-db) (newline)
   (cond
     ((null? g)
       (let ((next_result (print-frame e)))
@@ -80,15 +88,7 @@
       )))
 
 (define (top-level-prove6 l g r e n c whole-db)
-;  (newline) (display "prove6") (newline)
-;  (display "l = ") (display l) (newline)
-;  (display "g = ") (display g) (newline)
-;  (display "r = ") (display r) (newline)
-;  (display "e = ") (display e) (newline)
-;  (display "n = ") (display n) (newline)
-;  (display "c = ") (display c) (newline)
-;  (display "w = ") (display whole-db) (newline)
-  (prove6 l (rewrite g e) r e n c whole-db))
+  (prove6 l g r e n c whole-db))
 
 
 (define empty '((bottom)))
@@ -224,6 +224,7 @@
   '(
     ((some 10))
     ((some 20))
+    ((some 30))
     ((eq ("?" X) ("?" X)))
    ))
 
@@ -236,7 +237,12 @@
 		 (eq ("?" X) ("@" "unity" 10))))
 (define goals7 '( (some ("?" X)) (eq ("?" X) 20) ))
 (define goals8 '( (some ("?" X)) ))
-(define goals goals5)
+
+(define goals9 '((some ("?" X))
+		 (some ("?" Y))
+		 (eq ("?" X) ("@" "add" ("?" X) ("?" Y)))))
+
+(define goals goals9)
 
 (define (foreign? expr)
   (and (pair? expr)
@@ -246,8 +252,21 @@
 (define (call-foreign expr bindings)
   (let ((func (cadr expr))
 	(args (cddr expr)))
+
     (cond ((string=? "unity" func)
-	   (car args)))))
+	   (car args))
+
+	  ((string=? "add" func)
+	   (let ((resolved-args (map (lambda (a) (value a bindings)) args)))
+	     (display bindings)
+	     (newline)
+	     (display args)
+	     (newline)
+	     (display resolved-args)
+	     (newline)
+	     (+ (car resolved-args) (cadr resolved-args))))
+	  
+	  (else (error "call-foreign called with unknown operator" func)))))
 
 (define (rewrite expr bindings)
   (cond ((pair? expr)
