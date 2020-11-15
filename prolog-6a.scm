@@ -65,7 +65,7 @@
 	(append_to_result next_result))
       (back6 l g r e n c whole-db))
     ((eq? '! (car g))
-      (clear_r c)
+     (clear_r c)
       (prove6 c (cdr g) r e n c whole-db))
     ((eq? 'r! (car g))
       (prove6 l (cddr g) r e n (cadr g) whole-db))
@@ -99,6 +99,11 @@
        (string? (car x))
        (string=? "?" (car x))))
 
+(define (foreign-call? x)
+  (and (pair? x)
+       (string? (car x))
+       (string=? "@" (car x))))
+
 ;; manually rewritten named let
 (define (lookup_loop e id tm)
     (cond ((not (pair? (caar e)))
@@ -116,12 +121,16 @@
 ;;; end rewrite
 
 (define (value x e)
-  (if (var? x)
-      (let ((v (lookup x e)))
-        (if v
-            (value (cadr v) e)
-            x))
-      x))
+  (if (foreign-call? x)
+      (let ((fname (cadr x))
+	    (args (map (lambda (a) (resolve a e)) (cddr x))))
+	  (value (foreign-apply fname args) e))
+      (if (var? x)
+	  (let ((v (lookup x e)))
+            (if v
+		(value (cadr v) e)
+		x))
+	  x)))
 
 (define (copy x n)
   (cond
@@ -241,7 +250,7 @@
 (define goals '((some ("?" X))
                 (some ("?" Y))
 		(neq ("?" X) ("?" Y))
-                (eq ("?" Y) ("#" "unity" 20))))
+                (eq ("?" Y) ("@" "unity" 20))))
 
 ; 9-slide PROVE
 (clear_result)
