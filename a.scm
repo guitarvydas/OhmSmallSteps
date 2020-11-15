@@ -228,15 +228,16 @@
 
 (define (rewrite expr)
   (cond ((pair? expr)
-	 (cons (rewrite (car expr) (rewrite (cdr exp)))))
+	 (cons (rewrite (car expr))
+	       (rewrite (cdr expr))))
 	(else expr)))
 
 ; 9-slide PROVE
 (clear_result)
+(newline)  
+(newline)  
 (let ((g (rewrite goals)))
   (prove6 '() g db empty 1 '() db)
-  (newline)  
-  (newline)  
   (display_result)
   (newline)  
   (newline))
