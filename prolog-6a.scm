@@ -223,6 +223,9 @@
 
 ;; end manually rewritten version w/o named let
 
+(define (foreign-apply name args)
+  (cond ((string=? name "unity")
+	 (car args))))
 
 ;; Negation as failure
 
