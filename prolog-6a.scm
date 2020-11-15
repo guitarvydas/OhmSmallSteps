@@ -221,7 +221,9 @@
   '(    ((eq ("?" X) ("?" X)))
    ))
 
-(define goals '((eq ("?" X) 20)))
+(define goals1 '((eq ("?" X) 20)))
+(define goals2 '((eq 20 ("?" X))))
+(define goals goals2)
 
 ; 9-slide PROVE
 (clear_result)
