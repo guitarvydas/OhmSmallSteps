@@ -229,8 +229,7 @@
 
     ((neq ("?" X) ("?" Y)))))
 
-(define goals '((eq ("?" X) 20)
-		(eq ("?" X) 20)))
+(define goals '((eq ("?" X) 20)))
 
 ; 9-slide PROVE
 (clear_result)
