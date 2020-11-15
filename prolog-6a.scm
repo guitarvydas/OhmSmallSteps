@@ -218,16 +218,8 @@
 ;; Negation as failure
 
 (define db
-  '(((some foo))
-    ((some bar))
-    ((some baz))
-
-    ((eq ("?" X) ("?" X)))
-
-    ((neq ("?" X) ("?" Y))
-     (eq ("?" X) ("?" Y)) ! fail)
-
-    ((neq ("?" X) ("?" Y)))))
+  '(    ((eq ("?" X) ("?" X)))
+   ))
 
 (define goals '((eq ("?" X) 20)))
 
