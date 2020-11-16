@@ -256,23 +256,13 @@
 	  
 	  (else (error "call-foreign called with unknown operator" func)))))
 
-(define (rewrite expr bindings)
-  (cond ((pair? expr)
-	 (cond ((foreign? expr)
-		(call-foreign expr bindings))
-	       (else 
-		(cons (rewrite (car expr) bindings)
-		      (rewrite (cdr expr) bindings)))))
-	(else expr)))
-
 ; 9-slide PROVE
 (clear_result)
 (newline)  
 (newline)  
-(let ((g goals))
-  (prove6 '() g db empty 1 '() db)
-  (display_result)
-  (newline)  
-  (newline))
+(prove6 '() goals db empty 1 '() db)
+(display_result)
+(newline)  
+(newline)
 
 ;; end prolog-6a.scm
