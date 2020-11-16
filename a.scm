@@ -50,15 +50,17 @@
 	      whole-db))))
 
 
+;; g == goals
+;; r == rules (factbase)
 (define (prove6 l g r e n c whole-db)
-  (newline) (display "prove6") (newline)
-  (display "l = ") (display l) (newline)
-  (display "g = ") (display g) (newline)
-  (display "r = ") (display r) (newline)
-  (display "e = ") (display e) (newline)
-  (display "n = ") (display n) (newline)
-  (display "c = ") (display c) (newline)
-  (display "w = ") (display whole-db) (newline)
+;  (newline) (display "prove6") (newline)
+;  (display "l = ") (display l) (newline)
+;  (display "g = ") (display g) (newline)
+;  (display "r = ") (display r) (newline)
+;  (display "e = ") (display e) (newline)
+;  (display "n = ") (display n) (newline)
+;  (display "c = ") (display c) (newline)
+;  (display "w = ") (display whole-db) (newline)
   (cond
     ((null? g)
       (let ((next_result (print-frame e)))
@@ -77,7 +79,7 @@
       (let ((a  (copy (car r) n)))
         (let ((e* (unify (car a) (car g) e)))
           (if e*
-              (top-level-prove6 (link l g r e n c)
+              (prove6 (link l g r e n c)
                       (AppendInefficient3 (cdr a) `(r! ,l) (cdr g))
                       whole-db
                       e*
@@ -86,10 +88,6 @@
 		      whole-db)
               (back6 l g r e n c whole-db))))
       )))
-
-(define (top-level-prove6 l g r e n c whole-db)
-  (prove6 l g r e n c whole-db))
-
 
 (define empty '((bottom)))
 
@@ -119,12 +117,14 @@
 ;;; end rewrite
 
 (define (value x e)
-  (if (var? x)
-      (let ((v (lookup x e)))
-        (if v
-            (value (cadr v) e)
-            x))
-      x))
+  (cond ((foreign? x)
+	 (call-foreign x e))
+	((var? x)
+	 (let ((v (lookup x e)))
+           (if v
+               (value (cadr v) e)
+               x)))
+	(else x)))
 
 (define (copy x n)
   (cond
@@ -137,9 +137,6 @@
 (define (bind x y e)
   (cons (list x y) e))
 
-; (define (unify x y e)
-;   (let ((x (value x e))
-;         (y (value y e)))
 (define (unify x1 y1 e)
   (let ((x (value x1 e))
         (y (value y1 e)))
@@ -165,19 +162,6 @@
           (cons
             (resolve (car x) e)
             (resolve (cdr x) e)))))
-
-;; (define (print-frame e)
-;;   (newline)
-;;   (let loop ((ee e))
-;;     (cond ((pair? (cdr ee))
-;;             (cond ((null? (time (caar ee)))
-;;                     (display (cadaar ee))
-;;                     (display " = ")
-;;                     (display (resolve (caar ee) e))
-;;                     (newline)))
-;;             (loop (cdr ee))))))
-
-;; manually rewritten version w/o named let
 
 (define (has_bindings_Q_ ee)
   (pair? (cdr ee)))
@@ -215,10 +199,6 @@
   (let ((final_result (print_frame_helper e e '())))
     final_result))
 
-;; end manually rewritten version w/o named let
-
-
-;; Negation as failure
 
 (define db
   '(
@@ -240,7 +220,7 @@
 
 (define goals9 '((some ("?" X))
 		 (some ("?" Y))
-		 (eq ("?" X) ("@" "add" ("?" X) ("?" Y)))))
+		 (eq ("?" Z) ("@" "add" ("?" X) ("?" Y)))))
 
 (define goals goals9)
 
@@ -258,12 +238,10 @@
 
 	  ((string=? "add" func)
 	   (let ((resolved-args (map (lambda (a) (value a bindings)) args)))
-	     (display bindings)
-	     (newline)
-	     (display args)
-	     (newline)
-	     (display resolved-args)
-	     (newline)
+	     ; (display "add bindings ") (display bindings) (newline)
+	     ; (display "add args ") (display args) (newline)
+	     ; (display "add resolved-args ") (display resolved-args) (newline)
+	     ; (newline)
 	     (+ (car resolved-args) (cadr resolved-args))))
 	  
 	  (else (error "call-foreign called with unknown operator" func)))))
@@ -283,7 +261,7 @@
 (newline)  
 (let ((g goals))
   (display g) (newline)
-  (top-level-prove6 '() g db empty 1 '() db)
+  (prove6 '() g db empty 1 '() db)
   (display_result)
   (newline)  
   (newline))
