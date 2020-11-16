@@ -273,8 +273,7 @@
 
 	  ((string=? "display" func)
 	   (let ((a (value (car args) bindings)))
-	     (display "display: ") (display a) (newline))
-	   #t)
+	     (display "display: ") (display a) (newline)))
 	  
 	  ((string=? "newline" func)
 	   (newline))
