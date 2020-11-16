@@ -53,14 +53,17 @@
 ;; g == goals
 ;; r == rules (factbase)
 (define (prove6 l g r e n c whole-db)
-;  (newline) (display "prove6") (newline)
-;  (display "l = ") (display l) (newline)
-;  (display "g = ") (display g) (newline)
-;  (display "r = ") (display r) (newline)
-;  (display "e = ") (display e) (newline)
-;  (display "n = ") (display n) (newline)
-;  (display "c = ") (display c) (newline)
-;  (display "w = ") (display whole-db) (newline)
+  
+;;   (newline) (display "prove6") (newline)
+;; ;  (display "l = ") (display l) (newline)
+;;   (display "g = ") (display g) (newline)
+;;   (display "r = ") (display r) (newline)
+;;   (display "e = ") (display e) (newline)
+;; ;  (display "n = ") (display n) (newline)
+;; ;  (display "c = ") (display c) (newline)
+;; ;  (display "w = ") (display whole-db) (newline)
+;;   (newline)
+  
   (cond
     ((null? g)
       (let ((next_result (print-frame e)))
@@ -75,6 +78,12 @@
       (if (null? l)
           #t
           (back6 l g r e n c whole-db)))
+    ((foreign? (car g))
+     (call-foreign (car g) e)
+     (prove6 l (cdr g) r e n c whole-db))
+    ((foreign? (car r))
+     (call-foreign (car r) e)
+     (prove6 l g (cdr r) e n c whole-db))
     (else
       (let ((a  (copy (car r) n)))
         (let ((e* (unify (car a) (car g) e)))
@@ -202,10 +211,14 @@
 
 (define db
   '(
+    ((some 0))
     ((some 10))
     ((some 20))
     ((some 30))
     ((eq ("?" X) ("?" X)))
+    ((neq (? X) (? Y))
+     (eq (? X) (? Y)) ! fail)
+    ((neq (? X) (? Y)))
    ))
 
 (define goals1 '((eq ("?" X) 20)))
@@ -222,7 +235,21 @@
 		 (some ("?" Y))
 		 (eq ("?" Z) ("@" "add" ("?" X) ("?" Y)))))
 
-(define goals goals9)
+(define goals10 '((some ("?" X))
+		  (some ("?" Y))
+		  ("@" "display" 100)
+		  ;(neq ("?" X) ("?" Y))
+		  (eq ("?" X) ("@" "add" ("?" X) ("?" Y)))))
+
+(define goals11 '((some ("?" X))
+		  (some ("?" Y))
+		  ("@" "display" 9)
+		  ;("@" "display" ("?" Y))
+		  ;("@" "newine")
+		  ;(neq ("?" X) ("?" Y))
+		  (eq ("?" X) ("@" "add" ("?" X) ("?" Y)))))
+
+(define goals goals11)
 
 (define (foreign? expr)
   (and (pair? expr)
@@ -243,6 +270,14 @@
 	     ; (display "add resolved-args ") (display resolved-args) (newline)
 	     ; (newline)
 	     (+ (car resolved-args) (cadr resolved-args))))
+
+	  ((string=? "display" func)
+	   (let ((a (value (car args) bindings)))
+	     (display "display: ") (display a) (newline))
+	   #t)
+	  
+	  ((string=? "newline" func)
+	   (newline))
 	  
 	  (else (error "call-foreign called with unknown operator" func)))))
 
@@ -260,7 +295,6 @@
 (newline)  
 (newline)  
 (let ((g goals))
-  (display g) (newline)
   (prove6 '() g db empty 1 '() db)
   (display_result)
   (newline)  
